@@ -1,11 +1,11 @@
 <div class="content-wrapper">
 
 	<section class="content-header">
-		<h1>Penambahan Pemudik Covid-19</h1>
+		<h1><?=$title_header?></h1>
 		<ol class="breadcrumb">
 			<li><a href="<?= site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
-			<li><a href="<?= site_url('covid19')?>"> Daftar Pemudik Saat Covid-19</a></li>
-			<li class="active">Penambahan Pemudik Covid-19</li>
+			<li><a href="<?= site_url($url_button_back)?>"> <?=$title_breadcumb?> </a></li>
+			<li class="active"><?=$title_header?></li>
 		</ol>
 	</section>
 
@@ -15,7 +15,7 @@
 				<div class="box box-info">
 					<div class="box-header with-border">
 						<div class="col-md-12">
-							<a href="<?= site_url('covid19')?>" class="btn btn-social btn-flat btn-primary btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Daftar Pemudik Saat Covid-19"><i class="fa fa-arrow-circle-o-left"></i> Kembali Ke Daftar Pemudik Saat Covid-19</a>
+							<a href="<?= site_url($url_button_back)?>" class="btn btn-social btn-flat btn-primary btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Kembali Ke Daftar Pemudik Saat Covid-19"><i class="fa fa-arrow-circle-o-left"></i> <?=$label_button_back?> </a>
 						</div>
 					</div>
 					<div class="box-body">
@@ -63,7 +63,11 @@
 												<?php include("donjo-app/views/covid19/konfirmasi_pemudik.php"); ?>
 											<?php endif; ?>
 
-											<?php include("donjo-app/views/covid19/form_isian_pemudik.php"); ?>
+											<?php
+											if ($form_type=="pemudik"):
+												include("donjo-app/views/covid19/form_isian_pemudik.php");
+											endif
+											?>
 
 										</form>
 									</div>
