@@ -39,6 +39,8 @@
 													endforeach; ?>
 												</select>
 											</div>
+
+											<?php if ($form_type=="pemudik"): ?>
 											<div class="col-sm-4">
 												<a href="#" class="btn btn-social btn-block btn-success btn-sm" data-toggle="modal" data-target="#add-warga">
 													<i class="fa fa-plus"></i>
@@ -48,11 +50,16 @@
 													<code>Untuk penduduk pendatang/tidak tetap. Masukkan data di sini.</code>
 												</span>
 											</div>
+											<?php endif; ?>
+
 										</div>
 
 									</form>
 									<div id="form-melengkapi-data-peserta">
 										<form id="validasi" action="<?= $form_action?>" method="POST" enctype="multipart/form-data" class="form-horizontal">
+											<?php $val_kategori = ($form_type=="pemudik") ? "2" : "1"; ?>
+											<input type="hidden" name="kategori" value="<?=$val_kategori?>" />
+
 											<div class="form-group">
 												<label  class="col-sm-3 control-label"></label>
 												<div class="col-sm-8">
@@ -63,11 +70,7 @@
 												<?php include("donjo-app/views/covid19/konfirmasi_pemudik.php"); ?>
 											<?php endif; ?>
 
-											<?php
-											if ($form_type=="pemudik"):
-												include("donjo-app/views/covid19/form_isian_pemudik.php");
-											endif
-											?>
+											<?php include("donjo-app/views/covid19/form_isian_pemudik.php"); ?>
 
 										</form>
 									</div>

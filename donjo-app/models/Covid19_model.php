@@ -117,7 +117,7 @@ class Covid19_model extends CI_Model
 		return $data;
 	}
 
-	private function get_pemudik($id = NULL, $is_wajib_pantau = NULL, $limit = NULL)
+	private function get_pemudik($id = NULL, $is_wajib_pantau = NULL, $kategori = NULL, $limit = NULL)
 	{
 		$this->db->select('s.*, o.nik as terdata_id, o.nama, o.tempatlahir, o.tanggallahir, o.sex, w.rt, w.rw, w.dusun');
 		$this->db->select("(select (date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0) AS `(date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0)`
@@ -130,6 +130,9 @@ class Covid19_model extends CI_Model
 
 		if (isset($id))
 			$this->db->where('s.id', $id);
+
+		if (isset($kategori))
+			$this->db->where('s.kategori', $kategori);
 
 		if ($is_pantau_covid_page)
 			$this->db->where('s.is_wajib_pantau', '1');
@@ -152,7 +155,7 @@ class Covid19_model extends CI_Model
 		return $data;
 	}
 
-	public function get_list_pemudik($page)
+	public function get_list_pemudik($page, $kategori = NULL)
 	{
 		$retval = array();
 
@@ -164,7 +167,11 @@ class Covid19_model extends CI_Model
 
 			$cfg['page'] = $page;
 			$cfg['per_page'] = $this->session->userdata('per_page');
-			$cfg['num_rows'] = $this->get_pemudik()->num_rows();
+
+			if (isset($kategori))
+				$cfg['num_rows'] = $this->get_pemudik(NULL, NULL, $kategori)->num_rows();
+			else
+				$cfg['num_rows'] = $this->get_pemudik()->num_rows();
 
 			$this->paging->init($cfg);
 			$retval["paging"] = $this->paging;
@@ -179,7 +186,11 @@ class Covid19_model extends CI_Model
 			$limit["offset"] = $retval["paging"]->offset;
 		}
 
-		$query = $this->get_pemudik(NULL, NULL, NULL, $limit);
+		if (isset($kategori))
+			$query = $this->get_pemudik(NULL, NULL, $kategori, $limit);
+		else
+			$query = $this->get_pemudik(NULL, NULL, NULL, $limit);
+
 		if ($query->num_rows() > 0)
 		{
 			$data = $query->result_array();
@@ -201,7 +212,7 @@ class Covid19_model extends CI_Model
 
 	public function get_list_pemudik_wajib_pantau($is_wajib_pantau = NULL)
 	{
-		return $this->get_pemudik(NULL, $is_wajib_pantau, NULL)->result_array();
+		return $this->get_pemudik(NULL, $is_wajib_pantau)->result_array();
 	}
 
 	public function add_pemudik($post)
@@ -225,7 +236,8 @@ class Covid19_model extends CI_Model
 			'status_covid' => $post['status_covid'],
 			'is_wajib_pantau' => $post['wajib_pantau'],
 			'keluhan_kesehatan' => alfanumerik_spasi($post['keluhan']),
-			'keterangan' => alfanumerik_spasi($post['keterangan'])
+			'keterangan' => alfanumerik_spasi($post['keterangan']),
+			'kategori' => $post['kategori'],
 		);
 		return $data;
 	}

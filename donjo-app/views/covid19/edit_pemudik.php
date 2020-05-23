@@ -26,6 +26,8 @@
 			<div class="box box-danger">
 				<div class="box-body">
 					<form id="validasi" action="<?= $form_action?>" method="POST" enctype="multipart/form-data" class="form-horizontal">
+						<?php $val_kategori = ($form_type=="pemudik") ? "2" : "1"; ?>
+						<input type="hidden" name="kategori" value="<?=$val_kategori?>" />
 						<?php include("donjo-app/views/covid19/form_isian_pemudik.php"); ?>
 					</form>
 				</div>

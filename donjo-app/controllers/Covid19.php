@@ -30,7 +30,7 @@ class Covid19 extends Admin_Controller {
 		else
 			$this->session->set_userdata('per_page', 10);
 
-		$data = $this->covid19_model->get_list_pemudik($page);
+		$data = $this->covid19_model->get_list_pemudik($page, "2");
 		$data['per_page'] = $this->session->userdata('per_page');
 
 		$data['title_header'] = "Daftar Pemudik Saat Pandemi Covid-19";
@@ -54,7 +54,7 @@ class Covid19 extends Admin_Controller {
 		else
 			$this->session->set_userdata('per_page', 10);
 
-		$data = $this->covid19_model->get_list_pemudik($page);
+		$data = $this->covid19_model->get_list_pemudik($page, "1");
 		$data['per_page'] = $this->session->userdata('per_page');
 
 		$data['title_header'] = "Daftar Penduduk Terdata Pandemi Covid-19";
@@ -139,21 +139,34 @@ class Covid19 extends Admin_Controller {
 	public function add_pemudik()
 	{
 		$this->covid19_model->add_pemudik($_POST);
-		redirect("covid19");
+
+		if ($_POST["kategori"] == "1")
+			redirect("covid19/penduduk");
+		else if ($_POST["kategori"] == "2")
+			redirect("covid19/pemudik");
+		else
+			redirect("covid19");
 	}
 
-	public function hapus_pemudik($id_pemudik)
+	public function hapus_pemudik($form_type = "pemudik", $id_pemudik)
 	{
 		$this->redirect_hak_akses('h', "covid19");
 		$this->covid19_model->delete_pemudik_by_id($id_pemudik);
-		redirect("covid19");
+
+		if ($form_type == "penduduk")
+			redirect("covid19/penduduk");
+		else if ($form_type == "pemudik")
+			redirect("covid19/pemudik");
+		else
+			redirect("covid19");
 	}
 
-	public function edit_pemudik_form($id = 0)
+	public function edit_pemudik_form($form_type = "pemudik", $id = 0)
 	{
 		$data = $this->covid19_model->get_pemudik_by_id($id);
 		$data['select_tujuan_mudik'] = $this->covid19_model->list_tujuan_mudik();
 		$data['select_status_covid'] = $this->covid19_model->list_status_covid();
+		$data['form_type'] = $form_type;
 
 		$data['form_action'] = site_url("covid19/edit_pemudik/$id");
 		$this->load->view('covid19/edit_pemudik', $data);
@@ -162,7 +175,13 @@ class Covid19 extends Admin_Controller {
 	public function edit_pemudik($id)
 	{
 		$this->covid19_model->update_pemudik_by_id($_POST, $id);
-		redirect("covid19");
+
+		if ($_POST["kategori"] == "1")
+			redirect("covid19/penduduk");
+		else if ($_POST["kategori"] == "2")
+			redirect("covid19/pemudik");
+		else
+			redirect("covid19");
 	}
 
 	public function detil_pemudik($id)

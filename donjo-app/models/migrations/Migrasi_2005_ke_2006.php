@@ -39,6 +39,18 @@ class Migrasi_2005_ke_2006 extends CI_model {
 				'null' => TRUE,
 				),
 			));
+
+		// Tambah field kategori pemudik/warga
+  	if (!$this->db->field_exists('kategori', 'covid19_pemudik'))
+  	{
+			$this->dbforge->add_column('covid19_pemudik', array(
+				'kategori' => array(
+					'type' => 'VARCHAR',
+					'constraint' => 20,
+					'null' => TRUE,
+				),
+			));
+  	}
 	}
 
 	private function grup_akses_covid19()
