@@ -1,4 +1,6 @@
 <form id="form_penduduk" action="<?= $form_action_penduduk ?>" method="POST">
+	<input name="callback_url" type="hidden" value="covid19/form_pemudik/<?=$form_type?>" >
+
 	<div class="col-sm-6">
 		<div class="form-group">
 			<label for="nik">NIK</label>
@@ -69,15 +71,26 @@
 		</div>
 	</div>
 
+	<?php if ($form_type=="pemudik"): ?>
+	<?php endif; ?>
+
 	<div class="col-sm-6">
 		<div class="form-group">
 			<label for="status">Status Penduduk </label>
 			<select class="form-control input-sm required" name="status">
-				<?php foreach ($status_penduduk as $data): ?>
-					<?php if ($data['id'] != '1'): ?>
-						<option <?php selected($penduduk['id_status'], $data['id']); ?> value="<?= $data['id']?>"> <?= strtoupper($data['nama'])?> </option>
-					<?php endif;?>
-				<?php endforeach;?>
+				<?php if ($form_type=="pemudik"): ?>
+					<?php foreach ($status_penduduk as $data): ?>
+						<?php if ($data['id'] != '1'): ?>
+							<option <?php selected($penduduk['id_status'], $data['id']); ?> value="<?= $data['id']?>"> <?= strtoupper($data['nama'])?> </option>
+						<?php endif;?>
+					<?php endforeach;?>
+				<?php elseif ($form_type=="penduduk"): ?>
+					<?php foreach ($status_penduduk as $data): ?>
+						<?php if ($data['id'] == '1'): ?>
+							<option <?php selected($penduduk['id_status'], $data['id']); ?> value="<?= $data['id']?>"> <?= strtoupper($data['nama'])?> </option>
+						<?php endif;?>
+					<?php endforeach;?>
+				<?php endif; ?>
 			</select>
 		</div>
 	</div>

@@ -133,7 +133,7 @@ class Covid19 extends Admin_Controller {
 		$id = $this->penduduk_model->insert();
 		if ($_SESSION['success'] == -1)
 			$_SESSION['dari_internal'] = true;
-		redirect("covid19/form_pemudik");
+		redirect($callback_url);
 	}
 
 	public function add_pemudik()

@@ -40,17 +40,23 @@
 												</select>
 											</div>
 
-											<?php if ($form_type=="pemudik"): ?>
 											<div class="col-sm-4">
 												<a href="#" class="btn btn-social btn-block btn-success btn-sm" data-toggle="modal" data-target="#add-warga">
 													<i class="fa fa-plus"></i>
-													Tambah Penduduk Non Domisili
+													<?php if ($form_type=="pemudik"): ?>
+														Tambah Penduduk Non Domisili
+													<?php elseif ($form_type=="penduduk"): ?>
+														Tambah Penduduk
+													<?php endif; ?>
 												</a>
 												<span id="data_h_plus_msg" class="help-block">
-													<code>Untuk penduduk pendatang/tidak tetap. Masukkan data di sini.</code>
+													<?php if ($form_type=="pemudik"): ?>
+														<code>Untuk penduduk pendatang/tidak tetap. Masukkan data di sini.</code>
+													<?php elseif ($form_type=="penduduk"): ?>
+														<code>Jika belum masuk dalam daftar penduduk. Masukkan data di sini.</code>
+													<?php endif; ?>
 												</span>
 											</div>
-											<?php endif; ?>
 
 										</div>
 
@@ -96,7 +102,13 @@
 		<div class='modal-content'>
 			<div class='modal-header'>
 				<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
-				<h4 class='modal-title' id='myModalLabel'><i class='fa fa-plus text-green'></i> Tambah Penduduk Pendatang / Tidak Tetap</h4>
+				<h4 class='modal-title' id='myModalLabel'><i class='fa fa-plus text-green'></i>
+					<?php if ($form_type=="pemudik"): ?>
+						Tambah Penduduk Pendatang / Tidak Tetap
+					<?php elseif ($form_type=="penduduk"): ?>
+						Tambah Penduduk
+					<?php endif; ?>
+				</h4>
 			</div>
 			<div class='modal-body'>
 				<div class="row">
@@ -112,4 +124,3 @@
 		</div>
 	</div>
 </div>
-
