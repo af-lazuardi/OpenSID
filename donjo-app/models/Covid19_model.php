@@ -233,6 +233,7 @@ class Covid19_model extends CI_Model
 			'tujuan_mudik' => $tujuan_mudik[$post['tujuan_pemudik']],
 			'no_hp' => bilangan_spasi($post['hp_pemudik']),
 			'email' => strip_tags($post['email_pemudik']),
+			'nama_alias' => alfanumerik_spasi($post['nama_alias']),
 			'status_covid' => $post['status_covid'],
 			'is_wajib_pantau' => $post['wajib_pantau'],
 			'keluhan_kesehatan' => alfanumerik_spasi($post['keluhan']),

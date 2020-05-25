@@ -21,6 +21,7 @@
 												<th>Aksi</th>
 												<th>NIK</th>
 												<th>Nama</th>
+												<th>Alias</th>
 												<th>Usia</th>
 												<th>JK</th>
 												<th>Alamat</th>
@@ -49,6 +50,7 @@
 												</td>
 												<td><?= $item["terdata_nama"] ?></td>
 												<td nowrap><a href="<?= site_url('covid19/detil_pemudik/'.$item["id"])?>" title="Data terdata"><?= $item['terdata_info'];?></a></td>
+												<td><?= $item["nama_alias"] ?></td>
 												<td><?= $item["umur"] ?></td>
 												<?php
 												$jk = (strtoupper($item['sex']) === "PEREMPUAN") ? "Pr" : "Lk";

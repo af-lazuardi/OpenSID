@@ -65,6 +65,13 @@
 <?php endif; ?>
 
 <div class="form-group">
+	<label  class="col-sm-3 control-label" for="nama_alias">Nama Alias</label>
+	<div class="col-sm-8">
+		<input class="form-control input-sm" type="text" name="nama_alias" id="nama_alias" value="<?= $nama_alias?>" placeholder="Masukkan nama alias (nama sebutan) terdata Covid-19">
+	 </div>
+</div>
+
+<div class="form-group">
 	<label  class="col-sm-3 control-label" for="status_covid">Status Covid-19</label>
 	<div class="col-sm-8">
 		<select class="form-control input-sm required" name="status_covid" id="status_covid">

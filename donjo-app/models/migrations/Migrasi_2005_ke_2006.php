@@ -52,6 +52,18 @@ class Migrasi_2005_ke_2006 extends CI_model {
 			));
   	}
 
+  	// Tambah field nama alias warga terdata/pemudik
+  	if (!$this->db->field_exists('nama_alias', 'covid19_pemudik'))
+  	{
+			$this->dbforge->add_column('covid19_pemudik', array(
+				'nama_alias' => array(
+					'type' => 'VARCHAR',
+					'constraint' => 255,
+					'null' => TRUE,
+				),
+			));
+  	}
+
 		//tambah kolom kantor_desa di tabel config
 		if (!$this->db->field_exists('kantor_desa', 'config'))
 			$this->dbforge->add_column('config', array(
