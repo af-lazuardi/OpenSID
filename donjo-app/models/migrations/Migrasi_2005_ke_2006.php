@@ -64,6 +64,19 @@ class Migrasi_2005_ke_2006 extends CI_model {
 			));
   	}
 
+  	// Tambah data ref_status_covid
+  	$data[] = array(
+			'id'=>'7',
+			'nama' => 'IM');
+		foreach ($data as $status)
+		{
+			$sql = $this->db->insert_string('ref_status_covid', $status);
+			$sql .= " ON DUPLICATE KEY UPDATE
+			id = VALUES(id),
+			nama = VALUES(nama)";
+			$this->db->query($sql);
+		}
+
 		//tambah kolom kantor_desa di tabel config
 		if (!$this->db->field_exists('kantor_desa', 'config'))
 			$this->dbforge->add_column('config', array(

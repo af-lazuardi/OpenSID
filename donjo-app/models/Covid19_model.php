@@ -13,6 +13,7 @@ define("STATUS_COVID", serialize(array(
 	"Orang Tanpa Gejala (OTG)" => "OTG",
 	"Positif Covid-19" => "POSITIF",
 	"Dll" => "DLL",
+	"Isolasi Mandiri (IM)" => "IM",
 )));
 
 $h_plus_array = array();
