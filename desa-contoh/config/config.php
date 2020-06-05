@@ -31,6 +31,8 @@
 	$config['covid_desa'] = 1; // Tampilkan status Covid-19 dari data OpenSID desa
 	$config['covid_rss'] = 1; // Tampilkan rss feed https://www.covid19.go.id/feed/ di halaman muka
 
+	$confit['user_b'] = 1;
+
 /*
 	Setting untuk tampilkan grafik APBDes di Footer Halaman Muka atau Semua Halaman web. Untuk menyembunyikan ganti menjadi nilai 0;
 */
