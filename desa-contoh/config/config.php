@@ -32,8 +32,7 @@
 	$config['covid_rss'] = 1; // Tampilkan rss feed https://www.covid19.go.id/feed/ di halaman muka
 
 	$config['user_b'] = 1;
-	$confit['conflict_test'] = 1;
-
+	$config['ini_perubahan_line_sama'] = 1;
 /*
 	Setting untuk tampilkan grafik APBDes di Footer Halaman Muka atau Semua Halaman web. Untuk menyembunyikan ganti menjadi nilai 0;
 */
