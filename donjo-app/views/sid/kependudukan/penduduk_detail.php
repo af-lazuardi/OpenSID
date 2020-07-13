@@ -23,7 +23,7 @@
 							<?php if ($penduduk['status_dasar_id']==1): ?>
 								<a href="<?= site_url("penduduk/form/$p/$o/$penduduk[id]")?>" class="btn btn-social btn-flat btn-warning btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Ubah Biodata" ><i class="fa fa-edit"></i> Ubah Biodata</a>
 							<?php endif; ?>
-              <a href="<?= site_url("penduduk/cetak_biodata/$penduduk[id]")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Biodata" target="_blank"><i class="fa fa-print"></i>Cetak Biodata</a>
+              <a href="<?= site_url("penduduk/cetak_biodata/$penduduk[nik]")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Biodata" target="_blank"><i class="fa fa-print"></i>Cetak Biodata</a>
 							<a href="<?= site_url("penduduk/clear")?>" class="btn btn-social btn-flat btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"  title="Kembali Ke Daftar Penduduk">
 								<i class="fa fa-arrow-circle-left"></i>Kembali Ke Daftar Penduduk
 							</a>
@@ -40,11 +40,9 @@
 										<table class="table table-bordered table-striped table-hover" >
 											<tr>
 												<td colspan="3">
-													<?php if ($penduduk['foto']): ?>
-														 <img class="profile-user-img img-responsive img-circle" src="<?= AmbilFoto($penduduk['foto'])?>" alt="Foto">
-													<?php else: ?>
-														<img class="profile-user-img img-responsive img-circle" src="<?= base_url()?>assets/files/user_pict/kuser.png" alt="Foto">
-  												<?php endif; ?>
+													
+													<img class="profile-user-img img-responsive img-circle" src="data:image/png;base64, <?=$photo[content]?>" width="25%">
+								
 												</td>
 											</tr>
 										</table>
@@ -89,10 +87,10 @@
 													<td>Nomor KK Sebelumnya</td><td >:</td><td><?= $penduduk['no_kk_sebelumnya']?></td>
 												</tr>
 												<tr>
-													<td>Hubungan Dalam Keluarga</td><td >:</td><td><?= $penduduk['hubungan']?></td>
+													<td>Hubungan Dalam Keluarga</td><td >:</td><td><?= $penduduk['stat_hbkel']?></td>
 												</tr>
 												<tr>
-													<td>Jenis Kelamin</td><td >:</td><td><?= strtoupper($penduduk['sex'])?></td>
+													<td>Jenis Kelamin</td><td >:</td><td><?= strtoupper($penduduk['jenis_klmin'])?></td>
 												</tr>
 												<tr>
 													<td>Agama</td><td >:</td><td><?= strtoupper($penduduk['agama'])?></td>
@@ -182,7 +180,7 @@
 													<td>Dusun</td><td >:</td><td><?= strtoupper(ununderscore($penduduk['dusun']))?></td>
 												</tr>
 												<tr>
-													<td>RT/ RW</td><td >:</td><td><?= strtoupper($penduduk['rt'])?> / <?= $penduduk['rw']?></td>
+													<td>RT/ RW</td><td >:</td><td><?= strtoupper($penduduk['no_rt'])?> / <?= $penduduk['no_rw']?></td>
 												</tr>
 												<tr>
 													<td>Alamat Sebelumnya</td><td >:</td><td><?= strtoupper($penduduk['alamat_sebelumnya'])?></td>
@@ -194,19 +192,19 @@
 													<th colspan="3" class="subtitle_head"><strong>STATUS KAWIN</strong></th>
 												</tr>
 												<tr>
-													<td>Status Kawin</td><td >:</td><td><?= strtoupper($penduduk['kawin'])?></td>
+													<td>Status Kawin</td><td >:</td><td><?= strtoupper($penduduk['stat_kwn'])?></td>
 												</tr>
 												<tr>
-													<td>Akta perkawinan</td><td >:</td><td><?= strtoupper($penduduk['akta_perkawinan'])?></td>
+													<td>Akta perkawinan</td><td >:</td><td><?= strtoupper($penduduk['no_akta_kwn'])?></td>
 												</tr>
 												<tr>
-													<td>Tanggal perkawinan</td><td >:</td><td><?= strtoupper($penduduk['tanggalperkawinan'])?></td>
+													<td>Tanggal perkawinan</td><td >:</td><td><?= strtoupper($penduduk['tgl_kwn'])?></td>
 												</tr>
 												<tr>
-													<td>Akta perceraian</td><td >:</td><td><?= strtoupper($penduduk['akta_perceraian'])?></td>
+													<td>Akta perceraian</td><td >:</td><td><?= strtoupper($penduduk['no_akta_cerai'])?></td>
 												</tr>
 												<tr>
-													<td>Tanggal perceraian</td><td >:</td><td><?= strtoupper($penduduk['tanggalperceraian'])?></td>
+													<td>Tanggal perceraian</td><td >:</td><td><?= strtoupper($penduduk['tgl_cerai'])?></td>
 												</tr>
 												<tr>
 													<th colspan="3" class="subtitle_head"><strong>DATA KESEHATAN</strong></th>

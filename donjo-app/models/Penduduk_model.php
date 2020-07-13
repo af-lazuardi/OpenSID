@@ -268,31 +268,16 @@
 	private function list_data_sql()
 	{
 		$sql = "
-		FROM tweb_penduduk u
-		LEFT JOIN tweb_keluarga d ON u.id_kk = d.id
-		LEFT JOIN tweb_rtm b ON u.id_rtm = b.id
-		LEFT JOIN tweb_wil_clusterdesa a ON d.id_cluster = a.id
-		LEFT JOIN tweb_penduduk_pendidikan_kk n ON u.pendidikan_kk_id = n.id
-		LEFT JOIN tweb_penduduk_pendidikan sd ON u.pendidikan_sedang_id = sd.id
-		LEFT JOIN tweb_penduduk_pekerjaan p ON u.pekerjaan_id = p.id
-		LEFT JOIN tweb_penduduk_kawin k ON u.status_kawin = k.id
-		LEFT JOIN tweb_penduduk_sex x ON u.sex = x.id
-		LEFT JOIN tweb_penduduk_agama g ON u.agama_id = g.id
-		LEFT JOIN tweb_penduduk_warganegara v ON u.warganegara_id = v.id
-		LEFT JOIN tweb_golongan_darah m ON u.golongan_darah_id = m.id
-		LEFT JOIN tweb_cacat f ON u.cacat_id = f.id
-		LEFT JOIN tweb_penduduk_hubungan hub ON u.kk_level = hub.id
-		LEFT JOIN tweb_sakit_menahun j ON u.sakit_menahun_id = j.id
-		LEFT JOIN log_penduduk log ON u.id = log.id_pend and log.id_detail in (2,3,4)
+		FROM tweb_biodata_penduduk u
 		WHERE 1 ";
 
-		$sql .= $this->search_sql();
-		$sql .= $this->filter_sql();
-		$sql .= $this->status_dasar_sql();
-		$sql .= $this->sex_sql();
-		$sql .= $this->dusun_sql();
-		$sql .= $this->rw_sql();
-		$sql .= $this->rt_sql();
+		//$sql .= $this->search_sql();
+		//$sql .= $this->filter_sql();
+		//$sql .= $this->status_dasar_sql();
+		//$sql .= $this->sex_sql();
+		//$sql .= $this->dusun_sql();
+		//$sql .= $this->rw_sql();
+		//$sql .= $this->rt_sql();
 
 		$kolom_kode = array(
 			array('cacat','cacat_id'),
@@ -332,8 +317,9 @@
 		";
 		//Main Query
 		$list_data_sql = $this->list_data_sql();
-		$sql = $select_sql." ".$list_data_sql;
+		//$sql = $select_sql." ".$list_data_sql;
 
+		$sql = "SELECT * ".$list_data_sql;
 		//Ordering SQL
 		switch ($o)
 		{
@@ -375,7 +361,7 @@
 					";
 				$query = $this->db->query($sql, $data[$i]['id']);
 				$penduduk = $query->row_array();
-				$data[$i]['alamat'] = $penduduk['alamat_sekarang'];
+				//$data[$i]['alamat'] = $penduduk['alamat_sekarang'];
 				$data[$i]['dusun'] = $penduduk['dusun'];
 				$data[$i]['rw'] = $penduduk['rw'];
 				$data[$i]['rt'] = $penduduk['rt'];
@@ -809,62 +795,10 @@
 
 	public function get_penduduk($id=0)
 	{
-		$sql = "SELECT u.sex as id_sex, u.*, a.dusun, a.rw, a.rt, t.nama AS status, o.nama AS pendidikan_sedang, m.nama as golongan_darah, h.nama as hubungan,
-			b.nama AS pendidikan_kk, d.no_kk AS no_kk, d.alamat,
-			(SELECT DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0  FROM tweb_penduduk WHERE id = u.id)
-			 AS umur, x.nama AS sex, w.nama AS warganegara,
-			 p.nama AS pekerjaan, k.nama AS kawin, g.nama AS agama, c.nama as cacat,
-			 kb.nama as cara_kb, sm.nama as sakit_menahun,
-			 sd.nama as status_dasar, u.status_dasar as status_dasar_id,
-			(select tweb_penduduk.nama AS nama from tweb_penduduk where (tweb_penduduk.id = d.nik_kepala)) AS kepala_kk,
-			log.no_kk as log_no_kk
-		 FROM tweb_penduduk u
-			LEFT JOIN tweb_keluarga d ON u.id_kk = d.id
-			LEFT JOIN tweb_wil_clusterdesa a ON d.id_cluster = a.id
-			LEFT JOIN tweb_penduduk_pendidikan o ON u.pendidikan_sedang_id = o.id
-			LEFT JOIN tweb_penduduk_pendidikan_kk b ON u.pendidikan_kk_id = b.id
-			LEFT JOIN tweb_penduduk_warganegara w ON u.warganegara_id = w.id
-			LEFT JOIN tweb_penduduk_status t ON u.status = t.id
-			LEFT JOIN tweb_penduduk_pekerjaan p ON u.pekerjaan_id = p.id
-			LEFT JOIN tweb_penduduk_kawin k ON u.status_kawin = k.id
-			LEFT JOIN tweb_penduduk_sex x ON u.sex = x.id
-			LEFT JOIN tweb_penduduk_agama g ON u.agama_id = g.id
-			LEFT JOIN tweb_golongan_darah m ON u.golongan_darah_id = m.id
-			LEFT JOIN tweb_penduduk_hubungan h on u.kk_level = h.id
-			LEFT JOIN tweb_cacat c ON u.cacat_id = c.id
-			LEFT JOIN tweb_sakit_menahun sm ON u.sakit_menahun_id = sm.id
-			LEFT JOIN tweb_cara_kb kb ON u.cara_kb_id = kb.id
-			LEFT JOIN tweb_status_dasar sd ON u.status_dasar = sd.id
-			LEFT JOIN log_penduduk log ON u.id = log.id_pend
-			WHERE u.id=?";
+		$sql = "SELECT * from tweb_biodata_penduduk where nik=?";
 		$query = $this->db->query($sql, $id);
 		$data = $query->row_array();
-		$data['tanggallahir'] = tgl_indo_out($data['tanggallahir']);
-		$data['tanggal_akhir_paspor'] = tgl_indo_out($data['tanggal_akhir_paspor']);
-		$data['tanggalperkawinan'] = tgl_indo_out($data['tanggalperkawinan']);
-		$data['tanggalperceraian'] = tgl_indo_out($data['tanggalperceraian']);
-		// Penduduk lepas, pakai alamat penduduk
-		if ($data['id_kk'] == 0 OR $data['id_kk'] == '')
-		{
-			$data['alamat'] = $data['alamat_sekarang'];
-			$this->db->where('id', $data['id_cluster']);
-			$query = $this->db->get('tweb_wil_clusterdesa');
-			$cluster = $query->row_array();
-			$data['dusun'] = $cluster['dusun'];
-			$data['rw'] = $cluster['rw'];
-			$data['rt'] = $cluster['rt'];
-		}
-		// Data ektp: cari tulisan untuk kode
-		$wajib_ktp = $this->is_wajib_ktp($data);
-		if ($wajib_ktp !== null)
-			$data['wajib_ktp'] = $wajib_ktp ? 'WAJIB' : 'BELUM';
-		$data['ktp_el'] = strtoupper($this->ktp_el[$data['ktp_el']]);
-		$data['status_rekam'] = strtoupper($this->status_rekam[$data['status_rekam']]);
-		$data['tempat_dilahirkan_nama'] = strtoupper($this->tempat_dilahirkan[$data['tempat_dilahirkan']]);
-		$data['jenis_kelahiran_nama'] = strtoupper($this->jenis_kelahiran[$data['jenis_kelahiran']]);
-		$data['penolong_kelahiran_nama'] = strtoupper($this->penolong_kelahiran[$data['penolong_kelahiran']]);
-		// Tampilkan tanda kutip dalam nama
-		$data['nama'] =  str_replace ( "\"", "&quot;", $data['nama'] ) ;
+		
 
 		return $data;
 	}

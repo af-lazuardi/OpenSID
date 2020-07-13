@@ -3,6 +3,7 @@
 	public function __construct()
 	{
 		parent::__construct();
+		$this->load->model('biodata_model');
 	}
 
 	public function autocomplete()
@@ -42,7 +43,7 @@
 	private function list_data_sql()
 	{
 		$sql = " FROM tweb_wil_clusterdesa u
-			LEFT JOIN tweb_penduduk a ON u.id_kepala = a.id
+			LEFT JOIN tweb_wil_pamong a ON u.id_kepala = a.nik
 			WHERE u.rt = '0' AND u.rw = '0'  ";
 		$sql .= $this->search_sql();
 		return $sql;
@@ -90,6 +91,10 @@
 		$data['dusun'] = underscore($_POST['dusun']);
 		$this->db->insert('tweb_wil_clusterdesa', $data);
 
+		$biodata= $this->biodata_model->get_penduduk($data['id_kepala']);
+		$this->db->insert('tweb_wil_pamong', $biodata);
+
+
 		$rw = $data;
 		$rw['rw'] = "-";
 		$this->db->insert('tweb_wil_clusterdesa', $rw);
@@ -104,7 +109,7 @@
 
 	public function update($id='')
 	{
-		if (empty($_POST['id_kepala']))
+		if (empty($_POST['id_kepala']) || !is_numeric($_POST['id_kepala']))
 			UNSET($_POST['id_kepala']);
 
 		$data = $_POST;
@@ -114,6 +119,19 @@
 		$this->db->where('rw', '0');
 		$this->db->where('rt', '0');
 		$outp1 = $this->db->update('tweb_wil_clusterdesa', $data);
+
+		
+		$biodata= $this->biodata_model->get_penduduk($data['id_kepala']);
+		$log_id = $this->db->select('nik')->from('tweb_wil_pamong')->
+				where('nik', $biodata['nik'])->
+				limit(1)->get()->row()->nik;
+	
+		if($log_id) { 
+			$this->db->where('nik', $log_id);
+			$this->db->update('tweb_wil_pamong',$biodata);
+		} else {
+			$this->db->insert('tweb_wil_pamong', $biodata);
+		}
 
 		// Ubah nama dusun di semua baris rw/rt untuk dusun ini
 		$outp2 = $this->db->where('dusun', $temp['dusun'])->
@@ -142,13 +160,8 @@
 		$temp = $this->cluster_by_id($id);
 		$dusun = $temp['dusun'];
 
-		$sql = "SELECT u.*, a.nama AS nama_ketua, a.nik AS nik_ketua,
-		(SELECT COUNT(rt.id) FROM tweb_wil_clusterdesa rt WHERE dusun = u.dusun AND rw = u.rw AND rw <> '-' AND rt <> '-' AND rt <> '0' ) AS jumlah_rt,
-		(SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = u.rw) AND p.status_dasar=1) AS jumlah_warga,
-		(SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = u.rw) AND p.sex = 1 AND p.status_dasar=1) AS jumlah_warga_l,
-		(SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = u.rw) AND p.sex = 2 AND p.status_dasar=1) AS jumlah_warga_p,
-		(SELECT COUNT(p.id) FROM tweb_keluarga k inner join tweb_penduduk p ON k.nik_kepala=p.id  WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = u.rw) AND p.kk_level = 1 AND p.status_dasar=1) AS jumlah_kk
-		FROM tweb_wil_clusterdesa u LEFT JOIN tweb_penduduk a ON u.id_kepala = a.id WHERE u.rt = '0' AND u.rw <> '0' AND u.dusun = '$dusun'";
+		$sql = "SELECT u.*, a.nama AS nama_ketua, a.nik AS nik_ketua
+		FROM tweb_wil_clusterdesa u LEFT JOIN tweb_wil_pamong a ON u.id_kepala = a.nik WHERE u.rt = '0' AND u.rw <> '0' AND u.dusun = '$dusun'";
 		$query = $this->db->query($sql);
 		$data = $query->result_array();
 
@@ -167,6 +180,15 @@
 		$data['dusun']= $temp['dusun'];
 		$outp = $this->db->insert('tweb_wil_clusterdesa', $data);
 
+		$biodata= $this->biodata_model->get_penduduk($data['id_kepala']);
+
+
+		$cek = $this->db->query("SELECT * FROM tweb_wil_pamong WHERE nik = '".$biodata['nik']."'")->num_rows();
+
+		if ($cek < 1) {
+			$this->db->insert('tweb_wil_pamong', $biodata);
+		}
+
 		$rt = $data;
 		$rt['rt'] = "-";
 		$outp = $this->db->insert('tweb_wil_clusterdesa', $rt);
@@ -177,14 +199,30 @@
 
 	public function update_rw($dusun='', $rw='')
 	{
-		if (empty($_POST['id_kepala']))
-			UNSET($_POST['id_kepala']);
+		if (empty($_POST['id_kepala']) || !is_numeric($_POST['id_kepala']))
+		  UNSET($_POST['id_kepala']);
 
 		$data = $_POST;
+
 		$temp = $this->wilayah_model->cluster_by_id($dusun);
 		$this->db->where('dusun', $temp['dusun']);
 		$this->db->where('rw', $rw);
+        $this->db->where('rt', 0);//rw pasti data rt 0
 		$outp = $this->db->update('tweb_wil_clusterdesa', $data);
+		
+			
+
+		$biodata= $this->biodata_model->get_penduduk($data['id_kepala']);
+		$log_id = $this->db->select('nik')->from('tweb_wil_pamong')->
+				where('nik', $biodata['nik'])->
+				limit(1)->get()->row()->nik;
+	
+		if($log_id) { 
+			$this->db->where('nik', $log_id);
+			$this->db->update('tweb_wil_pamong',$biodata);
+		} else {
+			$this->db->insert('tweb_wil_pamong', $biodata);
+		}
 
 		if ($outp) $_SESSION['success'] = 1;
 		else $_SESSION['success'] = -1;
@@ -206,12 +244,8 @@
 	//Bagian RT
 	public function list_data_rt($dusun='', $rw='')
 	{
-		$sql = "SELECT u.*, a.nama AS nama_ketua, a.nik AS nik_ketua,
-		(SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = '$rw' AND rt = u.rt) AND p.status_dasar=1) AS jumlah_warga,
-		(SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = '$rw' AND rt = u.rt) AND p.sex = 1 AND p.status_dasar=1) AS jumlah_warga_l,(
-		SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = '$rw' AND rt = u.rt) AND p.sex = 2 AND p.status_dasar=1) AS jumlah_warga_p,
-		(SELECT COUNT(p.id) FROM tweb_keluarga k inner join tweb_penduduk p ON k.nik_kepala=p.id  WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = '$rw' AND rt = u.rt) AND p.kk_level = 1) AS jumlah_kk
-		FROM tweb_wil_clusterdesa u LEFT JOIN tweb_penduduk a ON u.id_kepala = a.id WHERE u.rt <> '0' AND u.rw = '$rw' AND u.dusun = '$dusun' AND u.rt <> '-'";
+		$sql = "SELECT u.*, a.nama AS nama_ketua, a.nik AS nik_ketua
+		FROM tweb_wil_clusterdesa u LEFT JOIN tweb_wil_pamong a ON u.id_kepala = a.nik WHERE u.rt <> '0' AND u.rw = '$rw' AND u.dusun = '$dusun' AND u.rt <> '-'";
 
 		$query = $this->db->query($sql);
 		$data=$query->result_array();
@@ -232,18 +266,43 @@
 		$data['rw'] = $rw;
 		$outp = $this->db->insert('tweb_wil_clusterdesa', $data);
 
+		$biodata= $this->biodata_model->get_penduduk($data['id_kepala']);
+
+		$cek = $this->db->query("SELECT * FROM tweb_wil_pamong WHERE nik = '".$biodata['nik']."'")->num_rows();
+
+		if ($cek < 1) {
+			$this->db->insert('tweb_wil_pamong', $biodata);
+		}
+
 		if ($outp) $_SESSION['success'] = 1;
 		else $_SESSION['success'] = -1;
 	}
 
 	public function update_rt($id=0)
 	{
-		if (empty($_POST['id_kepala']))
+		//Untuk mengakali update Nama RT saja tidak dengan kepala, sehingga ambil kepala sebelumnya
+		if (empty($_POST['id_kepala']) || !is_numeric($_POST['id_kepala']))
 			UNSET($_POST['id_kepala']);
 
 		$data = $_POST;
+
 		$this->db->where('id', $id);
 		$outp = $this->db->update('tweb_wil_clusterdesa', $data);
+		
+			
+
+		$biodata= $this->biodata_model->get_penduduk($data['id_kepala']);
+		$log_id = $this->db->select('nik')->from('tweb_wil_pamong')->
+				where('nik', $biodata['nik'])->
+				limit(1)->get()->row()->nik;
+	
+		if($log_id) { 
+			$this->db->where('nik', $log_id);
+			$this->db->update('tweb_wil_pamong',$biodata);
+		} else {
+			$this->db->insert('tweb_wil_pamong', $biodata);
+		}
+		
 
 		if ($outp) $_SESSION['success'] = 1;
 		else $_SESSION['success'] = -1;
@@ -251,7 +310,10 @@
 
 	public function update_dusun_map($dusun='')
 	{
-		$data = $_POST;
+  	if (empty($_POST['id_kepala']) || !is_numeric($_POST['id_kepala']))
+  		UNSET($_POST['id_kepala']);
+
+    $data = $_POST;
 		$this->db->where('id', $dusun);
 		$outp = $this->db->update('tweb_wil_clusterdesa', $data);
 
@@ -268,7 +330,10 @@
 
 	public function update_rw_map($dus=0, $id=0)
 	{
-		$data = $_POST;
+    if (empty($_POST['id_kepala']) || !is_numeric($_POST['id_kepala']))
+      UNSET($_POST['id_kepala']);
+
+    $data = $_POST;
 		$this->db->where('dusun', $dus);
 		$this->db->where('rw', $id);
 		$this->db->where('rt', '0');
@@ -280,7 +345,10 @@
 
 	public function update_rt_map($dus=0, $rw=0, $id=0)
 	{
-		$data = $_POST;
+    if (empty($_POST['id_kepala']) || !is_numeric($_POST['id_kepala']))
+      UNSET($_POST['id_kepala']);
+
+    $data = $_POST;
 		$this->db->where('dusun', $dus);
 		$this->db->where('rw', $rw);
 		$this->db->where('rt', $id);
@@ -337,7 +405,7 @@
 
 	public function get_penduduk($id=0)
 	{
-		$sql = "SELECT id,nik,nama FROM tweb_penduduk WHERE id = ?";
+		$sql = "SELECT id,nik,nama FROM tweb_wil_pamong WHERE nik = ?";
 		$query = $this->db->query($sql, $id);
 		$data = $query->row_array();
 		return $data;

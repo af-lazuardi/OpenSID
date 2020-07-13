@@ -19,6 +19,7 @@ class Pengurus extends CI_Controller {
 		$this->load->model('pamong_model');
 		$this->load->model('header_model');
 		$this->load->model('penduduk_model');
+		$this->load->model('biodata_model');
 		$this->modul_ini = 200;
 	}
 
@@ -55,6 +56,12 @@ class Pengurus extends CI_Controller {
 
 	public function form($id = '')
 	{
+
+		$desa = $this->get_data_desa();
+		$kodeProp = intval($desa['kode_propinsi']);
+		$kodeKab = intval($desa['kode_kabupaten']);
+		$kodeKec = intval($desa['kode_kecamatan']);
+		$kodeKel = intval($desa['kode_desa']);
 		if ($id)
 		{
 			$data['pamong'] = $this->pamong_model->get_data($id);
@@ -70,14 +77,60 @@ class Pengurus extends CI_Controller {
 		$data['pendidikan_kk'] = $this->penduduk_model->list_pendidikan_kk();
 		$data['agama'] = $this->penduduk_model->list_agama();
 		$data['penduduk'] = $this->penduduk_model->list_penduduk();
-		if (!empty($_POST['id_pend']))
-			$data['individu'] = $this->penduduk_model->get_penduduk($_POST['id_pend']);
-		else
+		if (!empty($_POST['id_pend'])) {
+			$data['individu'] = $this->biodata_model->get_penduduk($_POST['id_pend']);
+	
+			if($data['individu']['nik'] == NULL) {
+				$data['individu']['status_data'] = "Data Tidak ditemukan";
+			} else {
+				if(
+					$data['individu']['no_prop'] == $kodeProp
+					&& $data['individu']['no_kab'] == $kodeKab
+					&& $data['individu']['no_kec'] == $kodeKec
+					&& $data['individu']['no_kel'] == $kodeKel
+				) {
+					$this->biodata_model->save_biodata($data['individu']);
+					
+				} else {
+					$data['individu']['status_data'] = "Mohon Maaf Biodata Penduduk desa ".$data['individu']['kel_name'];
+				}	
+			}
+			
+			$data['individu']['alamat_wilayah']= $data['individu']['alamat'];
+
+		} else {
 			$data['individu'] = NULL;
+		}
 		$header = $this->header_model->get_data();
 		// Menampilkan menu dan sub menu aktif
 		$nav['act'] = 1;
 		$nav['act_sub'] = 18;
+
+		// $data['p_jabatan'] = array(
+		// 	""=>" - ",
+		// 	"Kepala Desa"=>"Lurah",
+		// 	"Sekretaris Desa"=>"Carik",
+		// 	"Kasi Pemerintahan"=>"Jogo Boyo",
+		// 	"Kasi Kemasyarakatan"=>"Kamituwa",
+		// 	"Kaur Umum Aparatur Desa & Aset"=>"Pranata Laksana Sarta Pangripta",
+		// 	"Kasi Pembanguanan & Pemberdayaan"=>"Ulu-Ulu",
+		// 	"Kaur Perencanaan & Keuangan"=>"Danarta",
+		// 	"Staff Desa"=>"Staff Desa",
+		// 	"Lainnya"=>"Lainnya",
+		// );
+		$data['p_jabatan'] = array(
+			""=>" - ",
+			"Lurah"=>"Lurah",
+			"Carik"=>"Carik",
+			"Jogobyo"=>"Jogoboyo",
+			"Kamituwa"=>"Kamituwa",
+			"Panata Laksana Sarta Pangripta"=>"Panata Laksana Sarta Pangripta",
+			"Ulu-Ulu"=>"Ulu-Ulu",
+			"Danarta"=>"Danarta",
+			"Staff Desa"=>"Staff Desa",
+			"Lainnya"=>"Lainnya",
+			"Dukuh"=>"Dukuh",
+		);
 
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
@@ -140,4 +193,30 @@ class Pengurus extends CI_Controller {
 		$this->pamong_model->ttd($id, 0);
 		redirect('pengurus');
 	}
+
+  public function cetak($o=0)
+  {
+    $data['main'] = $this->pamong_model->list_data();
+    $this->load->view('home/pengurus_print', $data);
+  }
+
+  public function excel($o=0)
+  {
+    $data['main'] = $this->pamong_model->list_data();
+    $this->load->view('home/pengurus_excel', $data);
+  }
+
+	public function urut($id = 0, $arah = 0)
+	{
+		$this->pamong_model->urut($id, $arah);
+		redirect("pengurus");
+	}
+
+	public function get_data_desa()
+	{
+		$sql = "SELECT * FROM config WHERE 1";
+		$query = $this->db->query($sql);
+		return $query->row_array();
+	}
+
 }

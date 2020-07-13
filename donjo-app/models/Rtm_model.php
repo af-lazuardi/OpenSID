@@ -105,9 +105,7 @@
 	private function list_data_sql()
 	{
 		$sql = " FROM tweb_rtm u
-			LEFT JOIN tweb_penduduk t ON u.id = t.id_rtm AND t.rtm_level = 1
-			LEFT JOIN tweb_keluarga k ON t.id_kk = k.id
-			LEFT JOIN tweb_wil_clusterdesa c ON t.id_cluster = c.id
+			LEFT JOIN tweb_biodata_penduduk t ON u.nik_kepala = t.nik 
 			WHERE 1 ";
 		$sql .= $this->search_sql();
 		$sql .= $this->kelas_sql();
@@ -134,8 +132,8 @@
 		//Paging SQL
 		$paging_sql = ' LIMIT ' .$offset. ',' .$limit;
 
-		$select_sql = "SELECT u.*, t.nama AS kepala_kk, t.nik, k.alamat AS alamat,
-			(SELECT COUNT(id) FROM tweb_penduduk WHERE id_rtm = u.id ) AS jumlah_anggota, c.dusun, c.rw, c.rt ";
+		$select_sql = "SELECT u.*, t.nama AS kepala_kk, t.nik, t.alamat AS alamat, t.no_rt as rt, t.no_rw as rw,
+			(SELECT COUNT(nik) FROM tweb_biodata_penduduk WHERE no_kk = t.nik ) AS jumlah_anggota ";
 		$sql = $select_sql . $this->list_data_sql();
 		$sql .= $order_sql;
 		$sql .= $paging_sql;

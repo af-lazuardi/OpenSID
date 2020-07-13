@@ -19,6 +19,7 @@ class Hom_sid extends CI_Controller {
 		}
 		$this->load->model('header_model');
 		$this->load->model('config_model');
+		$this->load->model('surat_masuk_suratku_model');
 		$this->modul_ini = 1;
 	}
 
@@ -36,6 +37,20 @@ class Hom_sid extends CI_Controller {
 		$nav['act_sub'] = 16;
 		$header = $this->header_model->get_data();
 
+		$data['main'] = $this->config_model->get_data();
+
+		$get_infodesa = cget("infodesa");
+
+		$config = $this->config_model->get_data();
+		$kode_prov = $config['kode_propinsi'];
+		$kode_kab = str_pad($config['kode_kabupaten'], 2, '0', STR_PAD_LEFT);
+		$kode_kec = $config['kode_kecamatan'];
+		$kode_desa = $config['kode_desa'];
+
+		$username = '003'.$kode_prov.$kode_kab.$kode_kec.$kode_desa;
+		$data['info_surat'] = $this->surat_masuk_suratku_model->get_dashboard($username);
+		
+		$data['infodesa'] = $get_infodesa['result']['data'];
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 		$this->load->view('home/desa', $data);

@@ -3,24 +3,18 @@
 	public function __construct()
 	{
 		parent::__construct();
+		$this->load->model('biodata_model');
 	}
 
 	public function list_data($aktif = false)
 	{
-		$sql = "SELECT u.*, p.nama as nama, p.nik as nik, p.tempatlahir, p.tanggallahir, x.nama AS sex, b.nama AS pendidikan_kk, g.nama AS agama, x2.nama AS pamong_sex, b2.nama AS pamong_pendidikan, g2.nama AS pamong_agama
+		$sql = "SELECT u.*, u.pamong_nama as nama, u.id_pend as nik, u.pamong_tempatlahir as tempatlahir, u.pamong_tanggallahir as tanggallahir, u.pamong_sex AS sex, u.pamong_pendidikan AS pendidikan_kk, u.pamong_agama AS agama, u.pamong_sex AS pamong_sex, u.pamong_pendidikan AS pamong_pendidikan, u.pamong_agama AS pamong_agama
 			FROM tweb_desa_pamong u
-			LEFT JOIN tweb_penduduk p ON u.id_pend = p.id
-			LEFT JOIN tweb_penduduk_pendidikan_kk b ON p.pendidikan_kk_id = b.id
-			LEFT JOIN tweb_penduduk_sex x ON p.sex = x.id
-			LEFT JOIN tweb_penduduk_agama g ON p.agama_id = g.id
-			LEFT JOIN tweb_penduduk_pendidikan_kk b2 ON u.pamong_pendidikan = b2.id
-			LEFT JOIN tweb_penduduk_sex x2 ON u.pamong_sex = x2.id
-			LEFT JOIN tweb_penduduk_agama g2 ON u.pamong_agama = g2.id
 			WHERE 1";
     $sql .= $aktif ? " AND u.pamong_status = '1'" : null;
-		$sql .= $this->search_sql();
-		$sql .= $this->filter_sql();
-		$sql .= ' ORDER BY jabatan';
+	//	$sql .= $this->search_sql();
+		// $sql .= $this->filter_sql();
+		$sql .= ' ORDER BY urut';
 
 		$query = $this->db->query($sql);
 		$data  = $query->result_array();
@@ -40,12 +34,6 @@
 			}
 			$data[$i]['no'] = $i + 1;
 		}
-		return $data;
-	}
-
-	public function list_semua()
-	{
-		$data = $this->db->select('*')->get('tweb_desa_pamong')->result_array();
 		return $data;
 	}
 
@@ -96,9 +84,15 @@
 
 	public function get_data($id=0)
 	{
-		$sql = "SELECT * FROM tweb_desa_pamong WHERE pamong_id = ?";
+		$sql = "SELECT u.*, p.nama as nama
+			FROM tweb_desa_pamong u
+			LEFT JOIN tweb_penduduk p ON u.id_pend = p.id
+			WHERE pamong_id = ?";
 		$query = $this->db->query($sql, $id);
 		$data  = $query->row_array();
+			if (!empty($data['id_pend']))
+				// Dari database penduduk
+		$data['pamong_nama'] = $data['nama'];
 		return $data;
 	 }
 
@@ -131,17 +125,57 @@
 			}
 		}
 
-		$data['id_pend'] = $this->input->post('id_pend');
-		$this->data_pamong_asal($data);
+		// Beri urutan terakhir
+	
+		$biodata = $this->biodata_model->get_penduduk($this->input->post('nik'));
+		if (empty($biodata['nik'])) {
+		$data['pamong_nama'] = $this->input->post('pamong_nama');
+		$data['pamong_nik'] = $this->input->post('pamong_nik');
+		$data['pamong_tempatlahir'] = $this->input->post('pamong_tempatlahir');
+		$data['pamong_tanggallahir'] = tgl_indo_in($this->input->post('pamong_tanggallahir'));
+		$data['pamong_sex'] = $this->input->post('pamong_sex');
+		$data['pamong_pendidikan'] = $this->input->post('pamong_pendidikan');
+		$data['pamong_agama'] = $this->input->post('pamong_agama');
 		$data['pamong_nip'] = $this->input->post('pamong_nip');
 		$data['jabatan'] = $this->input->post('jabatan');
 		$data['pamong_status'] = $this->input->post('pamong_status');
 		$data['pamong_nosk'] = $this->input->post('pamong_nosk');
 		$data['pamong_tglsk'] = tgl_indo_in($this->input->post('pamong_tglsk'));
 		$data['pamong_masajab'] = $this->input->post('pamong_masajab');
-		$data['pamong_tgl_terdaftar'] = NOW();
+		$data['pamong_tgl_terdaftar'] = tgl_indo_in($this->input->post('pamong_tglsk'));
 		$data['foto'] = $nama_file;
+		$data['urut'] = $this->urut_max() + 1;
+		$data['id_pend'] = $this->input->post('nik');
+		}else{
+		$data['pamong_nama'] = $biodata['nama'];
+		$data['pamong_nik'] = $biodata['nik'];
+		$data['pamong_tempatlahir'] = $biodata['tempatlahir'];
+		$data['pamong_tanggallahir'] = $biodata['tanggallahir'];
+		$data['pamong_sex'] = $biodata['jenis_klmin'];
+		$data['pamong_pendidikan'] = $biodata['pendidikan'];
+		$data['pamong_agama'] = $biodata['agama'];
+		$data['urut'] = $this->urut_max() + 1;
+		$data['id_pend'] = $this->input->post('nik');
+		$data['pamong_nip'] = $this->input->post('pamong_nip');
+		$data['jabatan'] = $this->input->post('jabatan');
+		$data['pamong_status'] = $this->input->post('pamong_status');
+		$data['pamong_nosk'] = $this->input->post('pamong_nosk');
+		$data['pamong_tglsk'] = tgl_indo_in($this->input->post('pamong_tglsk'));
+		$data['pamong_masajab'] = $this->input->post('pamong_masajab');
+		$data['pamong_tgl_terdaftar'] = tgl_indo_in($this->input->post('pamong_tglsk'));
+		$data['foto'] = $nama_file;
+		}
+		//$this->data_pamong_asal($data);
+		
 		$outp = $this->db->insert('tweb_desa_pamong', $data);
+
+		// start api
+		$data = $data;
+		$data['desa_id'] = $this->db->database;
+		$data['mode'] = "insert";
+		$data['desa_data_id'] = $this->db->insert_id();
+
+		cpost('pamong', $data);
 
 		if (!$outp) $_SESSION['success'] = -1;
 	}
@@ -193,20 +227,59 @@
 				$_SESSION['error_msg'] = " -> Jenis file salah: " . $tipe_file;
 			}
 		}
-
-		$data['id_pend'] = $this->input->post('id_pend');
-		$this->data_pamong_asal($data);
+		$biodata = $this->biodata_model->get_penduduk($this->input->post('nik'));
+		if (empty($biodata['nik'])) {
+		$data['pamong_nama'] = $this->input->post('pamong_nama');
+		$data['pamong_nik'] = $this->input->post('pamong_nik');
+		$data['pamong_tempatlahir'] = $this->input->post('pamong_tempatlahir');
+		$data['pamong_tanggallahir'] = tgl_indo_in($this->input->post('pamong_tanggallahir'));
+		$data['pamong_sex'] = $this->input->post('pamong_sex');
+		$data['pamong_pendidikan'] = $this->input->post('pamong_pendidikan');
+		$data['pamong_agama'] = $this->input->post('pamong_agama');
 		$data['pamong_nip'] = $this->input->post('pamong_nip');
 		$data['jabatan'] = $this->input->post('jabatan');
 		$data['pamong_status'] = $this->input->post('pamong_status');
 		$data['pamong_nosk'] = $this->input->post('pamong_nosk');
 		$data['pamong_tglsk'] = tgl_indo_in($this->input->post('pamong_tglsk'));
 		$data['pamong_masajab'] = $this->input->post('pamong_masajab');
+		$data['urut'] = $this->urut_max() + 1;
+		$data['id_pend'] = $this->input->post('nik');
+
+		}else{
+		$data['pamong_nama'] = $biodata['nama'];
+		$data['pamong_nik'] = $biodata['nik'];
+		$data['pamong_tempatlahir'] = $biodata['tempatlahir'];
+		$data['pamong_tanggallahir'] = $biodata['tanggallahir'];
+		$data['pamong_sex'] = $biodata['jenis_klmin'];
+		$data['pamong_pendidikan'] = $biodata['pendidikan'];
+		$data['pamong_agama'] = $biodata['agama'];
+		$data['urut'] = $this->urut_max() + 1;
+		$data['id_pend'] = $this->input->post('nik');
+		$data['pamong_nip'] = $this->input->post('pamong_nip');
+		$data['jabatan'] = $this->input->post('jabatan');
+		$data['pamong_status'] = $this->input->post('pamong_status');
+		$data['pamong_nosk'] = $this->input->post('pamong_nosk');
+		$data['pamong_tglsk'] = tgl_indo_in($this->input->post('pamong_tglsk'));
+		$data['pamong_masajab'] = $this->input->post('pamong_masajab');
+		}
+		//$data['id_pend'] = $this->input->post('id_pend');
+		//$this->data_pamong_asal($data);
+		
 		if (!empty($nama_file))
 		{
 			$data['foto'] = $nama_file;
 		}
 		$this->db->where("pamong_id", $id)->update('tweb_desa_pamong', $data);
+
+		// start api
+		$data = $data;
+		$data['desa_id'] = $this->db->database;
+		$data['mode'] = "update";
+		$data['desa_data_id'] = $id;
+
+		cpost('pamong', $data);
+		// end api
+
 	}
 
 	public function delete($id='')
@@ -219,6 +292,16 @@
 		}
 		$sql = "DELETE FROM tweb_desa_pamong WHERE pamong_id = ?";
 		$outp = $this->db->query($sql,array($id));
+
+		// start api
+		$data = $data;
+		$data['desa_id'] = $this->db->database;
+		$data['mode'] = "delete";
+		$data['desa_data_id'] = $id;
+
+		cpost('pamong', $data);
+		// end api
+		
 		return $outp;
 	}
 
@@ -245,6 +328,121 @@
 			$this->db->where('pamong_ttd', 1)->update('tweb_desa_pamong', array('pamong_ttd'=>0));
 		}
 		$this->db->where('pamong_id', $id)->update('tweb_desa_pamong', array('pamong_ttd'=>$val));
+	}
+
+  private function urut_max()
+  {
+    $this->db->select_max('urut');
+    $query = $this->db->get('tweb_desa_pamong');
+    $data = $query->row_array();
+    return $data['urut'];
+  }
+
+	private function urut_semua()
+	{
+		$sql = "SELECT urut, COUNT(*) c FROM tweb_desa_pamong GROUP BY urut HAVING c > 1";
+		$query = $this->db->query($sql);
+		$urut_duplikat = $query->result_array();
+		if ($urut_duplikat)
+		{
+			$this->db->select("pamong_id");
+			$this->db->order_by("urut");
+			$q = $this->db->get('tweb_desa_pamong');
+			$pamong = $q->result_array();
+			for ($i=0; $i<count($pamong); $i++)
+			{
+				$this->db->where('pamong_id', $pamong[$i]['pamong_id']);
+				$data['urut'] = $i + 1;
+				$this->db->update('tweb_desa_pamong', $data);
+			}
+		}
+	}
+
+	// $arah:
+	//		1 - turun
+	// 		2 - naik
+	public function urut($id, $arah)
+	{
+		// get detil data pamong
+		$this->db->where("pamong_id", $id);
+		$get_urutan = $this->db->get("tweb_desa_pamong")->row_array();
+
+		// ambil urut terdekat, berdasarkan tipe urutan
+		if ($arah == 2) {
+			$strq = "SELECT * FROM tweb_desa_pamong WHERE urut < ".$get_urutan['urut']." ORDER BY urut DESC LIMIT 1";
+		} else if ($arah == 1) {
+			$strq = "SELECT * FROM tweb_desa_pamong WHERE urut > ".$get_urutan['urut']." ORDER BY urut LIMIT 1";
+		}
+		// laksanakan perintah di atas
+		$laksanakan_queri = $this->db->query($strq)->row_array();
+
+
+		if ($arah == 2) {
+			// jika arah naik
+			// jika hasil kueri kosong > otomatis urut baru jadi 0
+			if (empty($laksanakan_queri)) {
+				$urut_baru = 0;
+			} else {
+				$urut_baru = intval($laksanakan_queri['urut']);
+				// update pamong yg di-naikkan urutannya
+				$this->db->where("urut", $urut_baru);
+				$this->db->update("tweb_desa_pamong", array("urut"=>$get_urutan['urut']));
+				// update pamong yang tergeser
+				$this->db->where("pamong_id", $get_urutan['pamong_id']);
+				$this->db->update("tweb_desa_pamong", array("urut"=>$urut_baru));
+			}
+		} else if ($arah == 1) {
+			// jika arah turun
+			// jika hasil kueri kosong > otomatis urut baru nomer urutan paling gede + 1
+			if (empty($laksanakan_queri)) {
+				$get_paling_gede = $this->db->query("SELECT MAX(urut) maks FROM tweb_desa_pamong LIMIT 1")->row_array();
+				$urut_baru = intval($get_paling_gede['maks']) + 1;
+			} else {
+				$urut_baru = intval($laksanakan_queri['urut']);
+				
+				// update pamong yg di-turunkan urutannya
+				$this->db->where("urut", $urut_baru);
+				$this->db->update("tweb_desa_pamong", array("urut"=>$get_urutan['urut']));
+				// update pamong yang tergeser
+				$this->db->where("pamong_id", $get_urutan['pamong_id']);
+				$this->db->update("tweb_desa_pamong", array("urut"=>$urut_baru));
+			}
+		}
+
+		/* 
+		INI YANG ASLI
+		$this->urut_semua();
+		$this->db->where('pamong_id', $id);
+		$q = $this->db->get('tweb_desa_pamong');
+		$pamong1 = $q->row_array();
+
+		$this->db->select("pamong_id, urut");
+		$this->db->order_by("urut");
+		$q = $this->db->get('tweb_desa_pamong');
+		$pamong = $q->result_array();
+		for ($i=0; $i<count($pamong); $i++)
+		{
+			if ($pamong[$i]['pamong_id'] == $id)
+				break;
+		}
+
+		if ($arah == 1)
+		{
+			if ($i >= count($pamong) - 1) return;
+			$pamong2 = $pamong[$i + 1];
+		}
+		if ($arah == 2)
+		{
+			if ($i <= 0) return;
+			$pamong2 = $pamong[$i - 1];
+		}
+
+		// Tukar urutan
+		$this->db->where('pamong_id', $pamong2['pamong_id'])->
+			update('tweb_desa_pamong', array('urut' => $pamong1['urut']));
+		$this->db->where('pamong_id', $pamong1['pamong_id'])->
+			update('tweb_desa_pamong', array('urut' => $pamong2['urut']));
+			*/
 	}
 
 }

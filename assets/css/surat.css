@@ -24,10 +24,15 @@ vertical-align: top;
 margin:18px;}
 
 .kop {
-font-size:24px; 
+font-size:22px; 
 text-align: center; 
 line-height:0.1;
 margin:22px;}
+
+.kop_nama_surat {
+    font-size:18px;
+    margin-top: 20px;
+}
 
 .kop3 {
 font-size:18px; 

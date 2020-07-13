@@ -19,6 +19,7 @@ class Rtm extends CI_Controller {
 		$this->load->model('header_model');
 		$this->load->model('rtm_model');
 		$this->load->model('penduduk_model');
+		$this->load->model('biodata_model');
 		$this->modul_ini = 2;
 	}
 
@@ -162,6 +163,7 @@ class Rtm extends CI_Controller {
 
 	public function insert()
 	{
+
 		$this->rtm_model->insert();
 		redirect('rtm');
 	}

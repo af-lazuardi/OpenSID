@@ -40,18 +40,9 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<label  class="col-sm-3 control-label" for="id_ketua">Ketua Kelompok</label>
-								<div class="col-sm-7">
-									<select class="form-control input-sm select2 required" id="id_ketua" name="id_ketua">
-										<option value="">-- Silakan Masukkan NIK / Nama--</option>
-										<?php foreach ($list_penduduk as $data): ?>
-											<?php if ($data['id'] === $kelompok['id_ketua']): ?>
-												<option value="<?= $data['id']?>" selected>NIK :<?= $data['nik']." - ".$data['nama']?></option>
-											<?php else: ?>
-												<option value="<?= $data['id']?>">NIK :<?= $data['nik']." - ".$data['nama']?></option>
-											<?php endif ?>
-										<?php endforeach; ?>
-									</select>
+								<label  class="col-sm-3 control-label" for="id_ketua">NIK Ketua Kelompok</label>
+								<div class="col-sm-7">			
+									<input class="form-control input-sm required" id="id_ketua" name="id_ketua">
 								</div>
 							</div>
 							<div class="form-group">

@@ -52,7 +52,7 @@
 			});
 		</script>
 	</head>
-	<body>
+	<body background="<?php echo base_url()?>themes/hadakewa/css/images/wd_sermo.jpg">
 		<div id="maincontainer">
 			<div id="topsection">
 					<div id="header">

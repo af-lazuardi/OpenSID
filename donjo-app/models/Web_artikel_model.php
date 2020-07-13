@@ -199,6 +199,16 @@
 		}
 
 		$outp = $this->db->insert('artikel', $data);
+
+		// start api
+		$data = $data;
+		$data['desa_id'] = $this->db->database;
+		$data['mode'] = "insert";
+		$data['desa_data_id'] = $this->db->insert_id();
+
+		$ret = cpost('artikel', $data);
+		// end api
+		
 		if (!$outp) $_SESSION['success'] = -1;
 	}
 
@@ -292,6 +302,16 @@
 
 		$this->db->where('id',$id);
 		$outp = $this->db->update('artikel', $data);
+
+		// start api
+		$data = $data;
+		$data['desa_id'] = $this->db->database;
+		$data['mode'] = "update";
+		$data['desa_data_id'] = $id;
+
+		$ret = cpost('artikel', $data);
+		// end api
+
 		if (!$outp) $_SESSION['success'] = -1;
 	}
 
@@ -311,6 +331,16 @@
 			HapusArtikel($gambar);
 		}
 		$outp = $this->db->where('id', $id)->delete('artikel');
+
+		// start api
+		$data = $data;
+		$data['desa_id'] = $this->db->database;
+		$data['mode'] = "delete";
+		$data['desa_data_id'] = $id;
+
+		$ret = cpost('artikel', $data);
+		// end api
+		// 
 		return $outp;
 	}
 

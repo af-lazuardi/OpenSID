@@ -47,21 +47,25 @@
 											<div class="col-sm-12">
 												<div class="form-group">
 													<label class="col-sm-3 control-label" for="id_kepala">Ketua RW</label>
-													<div class="col-sm-7">
-														<select class="form-control select2 input-sm" style="width: 100%;" id="id_kepala" name="id_kepala">
-															<option selected="selected">-- Silakan Masukan NIK / Nama--</option>
-															<?php foreach ($penduduk as $data): ?>
-																<option value="<?= $data['id']?>">NIK :<?= $data['nik']." - ".$data['nama']?></option>
-															<?php endforeach; ?>
-														</select>
+													<div class="col-sm-4">
+														<input class="form-control input-sm" id="id_kepala"  name="id_kepala" style ="width:100%;">	
 													</div>
+													<div class="col-sm-2">
+															<button type="button" class="btn btn-sosial btn-flat btn-success btn-sm" onclick="validasinik('id_kepala')"><i class="fa fa-check"></i>Validasi</button>
+													</div>
+												</div>
+											</div>
+											<div class="col-sm-12">
+												<div class="form-group">
+													<label for="" class="col-sm-3">&nbsp;</label>
+													<div class="col-sm-4" id="detil_nik"></div>
 												</div>
 											</div>
 										</div>
 									</div>
 									<div class="box-footer">
 										<div class="col-xs-12">
-											<button type="reset" class="btn btn-social btn-flat btn-danger btn-sm"><i class="fa fa-times"></i> Batal</button>
+											<!-- <button type="reset" class="btn btn-social btn-flat btn-danger btn-sm"><i class="fa fa-times"></i> Batal</button> -->
 											<button type="submit" class="btn btn-social btn-flat btn-info btn-sm pull-right"><i class="fa fa-check"></i> Simpan</button>
 										</div>
 									</div>

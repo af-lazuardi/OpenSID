@@ -36,9 +36,7 @@
 						<td width="220">Nama Lengkap</td><td width="2%">:</td>
 						<td><?= strtoupper($penduduk['nama'])?></td>
 						<td rowspan="18" style="vertical-align: middle;">
-							<?php if ($penduduk['foto']): ?>
-								<img src="<?= AmbilFoto($penduduk['foto'])?>" alt="" style="border: solid 1px black; padding: 5px;"/>
-							<?php endif; ?>
+								<img src="data:image/png;base64, <?=$photo[content]?>" width="25%"  alt="" style="border: solid 1px black; padding: 5px;"/>
 						</td>
 					</tr>
 					<tr>
@@ -51,11 +49,11 @@
 					</tr>
 					<tr>
 						<td>Jenis Kelamin</td><td >:</td>
-						<td><?= strtoupper($penduduk['sex'])?></td>
+						<td><?= strtoupper($penduduk['jenis_klmin'])?></td>
 					</tr>
 					<tr>
 						<td>Akta lahir</td><td >:</td>
-						<td><?= strtoupper($penduduk['akta_lahir'])?></td>
+						<td><?= strtoupper($penduduk['no_akta_lahir'])?></td>
 					</tr>
 					<tr>
 						<td>Agama</td><td >:</td>
@@ -80,11 +78,11 @@
 					</tr>
 					<tr>
 						<td>Status Kawin</td><td >:</td>
-						<td><?= strtoupper($penduduk['kawin'])?></td>
+						<td><?= strtoupper($penduduk['stat_kwn'])?></td>
 					</tr>
 					<tr>
 						<td>Hubungan dalam Keluarga</td><td >:</td>
-						<td><?= strtoupper($penduduk['hubungan'])?></td>
+						<td><?= strtoupper($penduduk['stat_hbkel'])?></td>
 					</tr>
 					<tr>
 						<td>Warga Negara</td><td >:</td>
@@ -113,7 +111,7 @@
 					<tr>
 						<td>Alamat</td><td >:</td>
 						<td><?= strtoupper(ununderscore($penduduk['alamat']))?><br>
-								RT. <?= strtoupper($penduduk['rt'])?> RW. <?= $penduduk['rw']?>
+								RT. <?= strtoupper($penduduk['no_rt'])?> RW. <?= $penduduk['no_rw']?>
 							<?= ucwords($this->setting->sebutan_dusun)?> <?= strtoupper(ununderscore($penduduk['dusun']))?>
 						</td>
 					</tr>
@@ -134,19 +132,19 @@
 					</tr>
 					<tr>
 						<td>Akta Perkawinan</td><td >:</td>
-						<td><?= strtoupper($penduduk['akta_perkawinan'])?></td>
+						<td><?= strtoupper($penduduk['no_akta_kwn'])?></td>
 					</tr>
 					<tr>
 						<td>Tanggal Perkawinan</td><td >:</td>
-						<td><?= strtoupper($penduduk['tanggalperkawinan'])?></td>
+						<td><?= strtoupper($penduduk['tgl_kwn'])?></td>
 					</tr>
 					<tr>
 						<td>Akta Perceraian</td><td >:</td>
-						<td><?= strtoupper($penduduk['akta_perceraian'])?></td>
+						<td><?= strtoupper($penduduk['akta_cerai'])?></td>
 					</tr>
 					<tr>
 						<td>Tanggal Perceraian</td><td >:</td>
-						<td><?= strtoupper($penduduk['tanggalperceraian'])?></td>
+						<td><?= strtoupper($penduduk['no_akta_cerai'])?></td>
 					</tr>
 				</table>
 				<table width="100%" border="0" cellspacing="0" cellpadding="0">

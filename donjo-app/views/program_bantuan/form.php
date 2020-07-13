@@ -59,16 +59,14 @@
                        <form action="" id="main" name="main" method="POST"  class="form-horizontal">
 												<div class="form-group" >
 									  			<label class="col-sm-4 col-lg-2 control-label"  for="nik">NIK / Nama Penduduk </label>
-													<div class="col-sm-7">
-														<select class="form-control select2 input-sm" id="nik" name="nik"  onchange="formAction('main')" style="width:100%" >
-															<option selected="selected">-- Silakan Masukan NIK / Nama--</option>
-															<?php foreach ($program[2]as $item):
-										  					if (strlen($item["id"])>0): ?>
-											  				  <option value="<?= $item['id']?>" <?php if ($individu['nik']==$item['nik']): ?>selected<?php endif; ?>>Nama : <?= $item['nama']." - ".$item['info']?></option>
-																<?php endif;
-                              endforeach;?>
-  													</select>
+												
+													<div class="col-sm-4">
+														<input class="form-control input-sm" id="nik"  value="<?= $individu['nik']?>" name="nik" style ="width:100%;">
 													</div>
+													<div class="col-sm-2">
+														<button class="btn btn-sosial btn-flat btn-success btn-sm" onclick="formAction('main')"><i class="fa fa-plus"></i>Validasi</button>
+													</div>
+													
 					    					</div>
                         <?php if ($individu): ?>
                           <?php include("donjo-app/views/program_bantuan/konfirmasi_peserta.php"); ?>

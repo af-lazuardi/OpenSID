@@ -52,11 +52,11 @@
 								<td><?= strtoupper($data['kepala_kk'])?></td>
 								<td class="textx"><?= strtoupper(unpenetration($data['nik']))?></td>
 								<td><?= $data['jumlah_anggota']?></td>
-								<td><?= $data['sex']?></td>
+								<td><?= $data['jenis_klmin']?></td>
 								<td><?= strtoupper($data['alamat'])?></td>
 								<td><?= strtoupper(ununderscore($data['dusun']))?></td>
-								<td><?= strtoupper($data['rw'])?></td>
-								<td><?= strtoupper($data['rt'])?></td>
+								<td><?= strtoupper($data['no_rw'])?></td>
+								<td><?= strtoupper($data['no_rt'])?></td>
 								<td><?= tgl_indo($data['tgl_daftar'])?></td>
 								<td><?= tgl_indo($data['tgl_cetak_kk'])?></td>
 							</tr>

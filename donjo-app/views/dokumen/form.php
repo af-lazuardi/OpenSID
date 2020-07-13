@@ -43,7 +43,7 @@
 											<button type="button" class="btn btn-info btn-flat"  id="file_browser"><i class="fa fa-search"></i> Browse</button>
 										</span>
 									</div>
-									<p class="small">(Kosongkan jika tidak ingin mengubah dokumen)</p>
+									<!-- <p class="small">(Kosongkan jika tidak ingin mengubah dokumen)</p> -->
 								</div>
 							</div>
 							<input name="kategori" type="hidden" value="<?= $kat;?>">
@@ -52,6 +52,8 @@
 									include ("donjo-app/views/dokumen/_sk_kades.php");
 								elseif ($kat == 3)
 									include ("donjo-app/views/dokumen/_perdes.php");
+								elseif ($kat == 4)
+									include ("donjo-app/views/dokumen/_produk_hukum.php");
 							?>
 						</div>
 						<div class='box-footer'>

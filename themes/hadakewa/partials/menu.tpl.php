@@ -53,6 +53,15 @@ navigasi ke tautannya.
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				<li><a href="<?php echo site_url()."first"?>"><i class="fa fa-home fa-lg"></i> Beranda</a></li>
+				<!-- <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-sitemap"></i> Profil Desa <span class='caret'></span></a>
+					<ul class="dropdown-menu">
+						<li><a href="<?php echo site_url()."first/profildesa"?>">Profil Desa</a></li>
+						<li><a href="<?php echo site_url()."first/wilayahdesa"?>">Wilayah Desa</a></li>
+						<li><a href="<?php echo site_url()."first/perangkatdesa"?>">Perangkat Desa</a></li>
+					</ul>
+				</li> -->
+
+
 				<?php foreach($menu_atas as $data){?>
 					<li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="<?php echo $data['link']?>"><i class="fa fa-th-large"></i> <?php echo $data['nama']; if(count($data['submenu'])>0) { echo "<span class='caret'></span>"; } ?></a>
 						<?php if(count($data['submenu'])>0): ?>
@@ -66,7 +75,7 @@ navigasi ke tautannya.
 				<?php }?>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<a href="<?php echo site_url('siteman') ?>"><button class="btn btn-primary navbar-btn"><i class="fa fa-lock fa-lg"></i> Login Admin</button></a>
+				<a href="<?php echo site_url('siteman') ?>"><button class="btn btn-primary navbar-btn"><i class="fa fa-lock fa-lg"></i></button></a>
 			</ul>
 		</div><!-- /.navbar-collapse -->
 	</div>

@@ -36,12 +36,18 @@
 			"statistik/4"  => "Jenis Kelamin",
 			"statistik/0"  => "Pendidikan Dalam KK",
 			"statistik/14" => "Pendidikan Sedang Ditempuh",
+			"statistik/10" => "Penyakit Menahun",
 			"statistik/1"  => "Pekerjaan",
 			"statistik/6"  => "Status Penduduk",
 			"statistik/2"  => "Status Perkawinan",
 			"statistik/13" => "Umur",
 			"statistik/18" => "Kepemilikan Wajib KTP",
-			"statistik/5"  => "Warga Negara"
+			"statistik/5"  => "Warga Negara",
+			"statistik/19"  => "Stat Hbkel",
+			"statistik/20"  => "Jenis Kelamin Kepala Keluarga",
+			"statistik/21"  => "Pendidikan Kepala Keluarga",
+			"statistik/22"  => "Pekerjaan Kepala Keluarga",
+			"statistik/23"  => "Umur Kepala Keluarga"
 		);
 		return $statistik;
 	}
@@ -94,9 +100,13 @@
 			case "16": return "Akseptor KB"; break;
 			case "17": return "Akte Kelahiran"; break;
 			case "18": return "Kepemilikan Wajib KTP"; break;
-			case "21": return "Klasifikasi Sosial"; break;
+		case "19": return "Status Hub Dalam  Keluarga"; break;
+			case "20": return "Jenis Kelamin Kepala Keluarga"; break;
+			case "21": return "Pendidikan Kepala Keluarga"; break;
+			case "22": return "Pekerjaan Kepala Keluarga"; break;
+			case "23": return "Umur Kepala Keluarga"; break;
 			case "24": return "Penerima BOS"; break;
-			default: return "Pendidikan";
+			default: return "Pendidikan";	
 		}
 	}
 

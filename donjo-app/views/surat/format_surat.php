@@ -12,6 +12,20 @@
 				<div class="box box-info">
 					<div class="box-header with-border">
 						<form id="main" name="main" action="<?= site_url()?>surat/search" method="post">
+							<!-- <div class="row">
+								<div class="col-sm-6">
+									<div class="box box-primary" style="background-color: #3c8dbc; ">
+										
+										<div class="box-body" style="background-color: #e2e4ea; border-radius: 5%;">
+											<h3><b>Petunjuk Penggunaan Layanan Surat</b></h3>
+											<embed src="<?php echo base_url(); ?>desa/file/petunjuk.pdf" width="100%" height="330"> </embed>
+										</div>
+									</div>
+								</div>	
+								<div class="col-sm-6">
+									<a href="<?php echo base_url().'index.php/surat/download/' ?>">Download file</a>
+								</div>
+							</div> -->
 							<div class="row">
 								<div class="col-sm-6">
 									<select class="form-control select2 " id="nik" name="nik" onchange="formAction('main')">
@@ -45,13 +59,19 @@
 														<tbody>
 															<?php if (count($surat_favorit) > 0): ?>
 															<?php $i=1; foreach ($surat_favorit AS $data): ?>
+															<?php if($data['nama']== 'Keterangan Pengantar'){
+																$nm = 'Keterangan (Umum)';
+															}else{
+																$nm = $data['nama'];
+															}
+															?>
 																<tr <?php if ($data['jenis']!=1): ?>style='background-color:#f8deb5 !important;'<?php endif; ?>>
 																	<td><?= $i;?></td>
 																	<td class="nostretch">
 																		<a href="<?= site_url()?>surat/form/<?= $data['url_surat']?>" class="btn btn-social btn-flat bg-olive btn-sm"  title="Buat Surat"><i class="fa fa-file-word-o"></i>Buat Surat</a>
 																		<a href="<?= site_url("surat/favorit/$data[id]/$data[favorit]")?>" class="btn bg-purple btn-flat btn-sm" title="Keluarkan dari Daftar Favorit" ><i class="fa fa-star"></i></a>
 																	</td>
-																	<td><?= $data['nama']?></td>
+																	<td><?= $nm?></td>
 																	<td><?= $data['kode_surat']?></td>
 																	<td><?= $data['nama_lampiran']?></td>
 																</tr>

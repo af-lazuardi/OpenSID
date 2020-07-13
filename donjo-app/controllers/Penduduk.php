@@ -21,6 +21,8 @@ class Penduduk extends CI_Controller {
 		$this->load->model('referensi_model');
 		$this->load->model('web_dokumen_model');
 		$this->load->model('header_model');
+		$this->load->model('biodata_model');
+		$this->load->model('biodata_model');
 		$this->modul_ini = 2;
 	}
 
@@ -170,6 +172,57 @@ class Penduduk extends CI_Controller {
 		$this->load->view('footer');
 	}
 
+	public function validasi($p = 1, $o = 0) {
+		$desa = $this->get_data_desa();
+		$kodeProp = intval($desa['kode_propinsi']);
+		$kodeKab = intval($desa['kode_kabupaten']);
+		$kodeKec = intval($desa['kode_kecamatan']);
+		$kodeKel = intval($desa['kode_desa']);
+		$header = $this->header_model->get_data();
+
+		$nav['act'] = 2;
+		$nav['act_sub'] = 21;
+		$header['minsidebar'] = 1;
+
+		if (!empty($_POST['nik']))
+		{
+
+			$data['individu'] = $this->biodata_model->get_penduduk($_POST['nik']);
+			$data['photo'] = $this->biodata_model->get_photo($_POST['nik']);
+			
+			//$data['anggota'] = $this->biodata_model->get_kartu_keluarga($_POST['nik']);
+			if($data['individu']['nik'] == NULL) {
+				$data['individu']['status_data'] = "Data Tidak ditemukan";
+			} else {
+				if(
+					$data['individu']['no_prop'] == $kodeProp
+					&& $data['individu']['no_kab'] == $kodeKab
+					&& $data['individu']['no_kec'] == $kodeKec
+					&& $data['individu']['no_kel'] == $kodeKel
+				) {
+					$this->biodata_model->save_biodata($data['individu']);
+					
+				} else {
+					$data['individu']['status_data'] = "Mohon Maaf Biodata Penduduk desa ".$data['individu']['kel_name'];
+				}	
+			}
+			
+			$data['individu']['alamat_wilayah']= $data['individu']['alamat'];
+	
+			
+		}
+		else
+		{
+			$data['individu'] = NULL;
+			$data['anggota'] = NULL;
+		}
+
+	
+		$this->load->view('header', $header);
+		$this->load->view('nav', $nav);
+		$this->load->view('sid/kependudukan/validasi_penduduk', $data);
+		$this->load->view('footer');
+	}
 	public function form($p = 1, $o = 0, $id = '')
 	{
 		// Reset kalau dipanggil dari luar pertama kali ($_POST kosong)
@@ -287,6 +340,8 @@ class Penduduk extends CI_Controller {
 		$nav['act']= 2;
 		$nav['act_sub'] = 21;
 
+		$data['photo'] = $this->biodata_model->get_photo($id);
+
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 		$this->load->view('sid/kependudukan/penduduk_detail', $data);
@@ -360,6 +415,7 @@ class Penduduk extends CI_Controller {
 
 	public function cetak_biodata($id = '')
 	{
+		$data['photo'] = $this->biodata_model->get_photo($id);	
 		$header = $this->header_model->get_data();
 		$data['desa'] = $header['desa'];
 		$data['penduduk'] = $this->penduduk_model->get_penduduk($id);
@@ -471,13 +527,13 @@ class Penduduk extends CI_Controller {
 
 	public function delete($p = 1, $o = 0, $id = '')
 	{
-		$this->penduduk_model->delete($id);
+		$this->biodata_model->delete($id);
 		redirect("penduduk/index/$p/$o");
 	}
 
 	public function delete_all($p = 1, $o = 0)
 	{
-		$this->penduduk_model->delete_all();
+		$this->biodata_model->delete_all();
 		redirect("penduduk/index/$p/$o");
 	}
 
@@ -885,5 +941,12 @@ class Penduduk extends CI_Controller {
 			unset($_SESSION['judul_statistik']);
 		}
 		redirect("penduduk");
+	}
+
+	public function get_data_desa()
+	{
+		$sql = "SELECT * FROM config WHERE 1";
+		$query = $this->db->query($sql);
+		return $query->row_array();
 	}
 }

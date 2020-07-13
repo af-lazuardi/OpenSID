@@ -53,7 +53,7 @@
 			});
 		</script>
 	</head>
-	<body>
+	<body background="<?php echo base_url()?>>themes/default/css/images/wd_sermo.jpg">
 		<div id="maincontainer">
 			<div id="topsection">
 				<div class="innertube">

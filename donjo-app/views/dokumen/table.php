@@ -99,7 +99,7 @@
 																		<th nowrap>Nomor Dan Tanggal Keputusan</th>
 																		<th nowrap>Uraian Singkat</th>
 																	<?php elseif ($kat == 3): ?>
-																		<th nowrap>Nomor Dan Tanggal Ditetapkan</th>
+																		<th nowrap>Nomor Dan Tahun Ditetapkan</th>
 																		<th nowrap>Uraian Singkat</th>
 																	<?php endif; ?>
                                   <?php if ($o==4): ?>
@@ -138,7 +138,7 @@
 																			<td><?= $data['attr']['no_kep_kades']." / ".$data['attr']['tgl_kep_kades']?></td>
 																			<td><?= $data['attr']['uraian']?></td>
 																		<?php elseif ($kat == 3): ?>
-																			<td><?= $data['attr']['no_ditetapkan']." / ".$data['attr']['tgl_ditetapkan']?></td>
+																			<td><?= $data['attr']['no_ditetapkan']." / ".$data['attr']['tahun_ditetapkan']?></td>
 																			<td width="30%"><?= $data['attr']['uraian']?></td>
 																		<?php endif; ?>
 																		<td><?= $data['aktif']?></td>

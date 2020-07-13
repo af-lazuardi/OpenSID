@@ -209,10 +209,9 @@ class Suplemen_model extends CI_Model {
 	private function get_penduduk_terdata_sql($suplemen_id)
 	{
 		# Data penduduk
-		if (!$jumlah) $select_sql = "p.*,o.nama,w.rt,w.rw,w.dusun";
+		if (!$jumlah) $select_sql = "p.*,o.nama, o.no_rt, o.no_rw, o.alamat";
 		$sql = " FROM suplemen_terdata s
-			LEFT JOIN tweb_penduduk o ON s.id_terdata=o.nik
-			LEFT JOIN tweb_wil_clusterdesa w ON w.id=o.id_cluster
+			LEFT JOIN tweb_biodata_penduduk o ON s.id_terdata=o.nik
 			WHERE s.id_suplemen=".$suplemen_id;
 		return $sql;
 	}
@@ -221,7 +220,7 @@ class Suplemen_model extends CI_Model {
 	{
 		$hasil = array();
 		$get_terdata_sql = $this->get_penduduk_terdata_sql($suplemen_id);
-		$select_sql = "SELECT s.*, o.nama, w.rt, w.rw, w.dusun ";
+		$select_sql = "SELECT s.*, o.nama, o.no_rt, o.no_rw, o.alamat ";
 		$sql = $select_sql.$get_terdata_sql;
 		if (!empty($_SESSION['per_page']) and $_SESSION['per_page'] > 0)
 		{
@@ -300,21 +299,7 @@ class Suplemen_model extends CI_Model {
 		{
 			case 1:
 				# Data penduduk
-				$sql   = "SELECT u.id AS id, u.nama AS nama, x.nama AS sex, u.id_kk AS id_kk,
-				u.tempatlahir AS tempatlahir, u.tanggallahir AS tanggallahir,
-				(select (date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0) AS `(date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0)`
-				from tweb_penduduk where (tweb_penduduk.id = u.id)) AS umur,
-				w.nama AS status_kawin, f.nama AS warganegara, a.nama AS agama, d.nama AS pendidikan, j.nama AS pekerjaan, u.nik AS nik, c.rt AS rt, c.rw AS rw, c.dusun AS dusun, k.no_kk AS no_kk, k.alamat,
-				(select tweb_penduduk.nama AS nama from tweb_penduduk where (tweb_penduduk.id = k.nik_kepala)) AS kepala_kk
-				from tweb_penduduk u
-				left join tweb_penduduk_sex x on u.sex = x.id
-				left join tweb_penduduk_kawin w on u.status_kawin = w.id
-				left join tweb_penduduk_agama a on u.agama_id = a.id
-				left join tweb_penduduk_pendidikan_kk d on u.pendidikan_kk_id = d.id
-				left join tweb_penduduk_pekerjaan j on u.pekerjaan_id = j.id
-				left join tweb_wil_clusterdesa c on u.id_cluster = c.id
-				left join tweb_keluarga k on u.id_kk = k.id
-				left join tweb_penduduk_warganegara f on u.warganegara_id = f.id
+				$sql   = "SELECT * from tweb_biodata_penduduk u
 				WHERE u.nik = ?";
 				$query = $this->db->query($sql, $id_terdata);
 				$data  = $query->row_array();

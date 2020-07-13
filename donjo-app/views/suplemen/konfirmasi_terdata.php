@@ -1,5 +1,11 @@
 <?php if ($suplemen["sasaran"] == 1): ?>
 	<div class="form-group">
+		<label for="keperluan"  class="col-sm-3 control-label">Nama</label>
+		<div class="col-sm-8">
+			<input class="form-control input-sm" type="text" value="<?= $individu['nama']; ?>" disabled="">
+		</div>
+	</div>
+	<div class="form-group">
 		<label for="keperluan"  class="col-sm-3 control-label">Tempat  Tanggal Lahir / Umur</label>
 		<div class="col-sm-4">
 			<input class="form-control input-sm" type="text" value="<?= $individu['tempatlahir']?>" disabled="">

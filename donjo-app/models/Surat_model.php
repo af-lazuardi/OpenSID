@@ -112,6 +112,7 @@
 		return trim($alamat_wilayah);
 	}
 
+
 	public function get_penduduk($id=0)
 	{
 		$sql   = "SELECT u.id AS id, u.nama AS nama, u.sex as sex_id, x.nama AS sex, u.id_kk AS id_kk, u.tempatlahir AS tempatlahir, u.tanggallahir AS tanggallahir, u.no_kk_sebelumnya, s.nama as status, u.waktu_lahir, u.tempat_dilahirkan, u.jenis_kelahiran, u.kelahiran_anak_ke, u.penolong_kelahiran, u.berat_lahir, u.panjang_lahir, u.id_cluster,
@@ -129,13 +130,15 @@
 		left join tweb_keluarga k on u.id_kk = k.id
 		left join tweb_penduduk_warganegara f on u.warganegara_id = f.id
 		left join tweb_penduduk_status s on u.status = s.id
-		WHERE u.id = ?";
+		WHERE u.nik = ?";
 		$query = $this->db->query($sql, $id);
 		$data  = $query->row_array();
 		$data['nama'] = addslashes($data['nama']);
 		$data['alamat_wilayah']= $this->get_alamat_wilayah($data);
 		return $data;
 	}
+	
+
 
 	function pengikut()
 	{
@@ -173,39 +176,52 @@
 
 	public function list_pamong()
 	{
-		$sql = "SELECT u.* FROM tweb_desa_pamong u WHERE pamong_status = 1 ";
+		/*
+		$sql = "SELECT u.*, p.nama as nama
+			FROM tweb_desa_pamong u
+			LEFT JOIN tweb_biodata_penduduk p ON u.id_pend = p.nik
+			WHERE pamong_status = 1";
+		*/
+		// $sql = "SELECT u.*, u.pamong_nama as nama
+		// 	FROM tweb_desa_pamong u
+		// 	WHERE pamong_status = 1";
+			$sql = "SELECT u.*, u.pamong_nama as nama
+			FROM tweb_desa_pamong u
+			WHERE jabatan = 'Lurah' or jabatan = 'Carik' ";
+			
 		$query = $this->db->query($sql);
 		$data  = $query->result_array();
+		for ($i=0; $i<count($data); $i++)
+		{
+			if (!empty($data[$i]['id_pend']))
+			{
+				// Dari database penduduk
+				$data[$i]['pamong_nama'] = $data[$i]['nama'];
+			}
+			$data[$i]['no'] = $i + 1;
+		}
 		return $data;
 	}
 
 	public function get_data_surat($id=0)
 	{
-		$sql = "SELECT u.*, g.nama AS gol_darah, x.nama AS sex, u.sex as sex_id,
-			(select (date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0) AS `(date_format(from_days((to_days(now()) - to_days(``tweb_penduduk``.``tanggallahir``))),'%Y') + 0)` from tweb_penduduk where (tweb_penduduk.id = u.id)) AS umur,
-			w.nama AS status_kawin, f.nama AS warganegara, a.nama AS agama, d.nama AS pendidikan, h.nama AS hubungan, j.nama AS pekerjaan, c.rt AS rt, c.rw AS rw, c.dusun AS dusun, k.no_kk AS no_kk, k.alamat, m.nama as cacat,
-			(select tweb_penduduk.nik from tweb_penduduk where (tweb_penduduk.id = k.nik_kepala)) AS nik_kk,
-			(select tweb_penduduk.telepon from tweb_penduduk where (tweb_penduduk.id = k.nik_kepala)) AS telepon_kk,
-			(select tweb_penduduk.nama AS nama from tweb_penduduk where (tweb_penduduk.id = k.nik_kepala)) AS kepala_kk
-			from tweb_penduduk u
-			left join tweb_penduduk_sex x on u.sex = x.id
-			left join tweb_penduduk_kawin w on u.status_kawin = w.id
-			left join tweb_penduduk_hubungan h on u.kk_level = h.id
-			left join tweb_penduduk_agama a on u.agama_id = a.id
-			left join tweb_penduduk_pendidikan_kk d on u.pendidikan_kk_id = d.id
-			left join tweb_penduduk_pekerjaan j on u.pekerjaan_id = j.id
-			left join tweb_cacat m on u.cacat_id = m.id
-			left join tweb_wil_clusterdesa c on u.id_cluster = c.id
-			left join tweb_keluarga k on u.id_kk = k.id
-			left join tweb_penduduk_warganegara f on u.warganegara_id = f.id
-			left join tweb_golongan_darah g on u.golongan_darah_id = g.id
-			WHERE u.id = ?";
+		$sql = "SELECT u.*, golongan_darah as gol_darah, jenis_klmin AS sex, 
+		(select (date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0) AS `(date_format(from_days((to_days(now()) - to_days(``tweb_penduduk``.``tanggallahir``))),'%Y') + 0)` from tweb_penduduk where (tweb_penduduk.id = u.id)) AS umur,
+		stat_kwn  AS status_kawin, 
+		 warganegara, 
+		 agama, 
+		 pendidikan,  
+		 pekerjaan, no_rt AS rt, no_rw AS rw, no_kk, alamat, kel_name, kec_name, kab_name,
+		kepala_kk kepala_kk
+		from tweb_biodata_penduduk u
+		WHERE u.nik = ?";
 		$query = $this->db->query($sql,$id);
 		$data  = $query->row_array();
 		$data['alamat_wilayah'] = $this->get_alamat_wilayah($data);
 		$this->format_data_surat($data);
 		return $data;
 	}
+	
 
 	public function format_data_surat(&$data)
 	{
@@ -255,22 +271,17 @@
 
 	public function get_data_pribadi($id=0)
 	{
-		$sql = "SELECT u.*, h.nama as hubungan, p.nama as kepala_kk, g.nama as gol_darah, d.nama as pendidikan, s.nama as status, r.nama as pek, m.nama as men, w.nama as wn, n.nama as agama, c.rw, c.rt, c.dusun, (DATE_FORMAT( FROM_DAYS( TO_DAYS( NOW( ) ) - TO_DAYS( u.tanggallahir ) ) , '%Y' ) +0) as umur, sex.nama as sex, k.alamat
-			FROM tweb_penduduk u
-			left join tweb_penduduk_hubungan h on u.kk_level = h.id
-			left join tweb_keluarga k on u.id_kk = k.id
-			left join tweb_penduduk p on k.nik_kepala = p.id
-			left join tweb_golongan_darah g on u.golongan_darah_id = g.id
-			left join tweb_penduduk_pendidikan_kk d on u.pendidikan_kk_id = d.id
-			left join tweb_penduduk_pekerjaan r on u.pekerjaan_id = r.id
-			left join tweb_cacat m on u.cacat_id = m.id
-			left join tweb_wil_clusterdesa c on u.id_cluster = c.id
-			left join tweb_penduduk_warganegara w on u.warganegara_id = w.id
-			left join tweb_penduduk_agama n on u.agama_id = n.id
-			LEFT JOIN tweb_penduduk_sex sex ON u.sex = sex.id
-			left join tweb_penduduk_status s on u.status = s.id
-			WHERE u.id = ?";
-		$query = $this->db->query($sql, $id);
+		$sql = "SELECT u.*, golongan_darah as gol_darah, jenis_klmin AS sex, 
+		(select (date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0) AS `(date_format(from_days((to_days(now()) - to_days(``tweb_penduduk``.``tanggallahir``))),'%Y') + 0)` from tweb_penduduk where (tweb_penduduk.id = u.id)) AS umur,
+		stat_kwn  AS status_kawin, 
+		 warganegara, 
+		 agama, 
+		 pendidikan,  
+		 pekerjaan, no_rt AS rt, no_rw AS rw, no_kk, alamat, kel_name, kec_name, kab_name,
+		kepala_kk kepala_kk
+		from tweb_biodata_penduduk u
+		WHERE u.nik = ?";
+		$query = $this->db->query($sql,$id);
 		$data  = $query->row_array();
 		$data['alamat_wilayah'] = $this->get_alamat_wilayah($data);
 		$this->format_data_surat($data);
@@ -809,6 +820,7 @@
 			default:
 				$id = $data['input']['nik'];
 				$data['individu'] = $this->get_data_surat($id);
+				//$data['individu'] = $this->get_penduduk($id);
 				$data['ayah'] = $this->get_data_ayah($id);
 				$data['ibu'] = $this->get_data_ibu($id);
 				break;

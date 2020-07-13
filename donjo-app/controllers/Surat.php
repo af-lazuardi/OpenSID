@@ -6,6 +6,7 @@ class Surat extends CI_Controller {
 	{
 		parent::__construct();
 		session_start();
+		$this->load->helper(array('url','download'));		
 		$this->load->model('user_model');
 		$grup = $this->user_model->sesi_grup($_SESSION['sesi']);
 		if ($grup != 1 AND $grup != 2 AND $grup != 3)
@@ -24,6 +25,7 @@ class Surat extends CI_Controller {
 		$this->load->model('config_model');
 		$this->load->model('referensi_model');
 		$this->load->model('penomoran_surat_model');
+		$this->load->model('biodata_model');
 		$this->modul_ini = 4;
 	}
 
@@ -67,31 +69,73 @@ class Surat extends CI_Controller {
 
 	public function form($url = '', $clear = '')
 	{
+		$desa = $this->get_data_desa();
+		$kodeProp = intval($desa['kode_propinsi']);
+		$kodeKab = intval($desa['kode_kabupaten']);
+		$kodeKec = intval($desa['kode_kecamatan']);
+		$kodeKel = intval($desa['kode_desa']);
+
 		$data['url'] = $url;
 		$data['anchor'] = $this->input->post('anchor');
+		$nik = $_POST['id'];
+		$no_kk = $this->biodata_model->get_kk($nik);
+		$data['jumlah'] = $this->biodata_model->countRow($no_kk);
 		if (!empty($_POST['nik']))
 		{
-			$data['individu'] = $this->surat_model->get_penduduk($_POST['nik']);
-			$data['anggota'] = $this->keluarga_model->list_anggota($data['individu']['id_kk']);
+			$nik = $_POST['nik'];
+
+			$data['individu'] = $this->biodata_model->get_penduduk($_POST['nik']);
+			$data['anggota'] = $this->biodata_model->get_kartu_keluarga($_POST['nik']);
+
+
+			if($data['individu']['nik'] == NULL) {
+				$data['individu']['status_data'] = "Data Tidak ditemukan";
+			} else {
+				if(
+					$data['individu']['no_prop'] == $kodeProp
+					&& $data['individu']['no_kab'] == $kodeKab
+					&& $data['individu']['no_kec'] == $kodeKec
+					&& $data['individu']['no_kel'] == $kodeKel
+				) {
+					$this->biodata_model->save_biodata($data['individu']);
+				        //$this->biodata_model->save_biodata($data['anggota']);	
+				} else {
+					if($url == 'surat_ket_domisili'){
+						$this->biodata_model->save_biodata($data['individu']);
+					}else{
+						$data['individu']['status_data'] = "Mohon Maaf Biodata Penduduk desa ".$data['individu']['kel_name'];
+					}
+				}	
+			}
+			
+			$data['individu']['alamat_wilayah']= $data['individu']['alamat'];
+	
+			
 		}
 		else
 		{
 			$data['individu'] = NULL;
 			$data['anggota'] = NULL;
 		}
+
+		//var_dump($data['anggota']);
+	//	exit;	
 		$this->get_data_untuk_form($url, $data);
 
 		$data['surat_url'] = rtrim($_SERVER['REQUEST_URI'], "/clear");
-		$data['form_action'] = site_url("surat/cetak/$url");
-		$data['form_action2'] = site_url("surat/doc/$url");
+		$data['form_action'] = site_url("surat/save_surat/$url");
+		// $data['form_action'] = site_url("surat/cetak/$url");
+		// $data['form_action2'] = site_url("surat/doc/$url");
 		$nav['act'] = 4;
 		$nav['act_sub'] = 31;
 		$header = $this->header_model->get_data();
-		$header['minsidebar'] = 1;
+		$header['minsidebar'] = 0;
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 		$this->load->view("surat/form_surat", $data);
 		$this->load->view('footer');
+		// echo $this->db->last_query();
+		
 	}
 
 	public function cetak($url = '')
@@ -128,7 +172,7 @@ class Surat extends CI_Controller {
 	{
 		$format = $this->surat_model->get_surat($url);
 		$log_surat['url_surat'] = $format['id'];
-		$log_surat['pamong_nama'] = $_POST['pamong'];
+		$log_surat['id_pamong'] = $_POST['pamong_id'];
 		$log_surat['id_user'] = $_SESSION['user'];
 		$log_surat['no_surat'] = $_POST['nomor'];
 		$id = $_POST['nik'];
@@ -152,8 +196,15 @@ class Surat extends CI_Controller {
 		if ($id)
 		{
 			$log_surat['id_pend'] = $id;
-			$nik = $this->db->select('nik')->where('id', $id)->get('tweb_penduduk')
+
+			//edit candta
+			$nik=$this->surat_model->get_penduduk($_POST['nik']);
+			//$nik=$this->biodata_model->get_biodata_local($_POST['nik']);
+			$nik = $this->db->select('nik')->where('nik', $id)->get('tweb_penduduk')
 					->row()->nik;
+					
+
+			
 		}
 		else
 		{
@@ -169,7 +220,7 @@ class Surat extends CI_Controller {
 		$log_surat['nama_surat'] = $nama_surat;
 		$log_surat['lampiran'] = $lampiran;
 		$this->keluar_model->log_surat($log_surat);
-
+		
 		header("location:".base_url(LOKASI_ARSIP.$nama_surat));
 	}
 
@@ -208,4 +259,77 @@ class Surat extends CI_Controller {
 		redirect("surat");
 	}
 
+	public function get_data_desa()
+	{
+		$sql = "SELECT * FROM config WHERE 1";
+		$query = $this->db->query($sql);
+		return $query->row_array();
+	}
+
+	public function save_surat($url = '')
+	{
+
+		$log_surat['url_surat'] = $url;
+		$log_surat['id_pamong'] = $_POST['pamong_id'];
+		$log_surat['pamong_nama'] = $_POST['pamong'];
+		$log_surat['id_user'] = $_SESSION['user'];
+		$log_surat['no_surat'] = $_POST['nomor'];
+		$log_surat['detail'] = json_encode($this->input->post());
+
+		$id = $_POST['nik'];
+
+		$nik = $_POST['pengikut'];
+		$no_kk = $this->biodata_model->get_kk($nik);
+		$data['jumlah'] = $this->biodata_model->countRow($no_kk);
+		$data['penduduk'] = $this->biodata_model->get_individu($nik)->result_array();
+		// echo $data['kk'];
+		// echo $this->db->last_query();
+
+		$log_surat['id_pend'] = $id;
+		$data['input'] = $_POST;
+		$data['tanggal_sekarang'] = tgl_indo(date("Y m d"));
+
+		$data['data'] = $this->surat_model->get_data_surat($id);
+
+		$data['pribadi'] = $this->surat_model->get_data_pribadi($id);
+		$data['kk'] = $this->surat_model->get_data_kk($id);
+		$data['ayah'] = $this->surat_model->get_data_ayah($id);
+		$data['ibu'] = $this->surat_model->get_data_ibu($id);
+
+		$data['desa'] = $this->surat_model->get_data_desa();
+		$data['pamong'] = $this->surat_model->get_pamong($_POST['pamong']);
+
+		$data['pengikut'] = $this->surat_model->pengikut();
+		
+		// $data['anggota'] = $this->biodata_model->get_kartu_keluarga($_POST['nik'], $_POST['tujuan'], $_POST['nik_b'], $_POST['hubkeluarga']);
+		$this->keluar_model->log_surat($log_surat);
+
+		// echo var_dump($data['anggota']);
+		// exit;
+
+		$data['url'] = $url;
+
+		$data_stat = array(
+			"desa_id"=>$this->db->database,
+			"id_surat"=>$url,
+			"tgl"=>date('Y-m-d'),
+			"jml"=>1
+		);
+		cpost('statistik_layanan_surat', $data_stat);
+
+
+		$this->load->view("surat/print_surat", $data);
+	}
+
+	public function download() 
+    {    
+    	force_download('desa/file/petunjuk.pdf',NULL);
+
+        // $nama='petunjuk.pdf';
+        // $file = 'desa/file'.$nama;
+        // force_download($file, NULL);
+
+        //  $nama_file=$this->input->post("file");
+        // force_download('file/$nama_file',NULL);
+    }
 }

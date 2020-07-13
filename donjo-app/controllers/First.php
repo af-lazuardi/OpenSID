@@ -6,6 +6,15 @@ class First extends Web_Controller {
 	{
 		parent::__construct();
 		session_start();
+		$this->load->helper(array('form', 'url','download'));
+		$ip = $this->getRealIpAddr();
+		$data_stat = array(
+			"desa_id"=>$this->db->database,
+			"ip_addres"=>$ip,
+			"tgl"=>date('Y-m-d'),
+			"hits"=>1
+		);
+		cpost('statistik', $data_stat);
 
 		// Jika offline_mode dalam level yang menyembunyikan website,
 		// tidak perlu menampilkan halaman website
@@ -44,6 +53,10 @@ class First extends Web_Controller {
 		$this->load->model('laporan_penduduk_model');
 		$this->load->model('track_model');
 		$this->load->model('keluar_model');
+		$this->load->model('agregat_dukcapil_model');
+		// added by akhwan to add "Pamong menu in front "
+		$this->load->model('pamong_model');
+		$this->load->model('m_download');
 	}
 
 	public function auth()
@@ -97,7 +110,7 @@ class First extends Web_Controller {
 
 		$this->load->view($this->template, $data);
 	}
-
+	
 	public function cetak_biodata($id='')
 	{
 		if ($_SESSION['mandiri'] != 1)
@@ -267,20 +280,98 @@ class First extends Web_Controller {
 
 	public function statistik($stat=0, $tipe=0)
 	{
+
+		$kategori = "";
+		switch ($stat) {
+			case '2':
+				$kategori = "statKawin";
+				break;
+			case '4':
+					$kategori = "jenisKelamin";
+					break;
+			case '0':
+					$kategori = "pendidikan";
+				break;
+			case '13':
+					$kategori = "umur";
+			break;
+					case '1':
+					$kategori = "pekerjaan";
+			break;
+					case '3':
+					$kategori = "agama";
+			break;
+				case '7':
+					$kategori = "golDarah";
+		break;
+			case '19':
+					$kategori = "statHbkel";
+			break;
+			case '20':
+					$kategori = "kkJenisKelamin";
+			break;
+			case '23':
+					$kategori = "kkUmur";
+			break;
+
+			case '21':
+					$kategori = "kkPendidikan";
+			break;
+
+			case '22':
+					$kategori = "kkPekerjaan";
+			break;
+
+
+		}
+
+		$tahun =  $_POST['tahun'];
+		$semester =  $_POST['semester'];
+		$dataAgregat =null;
+		if($tahun !=null && $semester !=null) {
+			$dataAgregat = $this->agregat_dukcapil_model->get_agregat($kategori, $tahun, $semester);
+		}
+		$exportDate = ["tahun"=> $tahun, "semester"=>$semester];
+
+
+		$someArray = json_decode($dataAgregat, true);
+		$hasilData = [];
+		foreach($someArray as $key=>&$val) {
+			$hasilData[] =[
+				"no" => $key+1,
+				"nama" => $val["kategori"],
+				"jumlah" => $val['jumlah'],
+				"laki" => $val["lakiLaki"],
+				 "perempuan" => $val["perempuan"],
+				 "persen1" => number_format((($val["lakiLaki"] / $val["jumlah"])* 100),2),
+				 "persen2" => number_format((($val["perempuan"] / $val["jumlah"])* 100),2)
+		];
+
+		}
+
 		$data = $this->includes;
 
+		$data['export_date'] = $exportDate;
 		$data['heading'] = $this->laporan_penduduk_model->judul_statistik($stat);
 		$data['jenis_laporan'] = $this->laporan_penduduk_model->jenis_laporan($stat);
-		$data['stat'] = $this->laporan_penduduk_model->list_data($stat);
+	//	$data['stat'] = $this->laporan_penduduk_model->list_data($stat);
+		$data['stat'] =  $hasilData;
 		$data['tipe'] = $tipe;
 		$data['st'] = $stat;
+
+
+	//	var_dump(json_encode($data['export_date']));
+	//	exit;
+
+		//var_dump(json_encode($data['stat']));
+		//exit;
 
 		$this->_get_common_data($data);
 
 		$this->set_template('layouts/stat.tpl.php');
 		$this->load->view($this->template, $data);
 	}
-
+	
 	public function data_analisis($stat="", $sb=0, $per=0)
 	{
 		$data = $this->includes;
@@ -425,6 +516,102 @@ class First extends Web_Controller {
 			$data[$kolom] = $this->security->xss_clean($data[$kolom]);
 		}
 
+	}
+	
+	public function produkhukum()
+	{
+		$data = $this->includes;
+		$this->_get_common_data($data);
+
+		$data['prokum'] = $this->db->query("SELECT *
+										FROM dokumen
+										WHERE kategori = 4")->result_array();
+		$data['p'] = "produk_hukum";
+
+		$this->set_template('layouts/perangkat_desa.tpl.php');
+		$this->load->view($this->template,$data);
+	}
+	public function tampil_dokumen($id){
+		$data = $this->includes;
+		$this->_get_common_data($data);
+
+		$data['prokum'] = $this->db->query("SELECT id,satuan
+										FROM dokumen
+										WHERE kategori = 4 
+										AND id = ".$id )->result_array();
+		$data['p'] = "dokumen";
+
+		$this->set_template('layouts/perangkat_desa.tpl.php');
+		$this->load->view($this->template,$data);
+	}
+	public function download($id) 
+    {    
+        $fileinfo = $this->m_download->download($id);
+        $file = 'desa/upload/dokumen/'.$fileinfo['satuan'];
+        force_download($file, NULL);
+
+        //  $nama_file=$this->input->post("file");
+        // force_download('file/$nama_file',NULL);
+    }
+	/*
+	added by akhwan
+	untuk menambahkan menu perangkat desa di frontend
+	*/
+	public function perangkatdesa()
+	{
+		$data = $this->includes;
+		$this->_get_common_data($data);
+
+		$data['data_pamong'] = $this->pamong_model->list_data();
+		$data['p'] = "perangkat_desa";
+
+		$this->set_template('layouts/perangkat_desa.tpl.php');
+		$this->load->view($this->template,$data);
+	}
+	public function profildesa()
+	{
+		$data = $this->includes;
+		$this->_get_common_data($data);
+
+		$data['main'] = $this->config_model->get_data();
+
+		$data['p'] = "profil_desa";
+
+		$this->set_template('layouts/perangkat_desa.tpl.php');
+		$this->load->view($this->template,$data);
+	}
+	public function wilayahdesa()
+	{
+		$data = $this->includes;
+		$this->_get_common_data($data);
+
+		$data['main'] = $this->db->query("SELECT a.dusun,
+										b.nama
+										FROM tweb_wil_clusterdesa a
+										INNER JOIN tweb_biodata_penduduk b ON a.id_kepala = b.nik
+										GROUP BY a.dusun")->result_array();
+
+		$data['p'] = "wilayah_desa";
+
+		$this->set_template('layouts/perangkat_desa.tpl.php');
+		$this->load->view($this->template,$data);
+	}
+
+	function getRealIpAddr()
+	{
+	    if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet
+	    {
+	      $ip=$_SERVER['HTTP_CLIENT_IP'];
+	    }
+	    elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))   //to check ip is pass from proxy
+	    {
+	      $ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+	    }
+	    else
+	    {
+	      $ip=$_SERVER['REMOTE_ADDR'];
+	    }
+	    return $ip;
 	}
 
 }

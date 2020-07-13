@@ -1,32 +1,93 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Statistik extends CI_Controller {
+class Statistik extends Ci_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
 		session_start();
-		$this->load->model('user_model');
 		$this->load->model('laporan_penduduk_model');
+		$this->load->model('pamong_model');
 		$this->load->model('program_bantuan_model');
-		$grup = $this->user_model->sesi_grup($_SESSION['sesi']);
-		if ($grup != 1 AND $grup != 2 AND $grup != 3)
-		{
-			if (empty($grup))
-				$_SESSION['request_uri'] = $_SERVER['REQUEST_URI'];
-			else
-				unset($_SESSION['request_uri']);
-			redirect('siteman');
-		}
 		$this->load->model('header_model');
+		$this->load->model('agregat_dukcapil_model');
 		$_SESSION['per_page'] = 500;
 		$this->modul_ini = 3;
 	}
 
 	public function index($lap = 0, $o = 0)
 	{
+
+				$kategori = "";
+				switch ($lap) {
+					case '2':
+						$kategori = "statKawin";
+						break;
+					case '4':
+							$kategori = "jenisKelamin";
+							break;
+					case '0':
+							$kategori = "pendidikan";
+						break;
+					case '13':
+							$kategori = "umur";
+					break;
+							case '1':
+							$kategori = "pekerjaan";
+					break;
+							case '3':
+							$kategori = "agama";
+					break;
+						case '7':
+							$kategori = "golDarah";
+				break;
+					case '19':
+							$kategori = "statHbkel";
+					break;
+					case '20':
+							$kategori = "kkJenisKelamin";
+					break;
+					case '23':
+							$kategori = "kkUmur";
+					break;
+
+					case '21':
+							$kategori = "kkPendidikan";
+					break;
+
+					case '22':
+							$kategori = "kkPekerjaan";
+					break;
+
+
+				}
+
+				$tahun =  $_POST['tahun'];
+				$semester =  $_POST['semester'];
+				$dataAgregat =null;
+				if($tahun !=null && $semester !=null) {
+					$dataAgregat = $this->agregat_dukcapil_model->get_agregat($kategori, $tahun, $semester);
+				}
+				$exportDate = ["tahun"=> $tahun, "semester"=>$semester];
+
+
+				$someArray = json_decode($dataAgregat, true);
+				$hasilData = [];
+				foreach($someArray as $key=>&$val) {
+					$hasilData[] =[
+						"no" => $key+1,
+						"nama" => $val["kategori"],
+						"jumlah" => $val['jumlah'],
+						"laki" => $val["lakiLaki"],
+						 "perempuan" => $val["perempuan"],
+						 "persen1" => number_format((($val["lakiLaki"] / $val["jumlah"])* 100),2),
+						 "persen2" => number_format((($val["perempuan"] / $val["jumlah"])* 100),2)
+				];
+
+				}
 		// $data['kategori'] untuk pengaturan penampilan kelompok statistik di laman statistik
-		$data['main'] = $this->laporan_penduduk_model->list_data($lap, $o);
+		$data['main'] = $hasilData;
+		$data['export_date'] = $exportDate;
 		$data['lap'] = $lap;
 		$data['judul_kelompok'] = "Jenis Kelompok";
 		$data['o'] = $o;
@@ -63,9 +124,79 @@ class Statistik extends CI_Controller {
 		redirect('statistik');
 	}
 
-	public function graph($lap = 0)
+	public function graph($lap = 0, $tahun=0, $semester=0)
 	{
-		$data['main'] = $this->laporan_penduduk_model->list_data($lap);
+
+		$kategori = "";
+		switch ($lap) {
+			case '2':
+				$kategori = "statKawin";
+				break;
+			case '4':
+					$kategori = "jenisKelamin";
+					break;
+			case '0':
+					$kategori = "pendidikan";
+				break;
+			case '13':
+					$kategori = "umur";
+			break;
+					case '1':
+					$kategori = "pekerjaan";
+			break;
+					case '3':
+					$kategori = "agama";
+			break;
+				case '7':
+					$kategori = "golDarah";
+		break;
+			case '19':
+					$kategori = "statHbkel";
+			break;
+			case '20':
+					$kategori = "kkJenisKelamin";
+			break;
+			case '23':
+					$kategori = "kkUmur";
+			break;
+
+			case '21':
+					$kategori = "kkPendidikan";
+			break;
+
+			case '22':
+					$kategori = "kkPekerjaan";
+			break;
+
+
+		}
+
+
+		$dataAgregat =null;
+		if($tahun !=null && $semester !=null) {
+			$dataAgregat = $this->agregat_dukcapil_model->get_agregat($kategori, $tahun, $semester);
+		}
+		$exportDate = ["tahun"=> $tahun, "semester"=>$semester];
+
+
+		$someArray = json_decode($dataAgregat, true);
+		$hasilData = [];
+		foreach($someArray as $key=>&$val) {
+			$hasilData[] =[
+				"no" => $key+1,
+				"nama" => $val["kategori"],
+				"jumlah" => $val['jumlah'],
+				"laki" => $val["lakiLaki"],
+				 "perempuan" => $val["perempuan"],
+				 "persen1" => number_format((($val["lakiLaki"] / $val["jumlah"])* 100),2),
+				 "persen2" => number_format((($val["perempuan"] / $val["jumlah"])* 100),2)
+		];
+
+		}
+// $data['kategori'] untuk pengaturan penampilan kelompok statistik di laman statistik
+$data['main'] = $hasilData;
+$data['export_date'] = $exportDate;
+		//$data['main'] = $this->laporan_penduduk_model->list_data($lap);
 		$data['lap'] = $lap;
 		$this->get_data_stat($data, $lap);
 		$nav['act'] = 3;
@@ -78,9 +209,79 @@ class Statistik extends CI_Controller {
 		$this->load->view('footer');
 	}
 
-	public function pie($lap = 0)
+	public function pie($lap = 0,$tahun=0, $semester=0)
 	{
-		$data['main'] = $this->laporan_penduduk_model->list_data($lap);
+
+		$kategori = "";
+		switch ($lap) {
+			case '2':
+				$kategori = "statKawin";
+				break;
+			case '4':
+					$kategori = "jenisKelamin";
+					break;
+			case '0':
+					$kategori = "pendidikan";
+				break;
+			case '13':
+					$kategori = "umur";
+			break;
+					case '1':
+					$kategori = "pekerjaan";
+			break;
+					case '3':
+					$kategori = "agama";
+			break;
+				case '7':
+					$kategori = "golDarah";
+		break;
+			case '19':
+					$kategori = "statHbkel";
+			break;
+			case '20':
+					$kategori = "kkJenisKelamin";
+			break;
+			case '23':
+					$kategori = "kkUmur";
+			break;
+
+			case '21':
+					$kategori = "kkPendidikan";
+			break;
+
+			case '22':
+					$kategori = "kkPekerjaan";
+			break;
+
+
+		}
+
+
+		$dataAgregat =null;
+		if($tahun !=null && $semester !=null) {
+			$dataAgregat = $this->agregat_dukcapil_model->get_agregat($kategori, $tahun, $semester);
+		}
+		$exportDate = ["tahun"=> $tahun, "semester"=>$semester];
+
+
+		$someArray = json_decode($dataAgregat, true);
+		$hasilData = [];
+		foreach($someArray as $key=>&$val) {
+			$hasilData[] =[
+				"no" => $key+1,
+				"nama" => $val["kategori"],
+				"jumlah" => $val['jumlah'],
+				"laki" => $val["lakiLaki"],
+				 "perempuan" => $val["perempuan"],
+				 "persen1" => number_format((($val["lakiLaki"] / $val["jumlah"])* 100),2),
+				 "persen2" => number_format((($val["perempuan"] / $val["jumlah"])* 100),2)
+		];
+
+		}
+// $data['kategori'] untuk pengaturan penampilan kelompok statistik di laman statistik
+$data['main'] = $hasilData;
+$data['export_date'] = $exportDate;
+	//	$data['main'] = $this->laporan_penduduk_model->list_data($lap);
 		$data['lap'] = $lap;
 		$this->get_data_stat($data, $lap);
 		$nav['act'] = 3;
@@ -115,21 +316,186 @@ class Statistik extends CI_Controller {
 		}
 	}
 
-	public function cetak($lap = 0)
+	public function dialog_cetak($lap = 0,$tahun=0, $semester=0)
 	{
+		$data['aksi'] = "Cetak";
+		$data['tahun']  = $tahun;
+		$data['semester'] = $semester;
+		$data['pamong'] = $this->pamong_model->list_data(true);
+		$data['form_action'] = site_url("statistik/cetak/$lap/$tahun/$semester");
+		$this->load->view('statistik/ajax_cetak', $data);
+	}
+
+	public function dialog_unduh($lap = 0,$tahun=0, $semester=0)
+	{
+		$data['aksi'] = "Unduh";
+		$data['tahun']  = $tahun;
+		$data['semester'] = $semester;
+		$data['pamong'] = $this->pamong_model->list_data(true);
+		$data['form_action'] = site_url("statistik/unduh/$lap/$tahun/$semester");
+		$this->load->view('statistik/ajax_cetak', $data);
+	}
+
+	public function cetak($lap = 0,$tahun=0, $semester=0)
+	{
+
+				$kategori = "";
+				switch ($lap) {
+					case '2':
+						$kategori = "statKawin";
+						break;
+					case '4':
+							$kategori = "jenisKelamin";
+							break;
+					case '0':
+							$kategori = "pendidikan";
+						break;
+					case '13':
+							$kategori = "umur";
+					break;
+							case '1':
+							$kategori = "pekerjaan";
+					break;
+							case '3':
+							$kategori = "agama";
+					break;
+						case '7':
+							$kategori = "golDarah";
+				break;
+					case '19':
+							$kategori = "statHbkel";
+					break;
+					case '20':
+							$kategori = "kkJenisKelamin";
+					break;
+					case '23':
+							$kategori = "kkUmur";
+					break;
+
+					case '21':
+							$kategori = "kkPendidikan";
+					break;
+
+					case '22':
+							$kategori = "kkPekerjaan";
+					break;
+
+
+				}
+
+
+				$dataAgregat =null;
+				if($tahun !=null && $semester !=null) {
+					$dataAgregat = $this->agregat_dukcapil_model->get_agregat($kategori, $tahun, $semester);
+				}
+				$exportDate = ["tahun"=> $tahun, "semester"=>$semester];
+
+
+				$someArray = json_decode($dataAgregat, true);
+				$hasilData = [];
+				foreach($someArray as $key=>&$val) {
+					$hasilData[] =[
+						"no" => $key+1,
+						"nama" => $val["kategori"],
+						"jumlah" => $val['jumlah'],
+						"laki" => $val["lakiLaki"],
+						 "perempuan" => $val["perempuan"],
+						 "persen1" => number_format((($val["lakiLaki"] / $val["jumlah"])* 100),2),
+						 "persen2" => number_format((($val["perempuan"] / $val["jumlah"])* 100),2)
+				];
+
+				}
+		// $data['kategori'] untuk pengaturan penampilan kelompok statistik di laman statistik
+		$data['main'] = $hasilData;
+		$data['export_date'] = $exportDate;
 		$data['lap'] = $lap;
 		$data['stat'] = $this->laporan_penduduk_model->judul_statistik($lap);
 		$data['config'] = $this->laporan_penduduk_model->get_config();
-		$data['main'] = $this->laporan_penduduk_model->list_data($lap);
+
+		$data['pamong_ttd'] = $this->pamong_model->get_data($_POST['pamong_ttd']);
+		$data['laporan_no'] = $this->input->post('laporan_no');
 		$this->load->view('statistik/penduduk_print', $data);
 	}
 
-	public function excel($lap = 0)
+	public function unduh($lap = 0,$tahun=0, $semester=0)
 	{
+
+
+				$kategori = "";
+				switch ($lap) {
+					case '2':
+						$kategori = "statKawin";
+						break;
+					case '4':
+							$kategori = "jenisKelamin";
+							break;
+					case '0':
+							$kategori = "pendidikan";
+						break;
+					case '13':
+							$kategori = "umur";
+					break;
+							case '1':
+							$kategori = "pekerjaan";
+					break;
+							case '3':
+							$kategori = "agama";
+					break;
+						case '7':
+							$kategori = "golDarah";
+				break;
+					case '19':
+							$kategori = "statHbkel";
+					break;
+					case '20':
+							$kategori = "kkJenisKelamin";
+					break;
+					case '23':
+							$kategori = "kkUmur";
+					break;
+
+					case '21':
+							$kategori = "kkPendidikan";
+					break;
+
+					case '22':
+							$kategori = "kkPekerjaan";
+					break;
+
+
+				}
+
+
+				$dataAgregat =null;
+				if($tahun !=null && $semester !=null) {
+					$dataAgregat = $this->agregat_dukcapil_model->get_agregat($kategori, $tahun, $semester);
+				}
+				$exportDate = ["tahun"=> $tahun, "semester"=>$semester];
+
+
+				$someArray = json_decode($dataAgregat, true);
+				$hasilData = [];
+				foreach($someArray as $key=>&$val) {
+					$hasilData[] =[
+						"no" => $key+1,
+						"nama" => $val["kategori"],
+						"jumlah" => $val['jumlah'],
+						"laki" => $val["lakiLaki"],
+						 "perempuan" => $val["perempuan"],
+						 "persen1" => number_format((($val["lakiLaki"] / $val["jumlah"])* 100),2),
+						 "persen2" => number_format((($val["perempuan"] / $val["jumlah"])* 100),2)
+				];
+
+				}
+		// $data['kategori'] untuk pengaturan penampilan kelompok statistik di laman statistik
+		$data['main'] = $hasilData;
+		$data['export_date'] = $exportDate;
+		$data['aksi'] = 'unduh';
 		$data['lap'] = $lap;
 		$data['stat'] = $this->laporan_penduduk_model->judul_statistik($lap);
 		$data['config']  = $this->laporan_penduduk_model->get_config();
-		$data['main'] = $this->laporan_penduduk_model->list_data($lap);
+		$data['pamong_ttd'] = $this->pamong_model->get_data($_POST['pamong_ttd']);
+		$data['laporan_no'] = $this->input->post('laporan_no');
 		$this->load->view('statistik/penduduk_excel', $data);
 	}
 
@@ -180,12 +546,14 @@ class Statistik extends CI_Controller {
 
 	public function rentang_delete($id = 0)
 	{
+		$this->redirect_hak_akses('h', 'statistik/rentang_umur');
 		$this->laporan_penduduk_model->delete_rentang($id);
 		redirect('statistik/rentang_umur');
 	}
 
 	public function delete_all_rentang()
 	{
+		$this->redirect_hak_akses('h', 'statistik/rentang_umur');
 		$this->laporan_penduduk_model->delete_all_rentang();
 		redirect('statistik/rentang_umur');
 	}

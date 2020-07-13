@@ -18,6 +18,7 @@ class Program_bantuan extends CI_Controller {
 		}
 		$this->load->model('header_model');
 		$this->load->model('program_bantuan_model');
+		$this->load->model('biodata_model');
 		$this->modul_ini = 6;
 	}
 
@@ -48,11 +49,38 @@ class Program_bantuan extends CI_Controller {
 
 	public function form($program_id)
 	{
+
+		$desa = $this->get_data_desa();
+		$kodeProp = intval($desa['kode_propinsi']);
+		$kodeKab = intval($desa['kode_kabupaten']);
+		$kodeKec = intval($desa['kode_kecamatan']);
+		$kodeKel = intval($desa['kode_desa']);
+
 		$data['program'] = $this->program_bantuan_model->get_program(1, $program_id);
 		$sasaran = $data['program'][0]['sasaran'];
 		if (isset($_POST['nik']))
 		{
-			$data['individu'] = $this->program_bantuan_model->get_peserta($_POST['nik'], $sasaran);
+			//$data['individu'] = $this->program_bantuan_model->get_peserta($_POST['nik'], $sasaran);
+
+			$data['individu'] = $this->biodata_model->get_penduduk($_POST['nik']);
+	
+			if($data['individu']['nik'] == NULL) {
+				$data['individu']['status_data'] = "Data Tidak ditemukan";
+			} else {
+				if(
+					$data['individu']['no_prop'] == $kodeProp
+					&& $data['individu']['no_kab'] == $kodeKab
+					&& $data['individu']['no_kec'] == $kodeKec
+					&& $data['individu']['no_kel'] == $kodeKel
+				) {
+					$this->biodata_model->save_biodata($data['individu']);
+					
+				} else {
+					$data['individu']['status_data'] = "Mohon Maaf Biodata Penduduk desa ".$data['individu']['kel_name'];
+				}	
+			}
+			
+			$data['individu']['alamat_wilayah']= $data['individu']['alamat'];
 		}
 		else
 		{
@@ -253,4 +281,12 @@ class Program_bantuan extends CI_Controller {
 			$this->load->view('program_bantuan/unduh-sheet', $data);
 		}
 	}
+
+	public function get_data_desa()
+	{
+		$sql = "SELECT * FROM config WHERE 1";
+		$query = $this->db->query($sql);
+		return $query->row_array();
+	}
+
 }

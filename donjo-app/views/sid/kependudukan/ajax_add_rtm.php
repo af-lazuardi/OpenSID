@@ -14,12 +14,7 @@
 					<div class="box-body">
 						<div class="form-group">
 							<label for="nik">Kepala Rumah Tangga</label>
-							<select class="form-control input-sm select2 required"  id="nik_kepala" name="nik_kepala" style="width:100%;">
-								<option option value="">-- Silakan Cari NIK / Nama Penduduk--</option>
-								<?php foreach ($penduduk as $data): ?>
-									<option value="<?= $data['id']?>">NIK :<?= $data['nik']." - ".$data['nama']?></option>
-								<?php endforeach; ?>
-							</select>
+							<input class="form-control" id="nik_kepala" name="nik_kepala">
 						</div>
 						<p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
 							Silakan cari nama / NIK dari data penduduk yang sudah terinput.

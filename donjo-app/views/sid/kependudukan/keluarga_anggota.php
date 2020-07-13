@@ -41,7 +41,7 @@
 											</tr>
 											<tr>
 												<td nowrap style="padding-top : 10px;padding-bottom : 10px;" >Alamat</td>
-												<td nowrap > : <?= $kepala_kk['alamat_wilayah']?></td>
+												<td nowrap > : <?= $kepala_kk['alamat']?></td>
 											</tr>
 										</tbody>
 									</table>
@@ -79,8 +79,8 @@
 																	<td><?= $data['nik']?></td>
 																	<td nowrap width="45%"><?= strtoupper(unpenetration($data['nama']))?></td>
 																	<td nowrap><?= tgl_indo($data['tanggallahir'])?></td>
-																	<td><?= $data['sex']?></td>
-																	<td nowrap><?= $data['hubungan']?></td>
+																	<td><?= $data['jenis_klmin']?></td>
+																	<td nowrap><?= $data['stat_hbkel']?></td>
 																</tr>
 															<?php endforeach; ?>
 														</tbody>

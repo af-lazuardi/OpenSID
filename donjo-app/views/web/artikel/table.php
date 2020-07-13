@@ -54,7 +54,7 @@
 						<div class="box-body no-padding">
 							<ul class="nav nav-pills nav-stacked">
 								<li <?php if ($cat == 999): ?>class="active"<?php endif; ?>><a href="<?=site_url('web/index/999')?>">Halaman Statis</a></li>
-               	<li <?php if ($cat == 1000): ?>class="active"<?php endif; ?>><a href="<?=site_url('web/index/1000')?>">Agenda</a></li>
+               					<li <?php if ($cat == 1000): ?>class="active"<?php endif; ?>><a href="<?=site_url('web/index/1000')?>">Agenda</a></li>
 							</ul>
 						</div>
 					</div>

@@ -142,19 +142,17 @@
 
 	private function list_data_sql()
 	{
-		$sql = "FROM tweb_keluarga u
-			LEFT JOIN tweb_penduduk t ON u.nik_kepala = t.id
-			LEFT JOIN tweb_wil_clusterdesa c ON t.id_cluster = c.id
+		$sql = "FROM tweb_biodata_penduduk u
 			WHERE 1 ";
 
-		$sql .=	$this->search_sql();
-		$sql .=	$this->status_dasar_sql();
-		$sql .=	$this->dusun_sql();
-		$sql .= $this->rw_sql();
-		$sql .=	$this->rt_sql();
-		$sql .=	$this->sex_sql();
-		$sql .= $this->kelas_sql();
-		$sql .= $this->bos_sql();
+		//$sql .=	$this->search_sql();
+		//$sql .=	$this->status_dasar_sql();
+		//$sql .=	$this->dusun_sql();
+		//$sql .= $this->rw_sql();
+		//$sql .=	$this->rt_sql();
+		//$sql .=	$this->sex_sql();
+		//$sql .= $this->kelas_sql();
+		//$sql .= $this->bos_sql();
 		return $sql;
 	}
 
@@ -169,13 +167,13 @@
 			case 4: $order_sql = ' ORDER BY kepala_kk DESC'; break;
 			case 5: $order_sql = ' ORDER BY g.nama'; break;
 			case 6: $order_sql = ' ORDER BY g.nama DESC'; break;
-			default:$order_sql = ' ORDER BY u.tgl_daftar DESC';
+			default:$order_sql = ' ORDER BY u.no_kk DESC';
 		}
 
 		//Paging SQL
 		$paging_sql = ' LIMIT ' .$offset. ',' .$limit;
 
-		$sql = "SELECT u.*, t.nama AS kepala_kk, t.nik, t.sex, t.status_dasar, (SELECT COUNT(id) FROM tweb_penduduk WHERE id_kk = u.id AND status_dasar = 1) AS jumlah_anggota, c.dusun, c.rw, c.rt ".$this->list_data_sql();
+		$sql = "SELECT u.*,  (SELECT COUNT(nik) FROM tweb_biodata_penduduk WHERE no_kk = u.no_kk) AS jumlah_anggota ".$this->list_data_sql();
 		$sql .= $order_sql;
 		$sql .= $paging_sql;
 
@@ -399,13 +397,8 @@
 	*/
 	public function delete($id='')
 	{
-		$nik_kepala = $this->db->select('nik_kepala')->where('id',$id)->get('tweb_keluarga')->row()->nik_kepala;
-		$list_anggota = $this->db->select('id')->where('id_kk',$id)->get('tweb_penduduk')->result_array();
-		foreach ($list_anggota as $anggota)
-		{
-			$this->rem_anggota($id,$anggota['id']);
-		}
-		$this->db->where('id',$id)->delete('tweb_keluarga');
+		
+		$this->db->where('no_kk',$id)->delete('tweb_biodata_penduduk');
 		// Untuk statistik perkembangan keluarga
 		$this->log_keluarga($id, $nik_kepala, 2);
 	}
@@ -599,24 +592,7 @@
 	// $options['pilih'] untuk membatasi ke nik tertentu saja
 	public function list_anggota($id=0,$options=array('dengan_kk'=>true))
 	{
-		$sql = "SELECT u.*, u.sex as sex_id, u.status_kawin as status_kawin_id,
-			(SELECT DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0 FROM tweb_penduduk WHERE id = u.id) AS umur,
-				b.dusun, b.rw, b.rt, x.nama as sex, u.kk_level, a.nama as agama, d.nama as pendidikan,j.nama as pekerjaan, w.nama as status_kawin, f.nama as warganegara, g.nama as golongan_darah, h.nama AS hubungan, k.alamat
-			FROM tweb_penduduk u
-			LEFT JOIN tweb_penduduk_agama a ON u.agama_id = a.id
-			LEFT JOIN tweb_penduduk_pekerjaan j ON u.pekerjaan_id = j.id
-			LEFT JOIN tweb_penduduk_pendidikan_kk d ON u.pendidikan_kk_id = d.id
-			LEFT JOIN tweb_penduduk_warganegara f ON u.warganegara_id = f.id
-			LEFT JOIN tweb_golongan_darah g ON u.golongan_darah_id = g.id
-			LEFT JOIN tweb_penduduk_kawin w ON u.status_kawin = w.id
-			LEFT JOIN tweb_penduduk_sex x ON u.sex = x.id
-			LEFT JOIN tweb_penduduk_hubungan h ON u.kk_level = h.id
-			LEFT JOIN tweb_wil_clusterdesa b ON u.id_cluster = b.id
-			LEFT JOIN tweb_keluarga k ON u.id_kk = k.id
-			WHERE status = 1 AND status_dasar = 1 AND id_kk = ?";
-		if ($options['dengan_kk'] !== NULL AND !$options['dengan_kk']) $sql .= " AND kk_level <> 1";
-		if (!empty($options['pilih'])) $sql .= " AND u.nik IN (".$options['pilih'].")";
-		$sql .= " ORDER BY kk_level, tanggallahir";
+		$sql = "select * from tweb_biodata_penduduk where no_kk=?";
 		$query = $this->db->query($sql, array($id));
 		$data = $query->result_array();
 		return $data;
@@ -626,24 +602,11 @@
 	// apabila $is_no_kk == true maka $id adalah no_kk
 	public function get_kepala_kk($id, $is_no_kk = false)
 	{
-		$kolom_id = ($is_no_kk) ? "no_kk" : "id";
-		$sql = "SELECT nik, u.id, u.nama, u.status_kawin as status_kawin_id, tempatlahir, tanggallahir, (SELECT DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0 FROM tweb_penduduk WHERE id = u.id) AS umur, a.nama as agama, d.nama as pendidikan,j.nama as pekerjaan, x.nama as sex, w.nama as status_kawin, h.nama as hubungan, f.nama as warganegara, warganegara_id, nama_ayah, nama_ibu, g.nama as golongan_darah, c.rt as rt, c.rw as rw, c.dusun as dusun, (SELECT no_kk FROM tweb_keluarga WHERE $kolom_id = ?) AS no_kk, (SELECT alamat FROM tweb_keluarga WHERE $kolom_id = ?) AS alamat, (SELECT id FROM tweb_keluarga WHERE $kolom_id = ?) AS id_kk
-			FROM tweb_penduduk u
-			LEFT JOIN tweb_penduduk_pekerjaan j ON u.pekerjaan_id = j.id
-			LEFT JOIN tweb_golongan_darah g ON u.golongan_darah_id = g.id
-			LEFT JOIN tweb_penduduk_pendidikan_kk d ON u.pendidikan_kk_id = d.id
-			LEFT JOIN tweb_penduduk_warganegara f ON u.warganegara_id = f.id
-			LEFT JOIN tweb_penduduk_agama a ON u.agama_id = a.id
-			LEFT JOIN tweb_penduduk_kawin w ON u.status_kawin = w.id
-			LEFT JOIN tweb_penduduk_sex x ON u.sex = x.id
-			LEFT JOIN tweb_penduduk_hubungan h ON u.kk_level = h.id
-			LEFT JOIN tweb_wil_clusterdesa c ON (SELECT id_cluster from tweb_keluarga where $kolom_id = ?) = c.id
-			WHERE u.id = (SELECT nik_kepala FROM tweb_keluarga WHERE $kolom_id = ?) ";
-		$query = $this->db->query($sql,array($id,$id,$id,$id,$id));
+		
+		$sql = "SELECT * from tweb_biodata_penduduk where stat_hbkel='KEPALA KELUARGA' and no_kk=?";
+		$query = $this->db->query($sql,array($id));
 		$data = $query->row_array();
-		if ($data['dusun'] != '') $data['alamat_plus_dusun'] = trim($data['alamat'].' '.ucwords($this->setting->sebutan_dusun).' '.$data['dusun']);
-		elseif ($data['alamat']) $data['alamat_plus_dusun'] = $data['alamat'];
-		$data['alamat_wilayah'] = $this->get_alamat_wilayah($data['id_kk']);
+
 		return $data;
 	}
 

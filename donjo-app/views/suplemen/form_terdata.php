@@ -54,30 +54,26 @@
 										<?php if ($suplemen["sasaran"] == 1): ?>
 											<div class="form-group" >
 												<label class="col-sm-3 control-label required"  for="nik">NIK / Nama</label>
-												<div class="col-sm-8">
-													<select class="form-control select2" id="nik" name="nik"  onchange="formAction('main')" >
-														<option value="">-- Silakan Masukan NIK / Nama--</option>
-														<?php foreach ($list_sasaran as $item):
-															if (strlen($item["id"])>0): ?>
-																<option value="<?= $item['id']?>" <?php if ($individu['nik']==$item['nik']): ?>selected<?php endif; ?>>Nama : <?= $item['nama']." - ".$item['info']?></option>
-															<?php endif;
-														endforeach; ?>
-													</select>
-												</div>
+											
+													<div class="col-sm-4">
+														<input class="form-control input-sm" id="nik"  value="<?= $individu['nik']?>" name="nik" style ="width:100%;">
+													</div>
+													<div class="col-sm-2">
+														<button class="btn btn-sosial btn-flat btn-success btn-sm" onclick="formAction('main')"><i class="fa fa-plus"></i>Validasi</button>
+													</div>
+												
 											</div>
 										<?php elseif ($suplemen["sasaran"] == 2): ?>
 											<div class="form-group" >
 												<label for="no_id_kartu" class="col-sm-3 control-label">No. KK / Nama KK</label>
-												<div class="col-sm-7">
-													<select class="form-control select2 required" id="nik" name="nik"  onchange="formAction('main')" >
-														<option selected="selected">-- Silakan Masukan NIK / Nama--</option>
-														<?php foreach ($list_sasaran as $item):
-															if (strlen($item["id"])>0): ?>
-																<option value="<?= $item['id']?>" <?php if ($individu['nik']==$item['nik']): ?>selected<?php endif; ?>>Nama :<?= $item['nama']." - ".$item['info']?></option>
-															<?php endif;
-														endforeach; ?>
-													</select>
-												</div>
+												
+													<div class="col-sm-4">
+														<input class="form-control input-sm" id="nik"  value="<?= $individu['nik']?>" name="nik" style ="width:100%;">
+													</div>
+													<div class="col-sm-2">
+														<button class="btn btn-sosial btn-flat btn-success btn-sm" onclick="formAction('main')"><i class="fa fa-plus"></i>Validasi</button>
+													</div>
+												
 											</div>
 										<?php endif; ?>
 									</form>

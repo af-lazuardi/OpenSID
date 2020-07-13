@@ -22,25 +22,60 @@
 				<div class="col-md-8">
 					<div class="box box-info">
             <div class="box-header with-border">
-							<a href="<?=site_url("statistik/cetak/$lap")?>" class="btn btn-social btn-flat bg-purple btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" target="_blank" title="Cetak Data">
-								<i class="fa fa-print"></i>Cetak
+							<a href="<?=site_url("statistik/dialog_cetak/$lap/$export_date[tahun]/$export_date[semester]")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Laporan" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Laporan"><i class="fa fa-print "></i>Cetak
             	</a>
-							<a href="<?=site_url("statistik/excel/$lap")?>" class="btn btn-social btn-flat bg-navy btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" target="_blank" title="Download Data">
-								<i class="fa fa-download"></i>Unduh
+							<a href="<?=site_url("statistik/dialog_unduh/$lap/$export_date[tahun]/$export_date[semester]")?>" class="btn btn-social btn-flat bg-navy btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Unduh Laporan" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Laporan"><i class="fa fa-print "></i>Unduh
             	</a>
-							<a href="<?=site_url("statistik/graph/$lap")?>" class="btn btn-social btn-flat bg-orange btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Grafik Data">
+							<a href="<?=site_url("statistik/graph/$lap/$export_date[tahun]/$export_date[semester]")?>" class="btn btn-social btn-flat bg-orange btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Grafik Data">
 								<i class="fa  fa-bar-chart"></i>Grafik Data
             	</a>
-							<a href="<?=site_url("statistik/pie/$lap")?>" class="btn btn-social btn-flat btn-primary btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Pie Data">
+							<a href="<?=site_url("statistik/pie/$lap/$export_date[tahun]/$export_date[semester]")?>" class="btn btn-social btn-flat btn-primary btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Pie Data">
 								<i class="fa fa-pie-chart"></i>Pie Data
             	</a>
-							<?php if ($lap=='13'): ?>
-								<a href="<?=site_url("statistik/rentang_umur")?>" class="btn btn-social btn-flat bg-olive btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Rentang Umur">
-									<i class="fa fa-arrows-h"></i>Rentang Umur
-								</a>
-							<?php endif; ?>
+						
 						</div>
 						<div class="box-body">
+              <div>
+                <form id="main" name="main" action="" method="post" class="form-horizontal">
+                          <div class="form-group">
+                            <label for="nik"  class="col-sm-1 control-label">Tahun</label>
+                            <div class="col-sm-4 col-lg-2">
+                              <select class="form-control  input-sm " id="nik" name="tahun" value="<?= $export_date['tahun'] ?>"style ="width:100%;" >
+                                <option value="">-- Tahun --</option>
+                                <option value="2019">2019</option>
+                                <option value="2018">2018</option>
+                                <option value="2017">2017</option>
+                                <option value="2016">2016</option>
+                                <option value="2015">2015</option>
+                                <option value="2014">2014</option>
+                                <option value="2013">2013</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="nik"  class="col-sm-1 control-label">Semester</label>
+                            <div class="col-sm-4 col-lg-2">
+                              <select class="form-control  input-sm" id="nik" name="semester"  value="<?= $export_date['semester'] ?>" style ="width:100%;" >
+                                <option value="">-- Semester --</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <label for="nik"  class="col-sm-1 control-label"></label>
+                            <div class="col-sm-4 col-lg-2">
+
+                            <button type="submit" class="btn btn-sosial btn-flat btn-success btn-sm" onclick="formAction('main')"><i class="fa fa-plus"></i>Tampilkan</button>
+                            </div>
+                          </div>
+                </form>
+                <br>
+                <?php if($main == null) { ?>
+                  <h3 class="text-center text-danger">Data Belum Tersedia</h3>
+                <?php } ?>
+
+              </div>
 							<div class="col-sm-12">
 								<?php if ($lap < 50): ?>
 									<h4 class="box-title"><b>Data Kependudukan menurut <?= ($stat);?></b></h4>
@@ -123,4 +158,3 @@
 		</form>
 	</section>
 </div>
-

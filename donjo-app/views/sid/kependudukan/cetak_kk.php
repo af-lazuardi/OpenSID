@@ -15,13 +15,13 @@
 				</tr>
 				<tr>
 					<td>Alamat</td>
-					<td>: <?= strtoupper($kepala_kk['alamat_plus_dusun']) ?> </td>
+					<td>: <?= strtoupper($kepala_kk['alamat']) ?> </td>
 					<td>Kabupaten/Kota</td>
 					<td>: <?= $desa['nama_kabupaten'] ?></td>
 				</tr>
 				<tr>
 					<td>RT / RW</td>
-					<td>: <?= $kepala_kk['rt']  ?> / <?= $kepala_kk['rw']  ?></td>
+					<td>: <?= $kepala_kk['no_rt']  ?> / <?= $kepala_kk['no_rw']  ?></td>
 					<td>Kode Pos</td>
 					<td>: <?= strtoupper($desa['kode_pos']) ?></td>
 				</tr>
@@ -56,7 +56,7 @@
 						<td class="text-center" width="2"><?= $key+1?></td>
 						<td><?= strtoupper($data['nama'])?></td>
 						<td><?= $data['nik']?></td>
-						<td><?= $data['sex']?></td>
+						<td><?= $data['jenis_klmin']?></td>
 						<td><?= $data['tempatlahir']?></td>
 						<td><?= tgl_indo($data['tanggallahir'])?></td>
 						<td><?= $data['agama']?></td>
@@ -88,9 +88,9 @@
 					<?php foreach ($main as $key => $data): ?>
 						<tr class="data">
 							<td class="text-center" width="2"><?= $key+1?></td>
-							<td><?= $data['status_kawin']?></td>
-							<td class="text-center"><?= tgl_indo_out($data['tanggalperkawinan'])?></td>
-							<td><?= $data['hubungan']?></td>
+							<td><?= $data['stat_kwn']?></td>
+							<td class="text-center"><?= tgl_indo_out($data['tgl_kwn'])?></td>
+							<td><?= $data['stat_hbkel']?></td>
 							<td><?= $data['warganegara']?></td>
 							<td><?= $data['dokumen_pasport']?></td>
 							<td><?= $data['dokumen_kitas']?></td>

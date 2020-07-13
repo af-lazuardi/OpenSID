@@ -53,6 +53,10 @@
 		<script src="<?= base_url()?>assets/js/leaflet.pm.min.js"></script>
 		<!-- Diperlukan untuk script jquery khusus halaman -->
 		<script src="<?= base_url() ?>assets/bootstrap/js/jquery.min.js"></script>
+		<script type="text/javascript">
+			base_url = "<?=base_url();?>";
+		</script>
+		<script src="<?= base_url() ?>assets/js/script-akhwan.js?v=<?=time();?>"></script>
 	</head>
 	<body class="skin-purple sidebar-mini fixed <?php if ($minsidebar==1): ?>sidebar-collapse<?php endif ?>">
 		<div class="wrapper">

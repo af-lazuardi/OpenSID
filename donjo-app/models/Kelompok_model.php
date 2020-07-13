@@ -56,7 +56,7 @@ class Kelompok_model extends CI_Model {
 	{
 		$sql = "FROM kelompok u
 			LEFT JOIN kelompok_master s ON u.id_master = s.id
-			LEFT JOIN tweb_penduduk c ON u.id_ketua = c.id
+			LEFT JOIN tweb_biodata_penduduk c ON u.id_ketua = c.nik
 			WHERE 1 ";
 		$sql .= $this->search_sql();
 		$sql .= $this->filter_sql();
@@ -245,7 +245,7 @@ class Kelompok_model extends CI_Model {
 
 	public function list_anggota($id=0)
 	{
-		$sql = "SELECT u.*,p.nik,p.nama,p.sex,(SELECT DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(tanggallahir)), '%Y')+0 FROM tweb_penduduk WHERE id = p.id) AS umur,a.dusun,a.rw,a.rt FROM kelompok_anggota u LEFT JOIN tweb_penduduk p ON u.id_penduduk = p.id LEFT JOIN tweb_wil_clusterdesa a ON p.id_cluster = a.id WHERE id_kelompok = ?";
+		$sql = "SELECT u.*,p.nik as nik ,p.nama as nama,p.jenis_klmin as jenis_klmin,(SELECT DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(tanggallahir)), '%Y')+0 FROM tweb_biodata_penduduk WHERE nik = p.nik) AS umur,p.no_rw,p.no_rt FROM kelompok_anggota u LEFT JOIN tweb_biodata_penduduk p ON u.id_penduduk = p.nik  WHERE id_kelompok = ?";
 		$query = $this->db->query($sql, $id);
 		$data=$query->result_array();
 

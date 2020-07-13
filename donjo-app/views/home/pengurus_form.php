@@ -33,12 +33,13 @@
 							<div class="form-group col-sm-12" >
 				  			<label class="col-sm-4 col-lg-2 control-label" for="id_pend">NIK / Nama Penduduk </label>
 								<div class="col-sm-7">
-									<select class="form-contr	ol select2 input-sm" id="id_pend" name="id_pend"  onchange="formAction('main')" style="width:100%" >
-										<option selected="selected">-- Silakan Masukan NIK / Nama--</option>
-										<?php foreach ($penduduk as $data): ?>
-											<option value="<?= $data['id']?>" <?php if ($individu['id']==$data['id']): ?>selected<?php endif; ?>>NIK : <?= $data['nik']." - ".$data['nama']?></option>
-										<?php endforeach;?>
-									</select>
+								<div class="col-sm-7">
+									<input class="form-control input-sm" id="id_pend"  value="<?= $individu['nik']?>" name="id_pend" style ="width:100%;">
+								</div>
+									<div class="col-sm-2">
+										<button class="btn btn-sosial btn-flat btn-success btn-sm" onclick="formAction('main')"><i class="fa fa-plus"></i>Validasi</button>
+									</div>
+	
 								</div>
 							</div>
 	          </form>
@@ -76,7 +77,8 @@
 								<label class="col-sm-4 control-label" for="pamong_nama">Nama Pegawai <?= ucwords($this->setting->sebutan_desa)?></label>
 								<div class="col-sm-7">
 									<input type="hidden" name="pamong_status" value="1">
-									<input name="pamong_desa" class="form-control input-sm pengurus-desa" type="text" placeholder="Nama" value="<?= ($individu['nama'])?>" disabled="disabled"></input>
+									<input type="hidden" name="nik" value="<?=$individu['nik']?>">
+									<input name="pamong_desa" class="form-control input-sm pengurus-desa" type="text" placeholder="Nama" value="<?= ($individu['nama'])?>" readonly="true"></input>
 									<input id="pamong_nama" name="pamong_nama" class="form-control input-sm pengurus-luar-desa <?= !empty($individu) ?: 'required'?>" type="text" placeholder="Nama" value="<?= ($pamong['pamong_nama'])?>" style="display: none;"></input>
 								</div>
 							</div>
@@ -89,21 +91,21 @@
 							<div class="form-group">
 								<label class="col-sm-4 control-label" for="pamong_nik">Nomor Induk Kependudukan</label>
 								<div class="col-sm-7">
-									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Nomor Induk Kependudukan" value="<?=$individu['nik']?>" disabled="disabled"></input>
+									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Nomor Induk Kependudukan" value="<?=$individu['nik']?>" readonly="true"></input>
 									<input id="pamong_nik" name="pamong_nik" class="form-control input-sm pengurus-luar-desa" type="text" placeholder="Nomor Induk Kependudukan" value="<?=$pamong['pamong_nik']?>" style="display: none;"></input>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 control-label" for="pamong_tempatlahir">Tempat Lahir</label>
 								<div class="col-sm-7">
-									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Tempat Lahir" value="<?= strtoupper($individu['tempatlahir'])?>" disabled="disabled"></input>
+									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Tempat Lahir" value="<?= strtoupper($individu['tempatlahir'])?>" readonly="true"></input>
 									<input name="pamong_tempatlahir" class="form-control input-sm pengurus-luar-desa" type="text" placeholder="Tempat Lahir" value="<?= strtoupper($pamong['pamong_tempatlahir'])?>" style="display: none;"></input>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 control-label" for="pamong_tanggallahir">Tanggal Lahir</label>
 								<div class="col-sm-7">
-									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Tanggal Lahir" value="<?= strtoupper($individu['tanggallahir'])?>" disabled="disabled"></input>
+									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Tanggal Lahir" value="<?= strtoupper($individu['tanggallahir'])?>" readonly="true"></input>
 									<div class="input-group input-group-sm date pengurus-luar-desa" style="display: none;">
 										<div class="input-group-addon">
 											<i class="fa fa-calendar"></i>
@@ -115,22 +117,22 @@
 							<div class="form-group">
 								<label class="col-sm-4 control-label" for="pamong_sex">Jenis Kelamin</label>
 								<div class="col-sm-7">
-									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Jenis Kelamin" value="<?= $individu['sex']?>" disabled="disabled"></input>
+									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Jenis Kelamin" value="<?= $individu['jenis_klmin']?>" readonly="true"></input>
 									<select class="form-control input-sm pengurus-luar-desa" name="pamong_sex" onchange="show_hide_hamil($(this).find(':selected').val());" style="display: none;">
 										<option value="">Jenis Kelamin</option>
-										<option value="1" <?php selected($pamong['pamong_sex'], '1'); ?>>Laki-Laki</option>
-										<option value="2" <?php selected($pamong['pamong_sex'], '2'); ?> >Perempuan</option>
+										<option value="LAKI-LAKI" <?php selected($pamong['pamong_sex'], '1'); ?> >Laki-Laki</option>
+										<option value="PEREMPUAN" <?php selected($pamong['pamong_sex'], '2'); ?> >Perempuan</option>
 									</select>
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-4 control-label" for="pamong_pendidikan">Pendidikan</label>
 								<div class="col-sm-7">
-									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Pendidikan" value="<?= $individu['pendidikan_kk']?>" disabled="disabled"></input>
+									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Pendidikan" value="<?= $individu['pendidikan']?>" readonly="true"></input>
 									<select class="form-control input-sm pengurus-luar-desa" name="pamong_pendidikan" style="display: none;">
 										<option value="">Pilih Pendidikan (Dalam KK) </option>
 										<?php foreach ($pendidikan_kk as $data): ?>
-											<option value="<?= $data['id']?>" <?php selected($pamong['pamong_pendidikan'], $data['id']); ?>><?= strtoupper($data['nama'])?></option>
+											<option value="<?= strtoupper($data['nama'])?>" <?php selected($pamong['pamong_pendidikan'], $data['id']); ?>><?= strtoupper($data['nama'])?></option>
 										<?php endforeach?>
 									</select>
 								</div>
@@ -138,11 +140,11 @@
 							<div class="form-group">
 								<label class="col-sm-4 control-label" for="pamong_agama">Agama</label>
 								<div class="col-sm-7">
-									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Agama" value="<?= $individu['agama']?>" disabled="disabled"></input>
+									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Agama" value="<?= $individu['agama']?>" readonly="true"></input>
 									<select class="form-control input-sm pengurus-luar-desa" name="pamong_agama" style="display: none;">
 										<option value="">Pilih Agama</option>
 										<?php foreach ($agama as $data): ?>
-											<option value="<?= $data['id']?>" <?php selected($pamong['pamong_agama'], $data['id']); ?>><?= strtoupper($data['nama'])?></option>
+											<option value="<?= strtoupper($data['nama'])?>" <?php selected($pamong['pamong_agama'], $data['id']); ?>><?= strtoupper($data['nama'])?></option>
 										<?php endforeach;?>
 									</select>
 								</div>
@@ -173,7 +175,8 @@
 							<div class="form-group">
 								<label class="col-sm-4 control-label" for="jabatan">Jabatan</label>
 								<div class="col-sm-7">
-									<input id="jabatan" name="jabatan" class="form-control input-sm required" type="text" placeholder="Jabatan" value="<?= $pamong['jabatan']?>" ></input>
+									<?php 
+									echo form_dropdown('jabatan',$p_jabatan,$pamong['jabatan'],'id="jabatan" class="form-control input-sm required" placeholder="Jabatan" ');?>
 								</div>
 							</div>
 							<div class="form-group">

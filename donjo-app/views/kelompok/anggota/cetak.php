@@ -41,7 +41,7 @@
 								<td><?= $data['nama']?></td>
 								<td><?= $data['alamat']?></td>
 								<td><?= $data['umur']?></td>
-								<td><?php if ($data['sex']==1): ?>Laki-laki <?php else: ?>Perempuan <?php endif; ?></td>
+								<td><?= $data['jenis_klmin'] ?></td>
 							</tr>
 						<?php endforeach; ?>
 					</tbody>

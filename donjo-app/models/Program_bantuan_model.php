@@ -151,18 +151,16 @@ class Program_bantuan_model extends CI_Model {
 		{
 			case 1:
 				# Data penduduk
-				if (!$jumlah) $select_sql = "p.*,o.nama,w.rt,w.rw,w.dusun";
+				if (!$jumlah) $select_sql = "p.*,o.nama,o.no_rt as rt,o.no_rw as rw,o.alamat as dusun";
 				$strSQL = "SELECT ". $select_sql." FROM program_peserta p
-					LEFT JOIN tweb_penduduk o ON p.peserta=o.nik
-					LEFT JOIN tweb_wil_clusterdesa w ON w.id=o.id_cluster WHERE p.program_id=".$slug;
+					LEFT JOIN tweb_biodata_penduduk o ON p.peserta=o.nik
+				 WHERE p.program_id=".$slug;
 				break;
 			case 2:
 				# Data KK
-				if (!$jumlah) $select_sql = "p.*,p.peserta as nama,o.nik_kepala,o.no_kk,q.nama,w.rt,w.rw,w.dusun";
+				if (!$jumlah) $select_sql = "p.*,p.peserta as nama,q.kepala_kk,q.no_kk,q.nama,q.no_rt as rt,q.no_rw as rw,q.alamat as dusun";
 				$strSQL = "SELECT ". $select_sql." FROM program_peserta p
-					LEFT JOIN tweb_keluarga o ON p.peserta=o.no_kk
-					LEFT JOIN tweb_penduduk q ON o.nik_kepala=q.id
-					LEFT JOIN tweb_wil_clusterdesa w ON w.id=q.id_cluster
+					LEFT JOIN tweb_biodata_penduduk q ON q.nik=p.peserta
 					WHERE p.program_id=".$slug;
 				break;
 			case 3:
@@ -332,11 +330,8 @@ class Program_bantuan_model extends CI_Model {
 						$hasil1 = false;
 					}
 					// Daftar keluarga, tidak termasuk keluarga yang sudah menjadi peserta
-					$strSQL = "SELECT k.no_kk as id, p.nama as nama, w.rt, w.rw, w.dusun
-						FROM tweb_keluarga k
-						LEFT JOIN tweb_penduduk p ON p.id = k.nik_kepala
-						LEFT JOIN tweb_wil_clusterdesa w ON w.id = p.id_cluster
-						WHERE p.status_dasar = 1";
+					$strSQL = "SELECT p.no_kk as id, p.nama as nama,  p.no_rt as rt, p.no_rw as rw, p.alamat as dusun
+						FROM  tweb_biodata_penduduk p";
 					$query = $this->db->query($strSQL);
 					$hasil2 = array();
 					$data = $query->result_array();
@@ -389,7 +384,7 @@ class Program_bantuan_model extends CI_Model {
 					}
 
 					$strSQL = "SELECT r.no_kk as id, o.nama, w.rt, w.rw, w.dusun  FROM tweb_rtm r
-						LEFT JOIN tweb_penduduk o ON o.id = r.nik_kepala
+						LEFT JOIN tweb_biodata_penduduk o ON o.nik = r.nik_kepala
 						LEFT JOIN tweb_wil_clusterdesa w ON w.id = o.id_cluster
 						WHERE 1
 						";
@@ -445,8 +440,8 @@ class Program_bantuan_model extends CI_Model {
 						$hasil1 = false;
 					}
 
-					$strSQL = "SELECT k.id,k.nama as nama_kelompok, o.nama, w.rt, w.rw, w.dusun FROM kelompok k
-						LEFT JOIN tweb_penduduk o ON o.id = k.id_ketua
+					$strSQL = "SELECT k.id,k.nama as nama_kelompok, o.nama, o.no_rt as rt, o.no_rw as rw, w.dusun FROM kelompok k
+						LEFT JOIN tweb_biodata_penduduk o ON o.nik = k.id_ketua
 						LEFT JOIN tweb_wil_clusterdesa w ON w.id = o.id_cluster
 						WHERE 1";
 					$query = $this->db->query($strSQL);

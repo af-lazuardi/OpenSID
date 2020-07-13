@@ -34,13 +34,13 @@
 									<div class="form-group">
 										<label class="col-sm-3 control-label">ALAMAT</label>
 										<div class="col-sm-8">
-											<p class="text-muted">: <?= strtoupper($kepala_kk['alamat_plus_dusun'])?></p>
+											<p class="text-muted">: <?= strtoupper($kepala_kk['alamat'])?></p>
 										</div>
 									</div>
 									<div class="form-group">
 										<label class="col-sm-3 control-label">RT/RW</label>
 										<div class="col-sm-9">
-											<p class="text-muted">: <?=$kepala_kk['rt']  ?> / <?= $kepala_kk['rw']  ?></p>
+											<p class="text-muted">: <?=$kepala_kk['no_rt']  ?> / <?= $kepala_kk['no_rw']  ?></p>
 										</div>
 									</div>
 									<div class="form-group">
@@ -107,7 +107,7 @@
 													<td class="text-center" ><?= $key+1?></td>
 													<td><?= strtoupper(unpenetration($data['nama']))?></td>
 													<td><?= $data['nik']?></td>
-													<td><?= $data['sex']?></td>
+													<td><?= $data['jenis_klmin']?></td>
 													<td><?= $data['tempatlahir']?></td>
 													<td><?= tgl_indo_out($data['tanggallahir'])?></td>
 													<td><?= $data['agama']?></td>
@@ -142,9 +142,9 @@
 												<?php foreach ($main as $key => $data): ?>
 												<tr>
 													<td class="text-center" ><?= $key+1?></td>
-													<td><?= $data['status_kawin']?></td>
-													<td class="text-center"><?= tgl_indo_out($data['tanggalperkawinan'])?></td>
-													<td><?= $data['hubungan']?></td>
+													<td><?= $data['stat_kwn']?></td>
+													<td class="text-center"><?= tgl_indo_out($data['tgl_kwn'])?></td>
+													<td><?= $data['stat_hbkel']?></td>
 													<td><?= $data['warganegara']?></td>
 													<td><?= $data['dokumen_pasport']?></td>
 													<td><?= $data['dokumen_kitas']?></td>

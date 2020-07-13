@@ -19,14 +19,10 @@
 							<div class='col-xs-12'>
 								<?php if (!@$pend): ?>
 									<div class="form-group">
-										<label class="col-sm-3 control-label"  for="id_penduduk">Nama Anggota</label>
+										<label class="col-sm-3 control-label"  for="id_penduduk">NIK Anggota</label>
 										<div class="col-sm-5">
-											<select class="form-control input-sm select2 required" id="id_penduduk" name="id_penduduk">
-												<option value="">-- Silakan Masukan NIK / Nama --</option>
-												<?php foreach ($list_penduduk as $data): ?>
-													 <option value="<?= $data['id']?>">NIK :<?= $data['nik']." - ".$data['nama']?></option>
-												<?php endforeach;?>
-											</select>
+						
+											<input class="form-control input-sm required" id="id_penduduk" name="id_penduduk">
 										</div>
 									</div>
 								<?php endif; ?>
