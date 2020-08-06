@@ -85,6 +85,7 @@ class First extends Web_Controller {
 
 	public function index($p=1)
 	{
+		$this->load->model('keuangan_grafik_model');
 		$data = $this->includes;
 
 		$data['p'] = $p;
@@ -422,7 +423,7 @@ class First extends Web_Controller {
 		$data['main'] = $this->dpt_model->statistik_wilayah();
 		$data['total'] = $this->dpt_model->statistik_total();
 		$data['tanggal_pemilihan'] = $this->dpt_model->tanggal_pemilihan();
-		$this->_get_common_data($data);a
+		$this->_get_common_data($data);
 		$data['tipe'] = 4;
 		$this->set_template('layouts/stat.tpl.php');
 		$this->load->view($this->template, $data);
@@ -495,7 +496,7 @@ class First extends Web_Controller {
 			$no++;
 			$row = array();
 			$row[] = $no;
-			$row[] = "<a href='".site_url('dokumen/unduh_berkas/').$baris['id']."' target='_blank'>".$baris['nama']."</a>";
+			$row[] = "<a href='".site_url('dokumen_web/unduh_berkas/').$baris['id']."' target='_blank'>".$baris['nama']."</a>";
 			$row[] = $baris['tahun'];
 			// Ambil judul kategori
 			$row[] = $this->referensi_model->list_kode_array(KATEGORI_PUBLIK)[$baris['kategori_info_publik']];
