@@ -137,7 +137,7 @@
 		$data['alamat_wilayah']= $this->get_alamat_wilayah($data);
 		return $data;
 	}
-	
+
 
 
 	function pengikut()
@@ -182,13 +182,20 @@
 			LEFT JOIN tweb_biodata_penduduk p ON u.id_pend = p.nik
 			WHERE pamong_status = 1";
 		*/
+		//18.12
 		// $sql = "SELECT u.*, u.pamong_nama as nama
 		// 	FROM tweb_desa_pamong u
 		// 	WHERE pamong_status = 1";
-			$sql = "SELECT u.*, u.pamong_nama as nama
+		$sql = "SELECT u.*, u.pamong_nama as nama
+		FROM tweb_desa_pamong u
+		WHERE jabatan = 'Lurah' or jabatan = 'Carik' ";
+
+		//19.01
+		/*$sql = "SELECT u.*, p.nama as nama
 			FROM tweb_desa_pamong u
-			WHERE jabatan = 'Lurah' or jabatan = 'Carik' ";
-			
+			LEFT JOIN tweb_penduduk p ON u.id_pend = p.id
+			WHERE pamong_status = 1";*/
+
 		$query = $this->db->query($sql);
 		$data  = $query->result_array();
 		for ($i=0; $i<count($data); $i++)
@@ -205,12 +212,12 @@
 
 	public function get_data_surat($id=0)
 	{
-		$sql = "SELECT u.*, golongan_darah as gol_darah, jenis_klmin AS sex, 
+		$sql = "SELECT u.*, golongan_darah as gol_darah, jenis_klmin AS sex,
 		(select (date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0) AS `(date_format(from_days((to_days(now()) - to_days(``tweb_penduduk``.``tanggallahir``))),'%Y') + 0)` from tweb_penduduk where (tweb_penduduk.id = u.id)) AS umur,
-		stat_kwn  AS status_kawin, 
-		 warganegara, 
-		 agama, 
-		 pendidikan,  
+		stat_kwn  AS status_kawin,
+		 warganegara,
+		 agama,
+		 pendidikan,
 		 pekerjaan, no_rt AS rt, no_rw AS rw, no_kk, alamat, kel_name, kec_name, kab_name,
 		kepala_kk kepala_kk
 		from tweb_biodata_penduduk u
@@ -221,7 +228,7 @@
 		$this->format_data_surat($data);
 		return $data;
 	}
-	
+
 
 	public function format_data_surat(&$data)
 	{
@@ -271,12 +278,12 @@
 
 	public function get_data_pribadi($id=0)
 	{
-		$sql = "SELECT u.*, golongan_darah as gol_darah, jenis_klmin AS sex, 
+		$sql = "SELECT u.*, golongan_darah as gol_darah, jenis_klmin AS sex,
 		(select (date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0) AS `(date_format(from_days((to_days(now()) - to_days(``tweb_penduduk``.``tanggallahir``))),'%Y') + 0)` from tweb_penduduk where (tweb_penduduk.id = u.id)) AS umur,
-		stat_kwn  AS status_kawin, 
-		 warganegara, 
-		 agama, 
-		 pendidikan,  
+		stat_kwn  AS status_kawin,
+		 warganegara,
+		 agama,
+		 pendidikan,
 		 pekerjaan, no_rt AS rt, no_rw AS rw, no_kk, alamat, kel_name, kec_name, kab_name,
 		kepala_kk kepala_kk
 		from tweb_biodata_penduduk u

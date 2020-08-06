@@ -120,7 +120,10 @@
 		if (isset($_SESSION['cacat']))
 		{
 			$kf = $_SESSION['cacat'];
-			$cacat_sql = " AND u.cacat_id <> $kf AND u.cacat_id is not null and u.cacat_id<>''";
+			if ($kf == BELUM_MENGISI)
+				$cacat_sql = " AND (u.cacat_id IS NULL OR u.cacat_id = '')";
+			else 
+				$cacat_sql = " AND u.cacat_id = $kf AND u.cacat_id is not null and u.cacat_id<>''";
 			return $cacat_sql;
 		}
 	}
@@ -130,8 +133,11 @@
 		if (isset($_SESSION['menahun']))
 		{
 			$kf = $_SESSION['menahun'];
-			$menahun_sql = " AND u.sakit_menahun_id <> $kf and u.sakit_menahun_id is not null and u.sakit_menahun_id<>'0' ";
-		return $menahun_sql;
+			if ($kf == BELUM_MENGISI)
+				$menahun_sql = " AND (u.sakit_menahun_id IS NULL OR u.sakit_menahun_id = '0')";
+			else 
+				$menahun_sql = " AND u.sakit_menahun_id = $kf and u.sakit_menahun_id IS NOT NULL and u.sakit_menahun_id<>'0' ";
+			return $menahun_sql;
 		}
 	}
 
@@ -730,6 +736,20 @@
 		$this->tulis_log_penduduk_data($log);
 	}
 
+	/**
+	 * Kembalikan status dasar penduduk ke hidup
+	 *
+	 * @param $id 			id penduduk
+	 * @return void
+	 */
+	public function kembalikan_status($id)
+	{
+		$_SESSION['success'] = 1;
+		$data['status_dasar'] = 1; // status dasar hidup
+		if (!$this->db->where('id', $id)->update('tweb_penduduk', $data))
+			$_SESSION['success'] = - 1;
+	}
+
 	public function delete($id='')
 	{
 		$sql = "DELETE FROM tweb_penduduk WHERE id = ?";
@@ -847,9 +867,12 @@
 
 	public function list_rw($dusun='')
 	{
-		$sql = "SELECT * FROM tweb_wil_clusterdesa WHERE rt = '0' AND dusun = ? AND rw <> '0'";
-		$query = $this->db->query($sql,$dusun);
-		$data = $query->result_array();
+		$data = $this->db->
+			where('rt', '0')->
+			where('dusun', $dusun)->
+			where("rw <> '0'")->
+			get('tweb_wil_clusterdesa')->
+			result_array();
 		return $data;
 	}
 

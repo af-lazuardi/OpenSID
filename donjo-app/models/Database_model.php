@@ -169,6 +169,55 @@
 
   private function migrasi_1812_ke_1901()
   {
+  	// Tambah status dasar 'Tidak Valid'
+		$data = array(
+			'id' => 9,
+			'nama' => 'TIDAK VALID');
+		$sql = $this->db->insert_string('tweb_status_dasar', $data);
+		$sql .= " ON DUPLICATE KEY UPDATE
+				id = VALUES(id),
+				nama = VALUES(nama)";
+		$this->db->query($sql);
+  	// Tambah kolom tweb_desa_pamong
+  	if (!$this->db->field_exists('no_hp', 'komentar'))
+  	{
+			// Tambah kolom
+			$fields = array();
+			$fields['no_hp'] = array(
+					'type' => 'varchar',
+					'constraint' => 15,
+					'default' => NULL
+			);
+			$this->dbforge->add_column('komentar', $fields);
+  	}
+
+  	// Tambah kolom tweb_desa_pamong
+  	if (!$this->db->field_exists('pamong_pangkat', 'tweb_desa_pamong'))
+  	{
+			// Tambah kolom
+			$fields = array();
+			$fields['pamong_niap'] = array(
+					'type' => 'varchar',
+					'constraint' => 20,
+					'default' => NULL
+			);
+			$fields['pamong_pangkat'] = array(
+					'type' => 'varchar',
+					'constraint' => 20,
+					'default' => NULL
+			);
+			$fields['pamong_nohenti'] = array(
+					'type' => 'varchar',
+					'constraint' => 20,
+					'default' => NULL
+			);
+			$fields['pamong_tglhenti'] = array(
+					'type' => 'date',
+					'default' => NULL
+			);
+			$this->dbforge->add_column('tweb_desa_pamong', $fields);
+  	}
+
   	// Urut tabel tweb_desa_pamong
   	if (!$this->db->field_exists('urut', 'tweb_desa_pamong'))
   	{
@@ -181,6 +230,8 @@
 			$this->dbforge->add_column('tweb_desa_pamong', $fields);
   	}
 		$this->db->where('id', 18)->update('setting_modul', array('url'=>'pengurus/clear', 'aktif'=>'1'));
+
+		$this->db->where('id', 48)->update('setting_modul', array('url'=>'web_widget/clear', 'aktif'=>'1'));
   }
 
   private function migrasi_1811_ke_1812()

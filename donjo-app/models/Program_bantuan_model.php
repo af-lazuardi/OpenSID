@@ -250,6 +250,7 @@ class Program_bantuan_model extends CI_Model {
 					 * */
 					$hasil0['judul_peserta'] = 'NIK';
 					$hasil0['judul_peserta_info'] = 'Nama Peserta';
+					$hasil0['judul_cari_peserta'] = 'NIK / Nama Peserta';
 					$filter = array();
 					if ($query->num_rows()>0)
 					{
@@ -308,6 +309,7 @@ class Program_bantuan_model extends CI_Model {
 					 * */
 					$hasil0['judul_peserta'] = 'NO. KK';
 					$hasil0['judul_peserta_info'] = 'Kepala Keluarga';
+					$hasil0['judul_cari_peserta'] = 'No. KK / Nama Kepala Keluarga';
 					$filter = array();
 					if ($query->num_rows()>0)
 					{
@@ -362,6 +364,7 @@ class Program_bantuan_model extends CI_Model {
 					 * */
 					$hasil0['judul_peserta'] = 'NO. Rumah Tangga';
 					$hasil0['judul_peserta_info'] = 'Kepala Rumah Tangga';
+					$hasil0['judul_cari_peserta'] = 'No. RT / Nama Kepala Rumah Tangga';
 					$filter = array();
 					if ($query->num_rows()>0)
 					{
@@ -419,6 +422,7 @@ class Program_bantuan_model extends CI_Model {
 
 					$hasil0['judul_peserta'] = 'Nama Kelompok';
 					$hasil0['judul_peserta_info'] = 'Ketua Kelompok';
+					$hasil0['judul_cari_peserta'] = 'Nama Kelompok / Nama Kepala Keluarga';
 					$filter = array();
 					if ($query->num_rows()>0)
 					{

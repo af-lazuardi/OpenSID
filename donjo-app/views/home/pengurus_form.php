@@ -39,7 +39,7 @@
 									<div class="col-sm-2">
 										<button class="btn btn-sosial btn-flat btn-success btn-sm" onclick="formAction('main')"><i class="fa fa-plus"></i>Validasi</button>
 									</div>
-	
+
 								</div>
 							</div>
 	          </form>
@@ -83,16 +83,22 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-4 control-label" for="pamong_nip">NIP / NIAPD</label>
+								<label class="col-sm-4 control-label" for="pamong_nik">Nomor Induk Kependudukan</label>
 								<div class="col-sm-7">
-									<input id="pamong_nip" name="pamong_nip" class="form-control input-sm" type="text" placeholder="NIP / NIAPD" value="<?=$pamong['pamong_nip']?>" ></input>
+									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Nomor Induk Kependudukan" value="<?=$individu['nik']?>" disabled="disabled"></input>
+									<input id="pamong_nik" name="pamong_nik" class="form-control input-sm pengurus-luar-desa" type="text" placeholder="Nomor Induk Kependudukan" value="<?=$pamong['pamong_nik']?>" style="display: none;"></input>
 								</div>
 							</div>
 							<div class="form-group">
-								<label class="col-sm-4 control-label" for="pamong_nik">Nomor Induk Kependudukan</label>
+								<label class="col-sm-4 control-label" for="pamong_niap">NIAP</label>
 								<div class="col-sm-7">
-									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Nomor Induk Kependudukan" value="<?=$individu['nik']?>" readonly="true"></input>
-									<input id="pamong_nik" name="pamong_nik" class="form-control input-sm pengurus-luar-desa" type="text" placeholder="Nomor Induk Kependudukan" value="<?=$pamong['pamong_nik']?>" style="display: none;"></input>
+									<input id="pamong_niap" name="pamong_niap" class="form-control input-sm" type="text" placeholder="NIAP" value="<?=$pamong['pamong_niap']?>" ></input>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-4 control-label" for="pamong_nip">NIP</label>
+								<div class="col-sm-7">
+									<input id="pamong_nip" name="pamong_nip" class="form-control input-sm" type="text" placeholder="NIP" value="<?=$pamong['pamong_nip']?>" ></input>
 								</div>
 							</div>
 							<div class="form-group">
@@ -150,6 +156,12 @@
 								</div>
 							</div>
 							<div class="form-group">
+								<label class="col-sm-4 control-label" for="pamong_pangkat">Pangkat / Golongan</label>
+								<div class="col-sm-7">
+									<input name="pamong_pangkat" class="form-control input-sm" type="text" placeholder="Pangkat / Golongan" value="<?= $pamong['pamong_pangkat']?>" ></input>
+								</div>
+							</div>
+							<div class="form-group">
 								<label class="col-sm-4 control-label" for="pamong_nosk">Nomor SK Pengangkatan</label>
 								<div class="col-sm-7">
 									<input name="pamong_nosk" class="form-control input-sm" type="text" placeholder="Nomor SK Pengangkatan" value="<?= $pamong['pamong_nosk']?>" ></input>
@@ -167,6 +179,23 @@
 								</div>
 							</div>
 							<div class="form-group">
+								<label class="col-sm-4 control-label" for="pamong_nohenti">Nomor SK Pemberhentian</label>
+								<div class="col-sm-7">
+									<input name="pamong_nohenti" class="form-control input-sm" type="text" placeholder="Nomor SK Pemberhentian" value="<?= $pamong['pamong_nohenti']?>" ></input>
+								</div>
+							</div>
+							<div class='form-group'>
+								<label class="col-sm-4 control-label" for="pamong_tglhenti">Tanggal SK Pemberhentian</label>
+								<div class="col-sm-7">
+									<div class="input-group input-group-sm date">
+										<div class="input-group-addon">
+											<i class="fa fa-calendar"></i>
+										</div>
+										<input class="form-control input-sm pull-right tgl_1" name="pamong_tglhenti" type="text" value="<?= $pamong['pamong_tglhenti']?>">
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
 								<label class="col-sm-4 control-label" for="pamong_masajab">Masa Jabatan (Usia/Periode)</label>
 								<div class="col-sm-7">
 									<input name="pamong_masajab" class="form-control input-sm" type="text" placeholder="Contoh: 6 Tahun Periode Pertama (2015 s/d 2021)" value="<?= $pamong['pamong_masajab']?>" ></input>
@@ -175,7 +204,7 @@
 							<div class="form-group">
 								<label class="col-sm-4 control-label" for="jabatan">Jabatan</label>
 								<div class="col-sm-7">
-									<?php 
+									<?php
 									echo form_dropdown('jabatan',$p_jabatan,$pamong['jabatan'],'id="jabatan" class="form-control input-sm required" placeholder="Jabatan" ');?>
 								</div>
 							</div>

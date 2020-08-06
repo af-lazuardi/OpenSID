@@ -170,19 +170,31 @@ class Keluar extends CI_Controller {
 		redirect('keluar');
 	}
 
-  	public function cetak_surat_keluar($id)
-  	{
-    	$berkas = $this->db->select('nama_surat')->where('id', $id)->get('log_surat')->row();
-    	ambilBerkas($berkas->nama_surat, 'keluar');
-  	}
+	public function cetak_surat_keluar($id)
+  {
+    $berkas = $this->db->select('nama_surat')->where('id', $id)->get('log_surat')->row();
+    ambilBerkas($berkas->nama_surat, 'keluar');
+  }
 
-  	public function unduh_lampiran($id)
-  	{
-    	$berkas = $this->db->select('lampiran')->where('id', $id)->get('log_surat')->row();
-    	ambilBerkas($berkas->lampiran, 'keluar');
- 	}
+	public function unduh_lampiran($id)
+  {
+    $berkas = $this->db->select('lampiran')->where('id', $id)->get('log_surat')->row();
+    ambilBerkas($berkas->lampiran, 'keluar');
+  }
 
-  	public function surat_keluar_cetak($id) {
+  public function cetak($o=0)
+  {
+	  $data['main'] = $this->keluar_model->list_data();
+	  $this->load->view('surat/keluar_print', $data);
+  }
+
+  public function excel($o=0)
+  {
+	  $data['main'] = $this->keluar_model->list_data();
+	  $this->load->view('surat/keluar_excel', $data);
+  }
+
+	public function surat_keluar_cetak($id) {
 		$this->db->where("a.id", $id);
 		$this->db->join("tweb_surat_format AS b", "a.id_format_surat = b.id");
 		$detil_log = $this->db->get("log_surat AS a")->row_array();
@@ -218,7 +230,7 @@ class Keluar extends CI_Controller {
 		// echo json_encode($data, JSON_PRETTY_PRINT);
 		// exit;
 
-
 		$this->load->view("surat/print_surat", $data);
 	}
+
 }

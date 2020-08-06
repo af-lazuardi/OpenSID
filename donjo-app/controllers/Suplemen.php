@@ -28,7 +28,6 @@ class Suplemen extends CI_Controller {
 		$nav['act'] = 2;
 		$nav['act_sub'] = 25;
 		$header = $this->header_model->get_data();
-		$header['minsidebar'] = 1;
 
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
@@ -78,7 +77,6 @@ class Suplemen extends CI_Controller {
 		$nav['act'] = 2;
 		$nav['act_sub'] = 25;
 		$header = $this->header_model->get_data();
-		$header['minsidebar'] = 1;
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 
@@ -104,7 +102,6 @@ class Suplemen extends CI_Controller {
 		$nav['act'] = 2;
 		$nav['act_sub'] = 25;
 		$header = $this->header_model->get_data();
-		$header['minsidebar'] = 1;
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 
@@ -138,7 +135,6 @@ class Suplemen extends CI_Controller {
 		$nav['act'] = 2;
 		$nav['act_sub'] = 25;
 		$header = $this->header_model->get_data();
-		$header['minsidebar'] = 1;
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 
@@ -153,7 +149,6 @@ class Suplemen extends CI_Controller {
 		$nav['act'] = 2;
 		$nav['act_sub'] = 25;
 		$header = $this->header_model->get_data();
-		$header['minsidebar'] = 1;
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 		$data['terdata'] = $this->suplemen_model->get_suplemen_terdata_by_id($id);
