@@ -86,6 +86,9 @@ class Web extends CI_Controller {
 
 	public function form($cat = 1, $p = 1, $o = 0, $id = '')
 	{
+		if (!$this->web_artikel_model->boleh_ubah($id, $_SESSION['user']))
+			redirect("web/index/$cat/$p/$o");
+
 		$data['p'] = $p;
 		$data['o'] = $o;
 		$data['cat'] = $cat;
@@ -176,12 +179,18 @@ class Web extends CI_Controller {
 	}
 
 	public function update($cat = 0, $id = '', $p = 1, $o = 0){
+		if (!$this->web_artikel_model->boleh_ubah($id, $_SESSION['user']))
+			redirect("web/index/$cat/$p/$o");
+
 		$this->web_artikel_model->update($cat, $id);
 		redirect("web/index/$cat/$p/$o");
 	}
 
 	public function delete($cat = 1, $p = 1, $o = 0, $id = '')
 	{
+		if (!$this->web_artikel_model->boleh_ubah($id, $_SESSION['user']))
+			redirect("web/index/$cat/$p/$o");
+
 		$_SESSION['success'] = 1;
 		$outp = $this->web_artikel_model->delete($id);
 		if (!$outp) $_SESSION['success'] = -1;
@@ -202,6 +211,9 @@ class Web extends CI_Controller {
 
 	public function ubah_kategori_form($id = 0)
 	{
+		if (!$this->web_artikel_model->boleh_ubah($id, $_SESSION['user']))
+			redirect("web/index");
+
 		$data['list_kategori'] = $this->web_kategori_model->list_kategori("kategori");
 		$data['form_action'] = site_url("web/update_kategori/$id");
 		$data['kategori_sekarang'] = $this->web_artikel_model->get_kategori_artikel($id);
@@ -217,24 +229,36 @@ class Web extends CI_Controller {
 
 	public function artikel_lock($cat = 1, $id = 0)
 	{
+		if (!$this->web_artikel_model->boleh_ubah($id, $_SESSION['user']))
+			redirect("web/index/$cat");
+
 		$this->web_artikel_model->artikel_lock($id, 1);
 		redirect("web/index/$cat");
 	}
 
 	public function artikel_unlock($cat = 1, $id = 0)
 	{
+		if (!$this->web_artikel_model->boleh_ubah($id, $_SESSION['user']))
+			redirect("web/index/$cat");
+
 		$this->web_artikel_model->artikel_lock($id, 2);
 		redirect("web/index/$cat");
 	}
 
 	public function komentar_lock($cat = 1, $id = 0)
 	{
+		if (!$this->web_artikel_model->boleh_ubah($id, $_SESSION['user']))
+			redirect("web/index/$cat");
+
 		$this->web_artikel_model->komentar_lock($id, 0);
 		redirect("web/index/$cat");
 	}
 
 	public function komentar_unlock($cat = 1, $id = 0)
 	{
+		if (!$this->web_artikel_model->boleh_ubah($id, $_SESSION['user']))
+			redirect("web/index/$cat");
+
 		$this->web_artikel_model->komentar_lock($id, 1);
 		redirect("web/index/$cat");
 	}
@@ -254,12 +278,18 @@ class Web extends CI_Controller {
 
 	public function headline($cat = 1, $p = 1, $o = 0, $id = 0)
 	{
+		if (!$this->web_artikel_model->boleh_ubah($id, $_SESSION['user']))
+			redirect("web/index/$cat/$p/$o");
+
 		$this->web_artikel_model->headline($id);
 		redirect("web/index/$cat/$p/$o");
 	}
 
 	public function slide($cat = 1, $p = 1, $o = 0, $id = 0)
 	{
+		if (!$this->web_artikel_model->boleh_ubah($id, $_SESSION['user']))
+			redirect("web/index/$cat/$p/$o");
+
 		$this->web_artikel_model->slide($id);
 		redirect("web/index/$cat/$p/$o");
 	}

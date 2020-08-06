@@ -279,6 +279,8 @@
 
 	public function get_data_pribadi($id=0)
 	{
+		//from kp19.02
+		/*
 		$sql = "SELECT u.*, golongan_darah as gol_darah, jenis_klmin AS sex,
 		(select (date_format(from_days((to_days(now()) - to_days(tweb_penduduk.tanggallahir))),'%Y') + 0) AS `(date_format(from_days((to_days(now()) - to_days(``tweb_penduduk``.``tanggallahir``))),'%Y') + 0)` from tweb_penduduk where (tweb_penduduk.id = u.id)) AS umur,
 		stat_kwn  AS status_kawin,
@@ -289,7 +291,26 @@
 		kepala_kk kepala_kk
 		from tweb_biodata_penduduk u
 		WHERE u.nik = ?";
-		$query = $this->db->query($sql,$id);
+		$query = $this->db->query($sql,$id);*/
+
+		//from opensid19.03 tapi tweb_penduduk diganti dengan tweb_biodata_penduduk
+		$sql = "SELECT u.*, h.nama as hubungan, p.nama as kepala_kk, g.nama as gol_darah, d.nama as pendidikan, s.nama as status, r.nama as pek, m.nama as men, w.nama as wn, n.nama as agama, c.rw, c.rt, c.dusun, (DATE_FORMAT( FROM_DAYS( TO_DAYS( NOW( ) ) - TO_DAYS( u.tanggallahir ) ) , '%Y' ) +0) as umur, sex.nama as sex, k.alamat,
+    	CONCAT('NIK: ', u.nik, ' - ', u.nama, '\nAlamat : RT-', c.rt, ', RW-', c.rw, ' ', c.dusun) AS info_pilihan_penduduk
+			FROM tweb_biodata_penduduk u
+			left join tweb_penduduk_hubungan h on u.kk_level = h.id
+			left join tweb_keluarga k on u.id_kk = k.id
+			left join tweb_penduduk p on k.nik_kepala = p.id
+			left join tweb_golongan_darah g on u.golongan_darah_id = g.id
+			left join tweb_penduduk_pendidikan_kk d on u.pendidikan_kk_id = d.id
+			left join tweb_penduduk_pekerjaan r on u.pekerjaan_id = r.id
+			left join tweb_cacat m on u.cacat_id = m.id
+			left join tweb_wil_clusterdesa c on u.id_cluster = c.id
+			left join tweb_penduduk_warganegara w on u.warganegara_id = w.id
+			left join tweb_penduduk_agama n on u.agama_id = n.id
+			LEFT JOIN tweb_penduduk_sex sex ON u.sex = sex.id
+			left join tweb_penduduk_status s on u.status = s.id
+			WHERE u.id = ?";
+		$query = $this->db->query($sql, $id);
 		$data  = $query->row_array();
 		$data['alamat_wilayah'] = $this->get_alamat_wilayah($data);
 		$this->format_data_surat($data);
