@@ -1,6 +1,6 @@
 <?php
 
-define("VERSION", '19.03');
+define("VERSION", '19.04');
 define("LOKASI_LOGO_DESA", 'desa/logo/');
 define("LOKASI_ARSIP", 'desa/arsip/');
 define("LOKASI_CONFIG_DESA", 'desa/config/');
@@ -24,6 +24,9 @@ define('BELUM_MENGISI', 777);
 
 // Kode laporan mandiri di tabel komentar
 define('LAPORAN_MANDIRI', 775);
+
+// Kode artikel terkait agenda
+define('AGENDA', 1000);
 
 //
 define("MAX_PINDAH", 7);
@@ -326,16 +329,6 @@ function session_success()
 {
 	$_SESSION['error_msg'] = '';
 	$_SESSION['success']   = 1;
-}
-
-function punya_akses($grup, $list_grup_boleh)
-{
-	if (!in_array($grup, $list_grup_boleh))
-	{
-		session_error("Anda tidak mempunyai akses pada fitur ini");
-		return false;
-	}
-	return true;
 }
 
 // Untuk mengirim data ke OpenSID tracker

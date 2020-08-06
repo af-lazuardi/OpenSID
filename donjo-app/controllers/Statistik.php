@@ -1,6 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Statistik extends Ci_Controller {
+class Statistik extends Admin_Controller {
 
 	public function __construct()
 	{

@@ -1,22 +1,13 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Surat extends CI_Controller {
+class Surat extends Admin_Controller {
 
 	public function __construct()
 	{
 		parent::__construct();
 		session_start();
-		$this->load->helper(array('url','download'));		
-		$this->load->model('user_model');
-		$grup = $this->user_model->sesi_grup($_SESSION['sesi']);
-		if ($grup != 1 AND $grup != 2 AND $grup != 3)
-		{
-			if (empty($grup))
-				$_SESSION['request_uri'] = $_SERVER['REQUEST_URI'];
-			else
-				unset($_SESSION['request_uri']);
-			redirect('siteman');
-		}
+		$this->load->helper(array('url','download'));
+		$this->load->model('biodata_model');
 		$this->load->model('header_model');
 		$this->load->model('penduduk_model');
 		$this->load->model('keluarga_model');
@@ -98,19 +89,19 @@ class Surat extends CI_Controller {
 					&& $data['individu']['no_kel'] == $kodeKel
 				) {
 					$this->biodata_model->save_biodata($data['individu']);
-				        //$this->biodata_model->save_biodata($data['anggota']);	
+				        //$this->biodata_model->save_biodata($data['anggota']);
 				} else {
 					if($url == 'surat_ket_domisili'){
 						$this->biodata_model->save_biodata($data['individu']);
 					}else{
 						$data['individu']['status_data'] = "Mohon Maaf Biodata Penduduk desa ".$data['individu']['kel_name'];
 					}
-				}	
+				}
 			}
-			
+
 			$data['individu']['alamat_wilayah']= $data['individu']['alamat'];
-	
-			
+
+
 		}
 		else
 		{
@@ -119,7 +110,7 @@ class Surat extends CI_Controller {
 		}
 
 		//var_dump($data['anggota']);
-	//	exit;	
+	//	exit;
 		$this->get_data_untuk_form($url, $data);
 
 		$data['surat_url'] = rtrim($_SERVER['REQUEST_URI'], "/clear");
@@ -135,7 +126,7 @@ class Surat extends CI_Controller {
 		$this->load->view("surat/form_surat", $data);
 		$this->load->view('footer');
 		// echo $this->db->last_query();
-		
+
 	}
 
 	public function cetak($url = '')
@@ -202,9 +193,9 @@ class Surat extends CI_Controller {
 			//$nik=$this->biodata_model->get_biodata_local($_POST['nik']);
 			$nik = $this->db->select('nik')->where('nik', $id)->get('tweb_penduduk')
 					->row()->nik;
-					
 
-			
+
+
 		}
 		else
 		{
@@ -220,7 +211,7 @@ class Surat extends CI_Controller {
 		$log_surat['nama_surat'] = $nama_surat;
 		$log_surat['lampiran'] = $lampiran;
 		$this->keluar_model->log_surat($log_surat);
-		
+
 		header("location:".base_url(LOKASI_ARSIP.$nama_surat));
 	}
 
@@ -300,7 +291,7 @@ class Surat extends CI_Controller {
 		$data['pamong'] = $this->surat_model->get_pamong($_POST['pamong']);
 
 		$data['pengikut'] = $this->surat_model->pengikut();
-		
+
 		// $data['anggota'] = $this->biodata_model->get_kartu_keluarga($_POST['nik'], $_POST['tujuan'], $_POST['nik_b'], $_POST['hubkeluarga']);
 		$this->keluar_model->log_surat($log_surat);
 
@@ -321,8 +312,8 @@ class Surat extends CI_Controller {
 		$this->load->view("surat/print_surat", $data);
 	}
 
-	public function download() 
-    {    
+	public function download()
+    {
     	force_download('desa/file/petunjuk.pdf',NULL);
 
         // $nama='petunjuk.pdf';
