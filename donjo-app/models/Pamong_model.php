@@ -11,10 +11,11 @@
 		$sql = "SELECT u.*, u.pamong_nama as nama, u.id_pend as nik, u.pamong_tempatlahir as tempatlahir, u.pamong_tanggallahir as tanggallahir, u.pamong_sex AS sex, u.pamong_pendidikan AS pendidikan_kk, u.pamong_agama AS agama, u.pamong_sex AS pamong_sex, u.pamong_pendidikan AS pamong_pendidikan, u.pamong_agama AS pamong_agama
 			FROM tweb_desa_pamong u
 			WHERE 1";
+
     $sql .= $aktif ? " AND u.pamong_status = '1'" : null;
-		//opensid-v19.01
+		//opensid-v19.02
 		//$sql .= $this->search_sql();
-		//$sql .= $this->filter_sql();
+		//$sql .= $this->filter_sql($aktif);
 		$sql .= ' ORDER BY urut';
 
 		$query = $this->db->query($sql);
@@ -80,14 +81,17 @@
 		}
 	}
 
-	private function filter_sql()
+	private function filter_sql($aktif=false)
 	{
-		if (isset($_SESSION['filter']))
-		{
-			$kf = $_SESSION['filter'];
-			$filter_sql = " AND u.pamong_status = $kf";
-			return $filter_sql;
-		}
+    if ($aktif)
+    	return " AND u.pamong_status = '1'";
+    else
+			if (!empty($_SESSION['filter']))
+			{
+				$kf = $_SESSION['filter'];
+				$filter_sql = " AND u.pamong_status = $kf";
+				return $filter_sql;
+			}
 	}
 
 	public function get_data($id=0)

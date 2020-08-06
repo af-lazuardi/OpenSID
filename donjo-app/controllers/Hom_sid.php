@@ -20,7 +20,9 @@ class Hom_sid extends CI_Controller {
 		$this->load->model('header_model');
 		$this->load->model('config_model');
 		$this->load->model('surat_masuk_suratku_model');
+		$this->load->model('program_bantuan_model');
 		$this->modul_ini = 1;
+		$this->controller = 'hom_sid';
 	}
 
 	public function index()
@@ -49,7 +51,7 @@ class Hom_sid extends CI_Controller {
 
 		$username = '003'.$kode_prov.$kode_kab.$kode_kec.$kode_desa;
 		$data['info_surat'] = $this->surat_masuk_suratku_model->get_dashboard($username);
-		
+
 		$data['infodesa'] = $get_infodesa['result']['data'];
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
@@ -68,5 +70,22 @@ class Hom_sid extends CI_Controller {
 		$this->load->view('nav', $nav);
 		$this->load->view('home/donasi');
 		$this->load->view('footer');
+	}
+
+	public function dialog_pengaturan()
+	{
+		$data['list_program_bantuan'] = $this->program_bantuan_model->list_program();
+		$data['sasaran'] = unserialize(SASARAN);
+		$data['form_action'] = site_url("hom_sid/ubah_program_bantuan");
+		$this->load->view('home/pengaturan_form', $data);
+	}
+
+	public function ubah_program_bantuan()
+	{
+		if ($_SESSION['grup'] != 1 )
+			session_error("Anda tidak mempunyai akses pada fitur ini");
+		else
+			$this->db->where('key','dashboard_program_bantuan')->update('setting_aplikasi', array('value'=>$this->input->post('program_bantuan')));
+		redirect('hom_sid');
 	}
 }

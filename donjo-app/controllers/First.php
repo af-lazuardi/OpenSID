@@ -22,7 +22,8 @@ class First extends Web_Controller {
 		{
 			redirect('siteman');
 			exit;
-		} elseif ($this->setting->offline_mode == 1)
+		}
+		elseif ($this->setting->offline_mode == 1)
 		{
 			// Jangan tampilkan website jika bukan admin/operator/redaksi
 			$this->load->model('user_model');
@@ -102,7 +103,7 @@ class First extends Web_Controller {
 		if ( ! empty($cari))
 		{
 			// Judul artikel bisa digunakan untuk serangan XSS
-			$data["judul_kategori"] = $this->security->xss_clean("Hasil pencarian: $cari");
+			$data["judul_kategori"] = html_escape("Hasil pencarian:". substr($cari, 0, 50));
 		}
 
 		$this->_get_common_data($data);
@@ -215,9 +216,11 @@ class First extends Web_Controller {
 
 		// Validasi pengisian komentar di add_comment()
 		// Kalau tidak ada error atau artikel pertama kali ditampilkan, kosongkan data sebelumnya
-		if (!isset($_SESSION['validation_error']) OR !$_SESSION['validation_error']) {
+		if (empty($_SESSION['validation_error']))
+		{
 			$_SESSION['post']['owner'] = '';
 			$_SESSION['post']['email'] = '';
+			$_SESSION['post']['no_hp'] = '';
 			$_SESSION['post']['komentar'] = '';
 			$_SESSION['post']['captcha_code'] = '';
 		}
@@ -453,20 +456,16 @@ class First extends Web_Controller {
 
 	public function add_comment($id=0)
 	{
-		// id = 775 dipakai untuk laporan mandiri, bukan komentar artikel
-		if ($id != 775)
+		// Periksa isian captcha
+		include FCPATH . 'securimage/securimage.php';
+		$securimage = new Securimage();
+		$_SESSION['validation_error'] = false;
+		if ($securimage->check($_POST['captcha_code']) == false)
 		{
-			// Periksa isian captcha
-			include FCPATH . 'securimage/securimage.php';
-			$securimage = new Securimage();
-			$_SESSION['validation_error'] = false;
-			if ($securimage->check($_POST['captcha_code']) == false)
-			{
-				$this->session->set_flashdata('flash_message', 'Kode anda salah. Silakan ulangi lagi.');
-				$_SESSION['post'] = $_POST;
-				$_SESSION['validation_error'] = true;
-				redirect("first/artikel/$id");
-			}
+			$this->session->set_flashdata('flash_message', 'Kode anda salah. Silakan ulangi lagi.');
+			$_SESSION['post'] = $_POST;
+			$_SESSION['validation_error'] = true;
+			redirect("first/artikel/$id");
 		}
 
 		$res = $this->first_artikel_m->insert_comment($id);
@@ -485,15 +484,8 @@ class First extends Web_Controller {
 				$this->session->set_flashdata('flash_message', 'Komentar anda gagal dikirim. Silakan ulangi lagi.');
 		}
 
-		if ($id != 775)
-		{
-			redirect("first/artikel/$id");
-		}
-		else
-		{
-			$_SESSION['sukses'] = 1;
-			redirect("first/mandiri/1/3");
-		}
+		$_SESSION['sukses'] = 1;
+		redirect("first/artikel/$id");
 	}
 
 	private function _get_common_data(&$data)

@@ -3,6 +3,7 @@ DROP VIEW IF EXISTS daftar_kontak;
 DROP VIEW IF EXISTS daftar_anggota_grup;
 DROP VIEW IF EXISTS daftar_grup;
 DROP VIEW IF EXISTS penduduk_hidup;
+DROP TABLE IF EXISTS log_penduduk;
 DROP TABLE IF EXISTS setting_aplikasi_options;
 DROP TABLE IF EXISTS data_persil;
 DROP TABLE IF EXISTS tweb_penduduk_mandiri;
@@ -5161,27 +5162,6 @@ CREATE TABLE `log_keluarga` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 #
-# TABLE STRUCTURE FOR: log_penduduk
-#
-
-DROP TABLE IF EXISTS `log_penduduk`;
-
-CREATE TABLE `log_penduduk` (
-  `id` int(10) NOT NULL AUTO_INCREMENT,
-  `id_pend` int(11) NOT NULL,
-  `id_detail` int(4) NOT NULL,
-  `tanggal` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `bulan` varchar(2) NOT NULL,
-  `tahun` varchar(4) NOT NULL,
-  `tgl_peristiwa` date NOT NULL,
-  `catatan` text,
-  `no_kk` decimal(16,0) DEFAULT NULL,
-  `nama_kk` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_pend` (`id_pend`,`id_detail`,`tgl_peristiwa`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-#
 # TABLE STRUCTURE FOR: log_perubahan_penduduk
 #
 
@@ -5464,7 +5444,7 @@ CREATE TABLE `program` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 
-INSERT INTO `program` (`id`, `nama`, `sasaran`, `ndesc`, `sdate`, `edate`, `userid`, `status`) VALUES (1, 'Raskin', 2, '', '2015-12-13', '2017-12-13', 0, NULL);
+INSERT INTO `program` (`id`, `nama`, `sasaran`, `ndesc`, `sdate`, `edate`, `userid`, `status`) VALUES (1, 'BPNT', 2, 'Bantuan Pemerintah Non Tunai', '2015-12-13', '2017-12-13', 0, NULL);
 INSERT INTO `program` (`id`, `nama`, `sasaran`, `ndesc`, `sdate`, `edate`, `userid`, `status`) VALUES (2, 'BLSM', 2, '', '2015-12-13', '2017-12-13', 0, NULL);
 INSERT INTO `program` (`id`, `nama`, `sasaran`, `ndesc`, `sdate`, `edate`, `userid`, `status`) VALUES (3, 'PKH', 2, '', '2015-12-13', '2017-12-13', 0, NULL);
 INSERT INTO `program` (`id`, `nama`, `sasaran`, `ndesc`, `sdate`, `edate`, `userid`, `status`) VALUES (4, 'Bedah Rumah', 2, '', '2015-12-13', '2017-12-13', 0, NULL);
@@ -5553,6 +5533,24 @@ INSERT INTO `provinsi` (`kode`, `nama`) VALUES (92, 'Papua Barat');
 
 
 #
+# TABLE STRUCTURE FOR: ref_pindah
+#
+
+DROP TABLE IF EXISTS `ref_pindah`;
+
+CREATE TABLE `ref_pindah` (
+  `id` tinyint(4) NOT NULL,
+  `nama` varchar(50) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `ref_pindah` (`id`, `nama`) VALUES (1, 'Pindah keluar Desa/Kelurahan');
+INSERT INTO `ref_pindah` (`id`, `nama`) VALUES (2, 'Pindah keluar Kecamatan');
+INSERT INTO `ref_pindah` (`id`, `nama`) VALUES (3, 'Pindah keluar Kabupaten/Kota');
+INSERT INTO `ref_pindah` (`id`, `nama`) VALUES (4, 'Pindah keluar Provinsi');
+
+
+#
 # TABLE STRUCTURE FOR: sentitems
 #
 
@@ -5599,7 +5597,7 @@ CREATE TABLE `setting_aplikasi` (
   `jenis` varchar(30) DEFAULT NULL,
   `kategori` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
 
 INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (1, 'sebutan_kabupaten', 'kabupaten', 'Pengganti sebutan wilayah kabupaten', '', '');
 INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (2, 'sebutan_kabupaten_singkat', 'kab.', 'Pengganti sebutan singkatan wilayah kabupaten', '', '');
@@ -5619,11 +5617,13 @@ INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `ka
 INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (17, 'libreoffice_path', '', 'Path tempat instal libreoffice di server SID', '', '');
 INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (18, 'sumber_gambar_slider', '1', 'Sumber gambar slider besar', NULL, NULL);
 INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (19, 'sebutan_singkatan_kadus', 'kawil', 'Sebutan singkatan jabatan kepala dusun', NULL, NULL);
-INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (20, 'current_version', '19.01', 'Versi sekarang untuk migrasi', NULL, NULL);
+INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (20, 'current_version', '19.02', 'Versi sekarang untuk migrasi', NULL, NULL);
 INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (21, 'timezone', 'Asia/Jakarta', 'Zona waktu perekaman waktu dan tanggal', NULL, NULL);
 INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (22, 'tombol_cetak_surat', '0', 'Tampilkan tombol cetak langsung di form surat', 'boolean', NULL);
 INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (23, 'web_artikel_per_page', '8', 'Jumlah artikel dalam satu halaman', 'int', 'web_theme');
 INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (24, 'penomoran_surat', '2', 'Penomoran surat mulai dari satu (1) setiap tahun', 'option', NULL);
+INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (25, 'dashboard_program_bantuan', '1	', 'ID program bantuan yang ditampilkan di dashboard', 'int', 'dashboard');
+INSERT INTO `setting_aplikasi` (`id`, `key`, `value`, `keterangan`, `jenis`, `kategori`) VALUES (26, 'panjang_nomor_surat', '', 'Nomor akan diisi \'0\' di sebelah kiri, kalau perlu', 'int', 'surat');
 
 
 #
@@ -5742,7 +5742,7 @@ DROP TABLE IF EXISTS `surat_keluar`;
 CREATE TABLE `surat_keluar` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nomor_urut` smallint(5) DEFAULT NULL,
-  `nomor_surat` varchar(20) DEFAULT NULL,
+  `nomor_surat` varchar(35) DEFAULT NULL,
   `kode_surat` varchar(10) DEFAULT NULL,
   `tanggal_surat` date NOT NULL,
   `tanggal_catat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -5762,7 +5762,7 @@ CREATE TABLE `surat_masuk` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nomor_urut` smallint(5) DEFAULT NULL,
   `tanggal_penerimaan` date NOT NULL,
-  `nomor_surat` varchar(20) DEFAULT NULL,
+  `nomor_surat` varchar(35) DEFAULT NULL,
   `kode_surat` varchar(10) DEFAULT NULL,
   `tanggal_surat` date NOT NULL,
   `pengirim` varchar(100) DEFAULT NULL,
@@ -6219,7 +6219,7 @@ INSERT INTO `tweb_penduduk_hubungan` (`id`, `nama`) VALUES (5, 'MENANTU');
 INSERT INTO `tweb_penduduk_hubungan` (`id`, `nama`) VALUES (6, 'CUCU');
 INSERT INTO `tweb_penduduk_hubungan` (`id`, `nama`) VALUES (7, 'ORANGTUA');
 INSERT INTO `tweb_penduduk_hubungan` (`id`, `nama`) VALUES (8, 'MERTUA');
-INSERT INTO `tweb_penduduk_hubungan` (`id`, `nama`) VALUES (9, 'FAMILI LAIN');
+INSERT INTO `tweb_penduduk_hubungan` (`id`, `nama`) VALUES (9, 'FAMILI');
 INSERT INTO `tweb_penduduk_hubungan` (`id`, `nama`) VALUES (10, 'PEMBANTU');
 INSERT INTO `tweb_penduduk_hubungan` (`id`, `nama`) VALUES (11, 'LAINNYA');
 
@@ -7062,6 +7062,30 @@ INSERT INTO `setting_aplikasi_options` (`id`, `id_setting`, `value`) VALUES (1, 
 INSERT INTO `setting_aplikasi_options` (`id`, `id_setting`, `value`) VALUES (2, 24, 'Nomor berurutan untuk masing-masing surat masuk dan keluar; dan untuk setiap surat layanan dengan jenis yang sama');
 INSERT INTO `setting_aplikasi_options` (`id`, `id_setting`, `value`) VALUES (3, 24, 'Nomor berurutan untuk keseluruhan surat layanan, masuk dan keluar');
 
+
+#
+# TABLE STRUCTURE FOR: log_penduduk
+#
+
+DROP TABLE IF EXISTS `log_penduduk`;
+
+CREATE TABLE `log_penduduk` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `id_pend` int(11) NOT NULL,
+  `id_detail` int(4) NOT NULL,
+  `tanggal` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `bulan` varchar(2) NOT NULL,
+  `tahun` varchar(4) NOT NULL,
+  `tgl_peristiwa` date NOT NULL,
+  `catatan` text,
+  `no_kk` decimal(16,0) DEFAULT NULL,
+  `nama_kk` varchar(100) DEFAULT NULL,
+  `ref_pindah` tinyint(4) DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_pend` (`id_pend`,`id_detail`,`tgl_peristiwa`),
+  KEY `id_ref_pindah` (`ref_pindah`),
+  CONSTRAINT `id_ref_pindah` FOREIGN KEY (`ref_pindah`) REFERENCES `ref_pindah` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 #
 # TABLE STRUCTURE FOR: daftar_kontak

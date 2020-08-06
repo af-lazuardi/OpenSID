@@ -306,6 +306,7 @@
 		unset($data['file_foto']);
 		unset($data['old_foto']);
 		unset($data['nik_lama']);
+		unset($data['kk_level_lama']);
 
 		$error_validasi = array_merge($this->validasi_data_penduduk($data), $this->validasi_data_keluarga($data));
 		if (!empty($error_validasi))
@@ -397,7 +398,7 @@
 	*/
 	public function delete($id='')
 	{
-		
+
 		$this->db->where('no_kk',$id)->delete('tweb_biodata_penduduk');
 		// Untuk statistik perkembangan keluarga
 		$this->log_keluarga($id, $nik_kepala, 2);
@@ -593,6 +594,35 @@
 	public function list_anggota($id=0,$options=array('dengan_kk'=>true))
 	{
 		$sql = "select * from tweb_biodata_penduduk where no_kk=?";
+		//19.02
+		/*
+		$sql = "SELECT u.*, u.sex as sex_id, u.status_kawin as status_kawin_id,
+			(SELECT DATE_FORMAT(FROM_DAYS(TO_DAYS(NOW())-TO_DAYS(`tanggallahir`)), '%Y')+0 FROM tweb_penduduk WHERE id = u.id) AS umur,
+			(CASE when u.status_kawin <> 2
+				then w.nama
+				else
+					case when u.akta_perkawinan = ''
+						then 'KAWIN TIDAK TERCATAT'
+						else 'KAWIN TERCATAT'
+					end
+				end) as status_kawin,
+			b.dusun, b.rw, b.rt, x.nama as sex, u.kk_level, a.nama as agama, d.nama as pendidikan,j.nama as pekerjaan, f.nama as warganegara, g.nama as golongan_darah, h.nama AS hubungan, k.alamat
+			FROM tweb_penduduk u
+			LEFT JOIN tweb_penduduk_agama a ON u.agama_id = a.id
+			LEFT JOIN tweb_penduduk_pekerjaan j ON u.pekerjaan_id = j.id
+			LEFT JOIN tweb_penduduk_pendidikan_kk d ON u.pendidikan_kk_id = d.id
+			LEFT JOIN tweb_penduduk_warganegara f ON u.warganegara_id = f.id
+			LEFT JOIN tweb_golongan_darah g ON u.golongan_darah_id = g.id
+			LEFT JOIN tweb_penduduk_kawin w ON u.status_kawin = w.id
+			LEFT JOIN tweb_penduduk_sex x ON u.sex = x.id
+			LEFT JOIN tweb_penduduk_hubungan h ON u.kk_level = h.id
+			LEFT JOIN tweb_wil_clusterdesa b ON u.id_cluster = b.id
+			LEFT JOIN tweb_keluarga k ON u.id_kk = k.id
+			WHERE status = 1 AND status_dasar = 1 AND id_kk = ?";
+		if ($options['dengan_kk'] !== NULL AND !$options['dengan_kk']) $sql .= " AND kk_level <> 1";
+		if (!empty($options['pilih'])) $sql .= " AND u.nik IN (".$options['pilih'].")";
+		$sql .= " ORDER BY kk_level, tanggallahir";
+		*/
 		$query = $this->db->query($sql, array($id));
 		$data = $query->result_array();
 		return $data;
@@ -602,7 +632,7 @@
 	// apabila $is_no_kk == true maka $id adalah no_kk
 	public function get_kepala_kk($id, $is_no_kk = false)
 	{
-		
+
 		$sql = "SELECT * from tweb_biodata_penduduk where stat_hbkel='KEPALA KELUARGA' and no_kk=?";
 		$query = $this->db->query($sql,array($id));
 		$data = $query->row_array();

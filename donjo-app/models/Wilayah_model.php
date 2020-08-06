@@ -120,13 +120,13 @@
 		$this->db->where('rt', '0');
 		$outp1 = $this->db->update('tweb_wil_clusterdesa', $data);
 
-		
+
 		$biodata= $this->biodata_model->get_penduduk($data['id_kepala']);
 		$log_id = $this->db->select('nik')->from('tweb_wil_pamong')->
 				where('nik', $biodata['nik'])->
 				limit(1)->get()->row()->nik;
-	
-		if($log_id) { 
+
+		if($log_id) {
 			$this->db->where('nik', $log_id);
 			$this->db->update('tweb_wil_pamong',$biodata);
 		} else {
@@ -161,7 +161,16 @@
 		$dusun = $temp['dusun'];
 
 		$sql = "SELECT u.*, a.nama AS nama_ketua, a.nik AS nik_ketua
-		FROM tweb_wil_clusterdesa u LEFT JOIN tweb_wil_pamong a ON u.id_kepala = a.nik WHERE u.rt = '0' AND u.rw <> '0' AND u.dusun = '$dusun'";
+			(SELECT COUNT(rt.id) FROM tweb_wil_clusterdesa rt WHERE dusun = u.dusun AND rw = u.rw AND rt <> '-' AND rt <> '0' ) AS jumlah_rt,
+			(SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = u.rw) AND p.status_dasar=1) AS jumlah_warga,
+			(SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = u.rw) AND p.sex = 1 AND p.status_dasar=1) AS jumlah_warga_l,
+			(SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = u.rw) AND p.sex = 2 AND p.status_dasar=1) AS jumlah_warga_p,
+			(SELECT COUNT(p.id) FROM tweb_keluarga k inner join tweb_penduduk p ON k.nik_kepala=p.id  WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = u.rw) AND p.kk_level = 1 AND p.status_dasar=1) AS jumlah_kk
+			FROM tweb_wil_clusterdesa u LEFT JOIN tweb_wil_pamong a ON u.id_kepala = a.nik WHERE u.rt = '0' AND u.rw <> '0' AND u.dusun = '$dusun'";
+
+		//19.02
+		//FROM tweb_wil_clusterdesa u LEFT JOIN tweb_penduduk a ON u.id_kepala = a.id WHERE u.rt = '0' AND u.rw <> '0' AND u.dusun = '$dusun'";
+
 		$query = $this->db->query($sql);
 		$data = $query->result_array();
 
@@ -209,15 +218,15 @@
 		$this->db->where('rw', $rw);
         $this->db->where('rt', 0);//rw pasti data rt 0
 		$outp = $this->db->update('tweb_wil_clusterdesa', $data);
-		
-			
+
+
 
 		$biodata= $this->biodata_model->get_penduduk($data['id_kepala']);
 		$log_id = $this->db->select('nik')->from('tweb_wil_pamong')->
 				where('nik', $biodata['nik'])->
 				limit(1)->get()->row()->nik;
-	
-		if($log_id) { 
+
+		if($log_id) {
 			$this->db->where('nik', $log_id);
 			$this->db->update('tweb_wil_pamong',$biodata);
 		} else {
@@ -288,21 +297,21 @@
 
 		$this->db->where('id', $id);
 		$outp = $this->db->update('tweb_wil_clusterdesa', $data);
-		
-			
+
+
 
 		$biodata= $this->biodata_model->get_penduduk($data['id_kepala']);
 		$log_id = $this->db->select('nik')->from('tweb_wil_pamong')->
 				where('nik', $biodata['nik'])->
 				limit(1)->get()->row()->nik;
-	
-		if($log_id) { 
+
+		if($log_id) {
 			$this->db->where('nik', $log_id);
 			$this->db->update('tweb_wil_pamong',$biodata);
 		} else {
 			$this->db->insert('tweb_wil_pamong', $biodata);
 		}
-		
+
 
 		if ($outp) $_SESSION['success'] = 1;
 		else $_SESSION['success'] = -1;
@@ -455,7 +464,7 @@
 		$sql = "SELECT sum(jumlah_rt) as jmlrt, sum(jumlah_warga) as jmlwarga, sum(jumlah_warga_l) as jmlwargal, sum(jumlah_warga_p) as jmlwargap, sum(jumlah_kk) as jmlkk
 			FROM
 			(SELECT u.*, a.nama AS nama_ketua, a.nik AS nik_ketua,
-				(SELECT COUNT(rt.id) FROM tweb_wil_clusterdesa rt WHERE dusun = u.dusun AND rw = u.rw AND rw <> '-' AND rt <> '-' AND rt <> '0' ) AS jumlah_rt,
+				(SELECT COUNT(rt.id) FROM tweb_wil_clusterdesa rt WHERE dusun = u.dusun AND rw = u.rw AND rt <> '-' AND rt <> '0' ) AS jumlah_rt,
 				(SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = u.rw ) and status_dasar = 1) AS jumlah_warga,
 				(SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = u.rw) AND p.sex = 1 and status_dasar = 1) AS jumlah_warga_l,
 				(SELECT COUNT(p.id) FROM tweb_penduduk p WHERE p.id_cluster IN(SELECT id FROM tweb_wil_clusterdesa WHERE dusun = '$dusun' AND rw = u.rw) AND p.sex = 2 and status_dasar = 1) AS jumlah_warga_p,

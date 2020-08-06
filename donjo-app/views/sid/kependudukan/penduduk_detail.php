@@ -40,9 +40,9 @@
 										<table class="table table-bordered table-striped table-hover" >
 											<tr>
 												<td colspan="3">
-													
+
 													<img class="profile-user-img img-responsive img-circle" src="data:image/png;base64, <?=$photo[content]?>" width="25%">
-								
+
 												</td>
 											</tr>
 										</table>
@@ -194,18 +194,22 @@
 												<tr>
 													<td>Status Kawin</td><td >:</td><td><?= strtoupper($penduduk['stat_kwn'])?></td>
 												</tr>
-												<tr>
-													<td>Akta perkawinan</td><td >:</td><td><?= strtoupper($penduduk['no_akta_kwn'])?></td>
-												</tr>
-												<tr>
-													<td>Tanggal perkawinan</td><td >:</td><td><?= strtoupper($penduduk['tgl_kwn'])?></td>
-												</tr>
-												<tr>
-													<td>Akta perceraian</td><td >:</td><td><?= strtoupper($penduduk['no_akta_cerai'])?></td>
-												</tr>
-												<tr>
-													<td>Tanggal perceraian</td><td >:</td><td><?= strtoupper($penduduk['tgl_cerai'])?></td>
-												</tr>
+												<?php if ($penduduk['status_kawin'] <> 1): ?>
+													<tr>
+														<td>Akta perkawinan</td><td >:</td><td><?= strtoupper($penduduk['no_akta_kwn'])?></td>
+													</tr>
+													<tr>
+														<td>Tanggal perkawinan</td><td >:</td><td><?= strtoupper($penduduk['tgl_kwn'])?></td>
+													</tr>
+												<?php endif ?>
+												<?php if ($penduduk['status_kawin'] <> 1 and $penduduk['status_kawin'] <> 2): ?>
+													<tr>
+														<td>Akta perceraian</td><td >:</td><td><?= strtoupper($penduduk['no_akta_cerai'])?></td>
+													</tr>
+													<tr>
+														<td>Akta perceraian</td><td >:</td><td><?= strtoupper($penduduk['tgl_cerai'])?></td>
+													</tr>
+												<?php endif ?>
 												<tr>
 													<th colspan="3" class="subtitle_head"><strong>DATA KESEHATAN</strong></th>
 												</tr>
@@ -218,9 +222,11 @@
 												<tr>
 													<td>Sakit Menahun</td><td >:</td><td><?= strtoupper($penduduk['sakit_menahun'])?></td>
 												</tr>
-												<tr>
-													<td>Akseptor KB</td><td >:</td><td><?= strtoupper($penduduk['cara_kb'])?></td>
-												</tr>
+												<?php if ($penduduk['status_kawin'] == 2): ?>
+													<tr>
+														<td>Akseptor KB</td><td >:</td><td><?= strtoupper($penduduk['cara_kb'])?></td>
+													</tr>
+												<?php endif ?>
 												<?php if ($penduduk['id_sex'] == 2): ?>
 													<tr>
 														<td>Status Kehamilan</td><td >:</td><td><?= empty($penduduk['hamil']) ? 'TIDAK HAMIL' : 'HAMIL'?></td>
