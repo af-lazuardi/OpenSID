@@ -151,30 +151,35 @@ class Program_bantuan_model extends CI_Model {
 		{
 			case 1:
 				# Data penduduk
-				if (!$jumlah) $select_sql = "p.*,o.nama,o.no_rt as rt,o.no_rw as rw,o.alamat as dusun";
+				if (!$jumlah) $select_sql = "p.*,o.nama,o.no_rt as rt,o.no_rw as rw,o.alamat as dusun, k.no_kk";
 				$strSQL = "SELECT ". $select_sql." FROM program_peserta p
 					LEFT JOIN tweb_biodata_penduduk o ON p.peserta=o.nik
-				 WHERE p.program_id=".$slug;
+				 	LEFT JOIN tweb_keluarga k ON k.id = o.id_kk
+					LEFT JOIN tweb_wil_clusterdesa w ON w.id = o.id_cluster
+					WHERE p.program_id =".$slug;
 				break;
 			case 2:
 				# Data KK
-				if (!$jumlah) $select_sql = "p.*,p.peserta as nama,q.kepala_kk,q.no_kk,q.nama,q.no_rt as rt,q.no_rw as rw,q.alamat as dusun";
+				if (!$jumlah) $select_sql = "p.*,p.peserta as nama,q.kepala_kk,q.no_kk,q.nama,q.no_rt as rt,q.no_rw as rw,q.alamat as dusun, o.nik_kepala, q.nik, w.rt ,w.rw";
 				$strSQL = "SELECT ". $select_sql." FROM program_peserta p
 					LEFT JOIN tweb_biodata_penduduk q ON q.nik=p.peserta
+					LEFT JOIN tweb_keluarga o ON p.peserta = o.no_kk
+					LEFT JOIN tweb_wil_clusterdesa w ON w.id = q.id_cluster
 					WHERE p.program_id=".$slug;
+
 				break;
 			case 3:
 				# Data RTM
-				if (!$jumlah) $select_sql = "p.*,o.nama,o.nik,r.no_kk,w.rt,w.rw,w.dusun";
+				if (!$jumlah) $select_sql = "p.*, o.nama, o.nik, r.no_kk, w.rt, w.rw, w.dusun";
 				$strSQL = "SELECT ". $select_sql." FROM program_peserta p
 					LEFT JOIN tweb_rtm r ON r.no_kk = p.peserta
-					LEFT JOIN tweb_penduduk o ON o.id=r.nik_kepala
-					LEFT JOIN tweb_wil_clusterdesa w ON w.id=o.id_cluster
+					LEFT JOIN tweb_penduduk o ON o.id = r.nik_kepala
+					LEFT JOIN tweb_wil_clusterdesa w ON w.id = o.id_cluster
 					WHERE p.program_id=".$slug;
 				break;
 			case 4:
 				# Data Kelompok
-				if (!$jumlah) $select_sql = "p.*,o.nama,o.nik,r.nama as nama_kelompok,w.rt,w.rw,w.dusun";
+				if (!$jumlah) $select_sql = "p.*, o.nama, o.nik, r.nama as nama_kelompok, w.rt, w.rw, w.dusun";
 				$strSQL = "SELECT ". $select_sql." FROM program_peserta p
 					LEFT JOIN kelompok r ON r.id = p.peserta
 					LEFT JOIN tweb_penduduk o ON o.id=r.id_ketua
@@ -266,6 +271,7 @@ class Program_bantuan_model extends CI_Model {
 					 * Data penduduk
 					 * */
 					$hasil0['judul_peserta'] = 'NIK';
+					$hasil0['judul_peserta_plus'] = 'No. KK';
 					$hasil0['judul_peserta_info'] = 'Nama Peserta';
 					$hasil0['judul_cari_peserta'] = 'NIK / Nama Peserta';
 					$filter = array();
@@ -276,6 +282,7 @@ class Program_bantuan_model extends CI_Model {
 						{
 							$data[$i]['id']=$data[$i]['id'];
 							$data[$i]['nik']=$data[$i]['peserta'];
+							$data[$i]['peserta_plus'] = $data[$i]['no_kk'];
 							$data[$i]['peserta_nama']=$data[$i]['peserta'];
 							$data[$i]['peserta_info']=$data[$i]['nama'];
 							$filter[] = $data[$i]['peserta'];
@@ -325,22 +332,25 @@ class Program_bantuan_model extends CI_Model {
 					 * Data KK
 					 * */
 					$hasil0['judul_peserta'] = 'NO. KK';
+					$hasil0['judul_peserta_plus'] = 'NIK';
 					$hasil0['judul_peserta_info'] = 'Kepala Keluarga';
 					$hasil0['judul_cari_peserta'] = 'No. KK / Nama Kepala Keluarga';
 					$filter = array();
 					if ($query->num_rows()>0)
 					{
-						$data=$query->result_array();
+						$data = $query->result_array();
 						for ($i=0; $i<count($data); $i++)
 						{
-							$data[$i]['id']=$data[$i]['id'];
-							$data[$i]['nik']=$data[$i]['no_kk'];
-							$data[$i]['peserta_nama']=$data[$i]['no_kk'];
-							$data[$i]['peserta_info']=$data[$i]['nama'];
+							$data[$i]['id'] = $data[$i]['id'];
+							$data[$i]['nik'] = $data[$i]['no_kk'];
+							$data[$i]['peserta_plus'] = $data[$i]['nik'];
+							$data[$i]['peserta_nama'] = $data[$i]['no_kk'];
+							$data[$i]['peserta_info'] = $data[$i]['nama'];
 							$filter[] = $data[$i]['no_kk'];
-							$data[$i]['nama']=strtoupper($data[$i]['nama'])." [".$data[$i]['no_kk']."]";
+							$data[$i]['nama'] = strtoupper($data[$i]['nama'])." [".$data[$i]['no_kk']."]";
 
-							$data[$i]['info']= "RT/RW ". $data[$i]['rt']."/".$data[$i]['rw']." - ".strtoupper($data[$i]['dusun']);
+							$data[$i]['info'] = "RT/RW ". $data[$i]['rt']."/".$data[$i]['rw']." - ".strtoupper($data[$i]['dusun']);
+							$data[$i]['kartu_tanggal_lahir'] = tgl_indo_out($data[$i]['kartu_tanggal_lahir']);
 						}
 						$hasil1 = $data;
 					}
@@ -362,10 +372,10 @@ class Program_bantuan_model extends CI_Model {
 							// Abaikan keluarga yang sudah terdaftar pada program
 							if(!in_array($data[$i]['id'], $filter)){
 								$data[$i]['id'] = preg_replace('/[^a-zA-Z0-9]/', '', $data[$i]['id']); //Hapus karakter non alpha di no_kk
-								$hasil2[$j]['id']=$data[$i]['id'];
-								$hasil2[$j]['nik']=$data[$i]['id'];
-								$hasil2[$j]['nama']=strtoupper($data[$i]['nama']) ." [".$data[$i]['id']."]";
-								$hasil2[$j]['info']= "RT/RW ". $data[$i]['rt']."/".$data[$i]['rw']." - ".strtoupper($data[$i]['dusun']);
+								$hasil2[$j]['id'] = $data[$i]['id'];
+								$hasil2[$j]['nik'] = $data[$i]['id'];
+								$hasil2[$j]['nama'] = strtoupper($data[$i]['nama']) ." [".$data[$i]['id']."]";
+								$hasil2[$j]['info'] = "RT/RW ". $data[$i]['rt']."/".$data[$i]['rw']." - ".strtoupper($data[$i]['dusun']);
 								$j++;
 							}
 						}

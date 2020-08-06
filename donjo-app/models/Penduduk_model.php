@@ -25,7 +25,7 @@
 			$cari = $_SESSION['cari'];
 			$kw = $this->db->escape_like_str($cari);
 			$kw = '%' .$kw. '%';
-			$search_sql = " AND (u.nama LIKE '$kw' OR u.nik LIKE '$kw')";
+			$search_sql = " AND (u.nama LIKE '$kw' OR u.nik LIKE '$kw' OR u.tag_id_card LIKE '$kw')";
 			return $search_sql;
 		}
 	}
@@ -334,7 +334,7 @@
 
 	public function list_data($o=0, $offset=0, $limit=500)
 	{
-		$select_sql = "SELECT DISTINCT u.id, u.nik, u.tanggallahir, u.tempatlahir, u.status, u.status_dasar, u.id_kk, u.nama, u.nama_ayah, u.nama_ibu, a.dusun, a.rw, a.rt, d.alamat, d.no_kk AS no_kk,
+		$select_sql = "SELECT DISTINCT u.id, u.nik, u.tanggallahir, u.tempatlahir, u.status, u.status_dasar, u.id_kk, u.nama, u.nama_ayah, u.nama_ibu, a.dusun, a.rw, a.rt, d.alamat, d.no_kk AS no_kk, u.kk_level, u.tag_id_card,
 			(CASE when u.status_kawin <> 2
 				then k.nama
 				else
@@ -363,7 +363,7 @@
 			case 6: $order_sql = ' ORDER BY d.no_kk DESC'; break;
 			case 7: $order_sql = ' ORDER BY umur'; break;
 			case 8: $order_sql = ' ORDER BY umur DESC'; break;
-			default:$order_sql = '';
+			default:$order_sql = ' ORDER BY CONCAT(d.no_kk, u.kk_level)';
 		}
 
 		//Paging SQL
@@ -432,6 +432,7 @@
 				end as alamat
 				FROM tweb_penduduk u
 				LEFT JOIN tweb_wil_clusterdesa a ON u.id_cluster = a.id
+				LEFT JOIN tweb_wil_clusterdesa a2 ON u.id_cluster = a2.id
 				LEFT JOIN tweb_keluarga d ON u.id_kk = d.id
 				LEFT JOIN tweb_penduduk_pendidikan_kk n ON u.pendidikan_kk_id = n.id
 				LEFT JOIN tweb_penduduk_pendidikan sd ON u.pendidikan_sedang_id = sd.id
@@ -497,6 +498,8 @@
 		if ($data['status_kawin'] != 2) $data['cara_kb_id'] = NULL;
 		// Status hamil tidak berlaku bagi laki-laki
 		if ($data['sex'] == 1) $data['hamil'] = 0;
+		if ($data['warganegara_id'] == 1 or empty($data['dokumen_kitas']))
+			$data['dokumen_kitas'] = NULL;
 		switch ($data['status_kawin']) {
 			case 1:
 				// Status 'belum kawin' tidak berlaku akta perkawinan dan perceraian
@@ -534,6 +537,7 @@
 		return $valid;
 	}
 
+	// Tambah penduduk domisili (tidak ada nomor KK)
 	public function insert()
 	{
 		unset($_SESSION['validation_error']);
@@ -541,6 +545,23 @@
 		$_SESSION['error_msg'] = '';
 
 		$data = $_POST;
+
+		$error_validasi = $this->validasi_data_penduduk($data);
+		if (!empty($error_validasi))
+		{
+			foreach ($error_validasi as $error)
+			{
+				$_SESSION['error_msg'] .= ': ' . $error . '\n';
+			}
+			// Form menggunakan kolom id_sex = sex
+			$_POST['id_sex'] = $_POST['sex'];
+			// Tampilkan tanda kutip dalam nama
+			$_POST['nama'] =  str_replace ( "\"", "&quot;", $_POST['nama'] ) ;
+			$_SESSION['post'] = $_POST;
+			$_SESSION['success']=-1;
+			return;
+		}
+
 		$lokasi_file = $_FILES['foto']['tmp_name'];
 		$tipe_file = $_FILES['foto']['type'];
 		$nama_file = $_FILES['foto']['name'];
@@ -567,27 +588,9 @@
 		unset($data['old_foto']);
 		unset($data['nik_lama']);
     unset($data['kk_level_lama']);
-
-		$data['id_cluster'] = $data['rt'];
-		UNSET($data['dusun']);
-		UNSET($data['rw']);
-		UNSET($data['rt']);
-
-		$error_validasi = $this->validasi_data_penduduk($data);
-		if (!empty($error_validasi))
-		{
-			foreach ($error_validasi as $error)
-			{
-				$_SESSION['error_msg'] .= ': ' . $error . '\n';
-			}
-			// Form menggunakan kolom id_sex = sex
-			$_POST['id_sex'] = $_POST['sex'];
-			// Tampilkan tanda kutip dalam nama
-			$_POST['nama'] =  str_replace ( "\"", "&quot;", $_POST['nama'] ) ;
-			$_SESSION['post'] = $_POST;
-			$_SESSION['success']=-1;
-			return;
-		}
+		unset($data['dusun']);
+		unset($data['rw']);
+		unset($data['no_kk']);
 
 		if ($data['tanggallahir'] == '') unset($data['tanggallahir']);
 		if ($data['tanggalperkawinan'] == '') unset($data['tanggalperkawinan']);
@@ -643,7 +646,30 @@
 		unset($_SESSION['error_msg']);
 		$data = $_POST;
 
-    $sql = "SELECT id_kk,status_dasar FROM tweb_penduduk WHERE id = ?";
+    // Jangan update nik apabila tidak berubah
+    if ($data['nik_lama'] == $data['nik'])
+    {
+      unset($data['nik']);
+    }
+    unset($data['nik_lama']);
+
+    $error_validasi = $this->validasi_data_penduduk($data);
+    if (!empty($error_validasi))
+    {
+      foreach ($error_validasi as $error)
+      {
+        $_SESSION['error_msg'] .= ': ' . $error . '\n';
+      }
+			// Form menggunakan kolom id_sex = sex
+			$_POST['id_sex'] = $_POST['sex'];
+      // Tampilkan tanda kutip dalam nama
+      $_POST['nama'] =  str_replace ( "\"", "&quot;", $_POST['nama'] ) ;
+      $_SESSION['post'] = $_POST;
+      $_SESSION['success'] = -1;
+      return;
+    }
+
+    $sql = "SELECT id_kk, id_cluster, status_dasar FROM tweb_penduduk WHERE id = ?";
 		$query = $this->db->query($sql, $id);
 		$pend = $query->row_array();
     if ($pend['status_dasar'] != 1)
@@ -655,6 +681,23 @@
 
 		$this->keluarga_model->update_kk_level($id, $pend['id_kk'], $data['kk_level'], $data['kk_level_lama']);
     unset($data['kk_level_lama']);
+
+    // Untuk anggota keluarga
+    if (!empty($data['no_kk']))
+    {
+    	// Ganti alamat KK
+    	$this->db->
+    		where('id', $pend['id_kk'])->
+    		update('tweb_keluarga', array('alamat' => $data['alamat']));
+	    if ($pend['id_cluster'] != $data['id_cluster'])
+	    {
+	    	$this->keluarga_model->pindah_keluarga($pend['id_kk'], $data['id_cluster']);
+	    }
+	    unset($data['alamat']);
+    }
+    unset($data['no_kk']);
+    unset($data['dusun']);
+    unset($data['rw']);
 
     $lokasi_file = $_FILES['foto']['tmp_name'];
     $tipe_file = $_FILES['foto']['type'];
@@ -679,29 +722,6 @@
 
     unset($data['file_foto']);
     unset($data['old_foto']);
-
-    // Jangan update nik apabila tidak berubah
-    if ($data['nik_lama'] == $data['nik'])
-    {
-      unset($data['nik']);
-    }
-    unset($data['nik_lama']);
-
-    $error_validasi = $this->validasi_data_penduduk($data);
-    if (!empty($error_validasi))
-    {
-      foreach ($error_validasi as $error)
-      {
-        $_SESSION['error_msg'] .= ': ' . $error . '\n';
-      }
-			// Form menggunakan kolom id_sex = sex
-			$_POST['id_sex'] = $_POST['sex'];
-      // Tampilkan tanda kutip dalam nama
-      $_POST['nama'] =  str_replace ( "\"", "&quot;", $_POST['nama'] ) ;
-      $_SESSION['post'] = $_POST;
-      $_SESSION['success'] = -1;
-      return;
-    }
 
     $this->db->where('id', $id);
     $outp = $this->db->update('tweb_penduduk', $data);
@@ -863,7 +883,7 @@
 		//19.02
 		/*
 		$sql = "SELECT u.sex as id_sex, u.*, a.dusun, a.rw, a.rt, t.nama AS status, o.nama AS pendidikan_sedang, m.nama as golongan_darah, h.nama as hubungan,
-			b.nama AS pendidikan_kk, d.no_kk AS no_kk, d.alamat,
+			b.nama AS pendidikan_kk, d.no_kk AS no_kk, d.alamat, u.id_cluster as id_cluster,
 			(CASE when u.status_kawin <> 2
 				then k.nama
 				else
@@ -881,7 +901,7 @@
 			log.no_kk as log_no_kk
 		 FROM tweb_penduduk u
 			LEFT JOIN tweb_keluarga d ON u.id_kk = d.id
-			LEFT JOIN tweb_wil_clusterdesa a ON d.id_cluster = a.id
+			LEFT JOIN tweb_wil_clusterdesa a ON u.id_cluster = a.id
 			LEFT JOIN tweb_penduduk_pendidikan o ON u.pendidikan_sedang_id = o.id
 			LEFT JOIN tweb_penduduk_pendidikan_kk b ON u.pendidikan_kk_id = b.id
 			LEFT JOIN tweb_penduduk_warganegara w ON u.warganegara_id = w.id
@@ -1165,24 +1185,6 @@
 		$penduduk = $q->row_array();
 		if ($penduduk['id_kk'] > 0) return true;
 		else return false;
-	}
-
-	// Pindah untuk penduduk lepas (yang bukan anggota keluarga)
-	public function pindah_proses($id=0, $id_cluster='', $alamat)
-	{
-		$this->db->where('id',$id);
-		if (!empty($alamat)) $data['alamat_sekarang'] = $alamat;
-		if ($id_cluster AND $id_cluster != '') $data['id_cluster'] = $id_cluster;
-		if (!empty($data))
-		{
-			$outp = $this->db->update('tweb_penduduk', $data);
-			$this->tulis_log_penduduk($id, '6', date('m'), date('Y'));
-		}
-		else
-			$outp = true;
-
-		if($outp) $_SESSION['success'] = 1;
-		else $_SESSION['success'] = -1;
 	}
 
 	public function tulis_log_penduduk_data($log)

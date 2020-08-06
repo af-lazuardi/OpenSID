@@ -44,9 +44,9 @@
 											<tr>
 												<td colspan="3">
 												<?php if ($penduduk['foto']): ?>
-													<img class="profile-user-img img-responsive img-circle" src="data:image/png;base64, <?=$photo[content]?>" width="25%">
+													<img class="penduduk profile-user-img img-responsive img-circle" src="data:image/png;base64, <?=$photo[content]?>" width="25%" alt="Foto">
 													<?php else: ?>
-													<img class="profile-user-img img-responsive img-circle" src="<?= base_url()?>assets/files/user_pict/kuser.png" alt="Foto">
+													<img class="penduduk profile-user-img img-responsive img-circle" src="<?= base_url()?>assets/files/user_pict/kuser.png" alt="Foto">
 												<?php endif; ?>
 												</td>
 											</tr>
@@ -70,11 +70,13 @@
 																<th>Wajib KTP</th>
 																<th>KTP-EL</th>
 																<th>Status Rekam</th>
+																<th>Tag ID Card</th>
 															</tr>
 															<tr>
 																<td><?= strtoupper($penduduk['wajib_ktp'])?></td>
 																<td><?= strtoupper($penduduk['ktp_el'])?></td>
 																<td><?= strtoupper($penduduk['status_rekam'])?></td>
+																<td><?= $penduduk['tag_id_card']?></td>
 															</tr>
 														</table>
 													</td>

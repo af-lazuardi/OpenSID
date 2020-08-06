@@ -39,9 +39,9 @@ class Suplemen extends Admin_Controller {
 		$data['suplemen'] = $this->suplemen_model->get_suplemen($id);
 		$sasaran = $data['suplemen']['sasaran'];
 		$data['list_sasaran'] = $this->suplemen_model->list_sasaran($id, $sasaran);
-		if (isset($_POST['nik']))
+		if (isset($_POST['terdata']))
 		{
-			//$data['individu'] = $this->suplemen_model->get_terdata($_POST['nik'], $sasaran);
+			// from 19.05 $data['individu'] = $this->suplemen_model->get_terdata($_POST['terdata'], $sasaran);
 			$data['individu'] = $this->biodata_model->get_penduduk($_POST['nik']);
 			if($data['individu']['nik'] == NULL) {
 				$data['individu']['status_data'] = "Data Tidak ditemukan";
@@ -53,10 +53,10 @@ class Suplemen extends Admin_Controller {
 					&& $data['individu']['no_kel'] == $kodeKel
 				) {
 					$this->biodata_model->save_biodata($data['individu']);
-					
+
 				} else {
 					$data['individu']['status_data'] = "Mohon Maaf Biodata Penduduk desa ".$data['individu']['kel_name'];
-				}	
+				}
 			}
 			$data['individu']['alamat_wilayah']= $data['individu']['alamat'];
 		}
@@ -154,10 +154,10 @@ class Suplemen extends Admin_Controller {
 		redirect("suplemen/rincian/1/$id");
 	}
 
-	public function hapus_terdata($id_suplemen, $terdata_id)
+	public function hapus_terdata($id_suplemen, $id_terdata)
 	{
 		$this->redirect_hak_akses('h', "suplemen/rincian/1/$id_suplemen");
-		$this->suplemen_model->hapus_terdata($terdata_id);
+		$this->suplemen_model->hapus_terdata($id_terdata);
 		redirect("suplemen/rincian/1/$id_suplemen");
 	}
 

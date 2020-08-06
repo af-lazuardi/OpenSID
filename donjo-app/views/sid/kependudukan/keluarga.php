@@ -77,7 +77,7 @@
 												<select class="form-control input-sm " name="dusun" onchange="formAction('mainform','<?= site_url('keluarga/dusun')?>')">
 													<option value="">Pilih <?= ucwords($this->setting->sebutan_dusun)?></option>
 													<?php foreach ($list_dusun AS $data): ?>
-														<option value="<?= $data['dusun']?>" <?php if ($dusun == $data['dusun']): ?>selected<?php endif ?>><?= strtoupper(unpenetration(ununderscore($data['dusun'])))?></option>
+														<option value="<?= $data['dusun']?>" <?php if ($dusun == $data['dusun']): ?>selected<?php endif ?>><?= strtoupper($data['dusun'])?></option>
 													<?php endforeach;?>
 												</select>
 												<?php if ($dusun): ?>
@@ -133,6 +133,7 @@
                                   <th nowrap><a href="<?= site_url("keluarga/index/$p/3")?>">Kepala Keluarga <i class='fa fa-sort fa-sm'></i></a></th>
                                 <?php endif; ?>
 																<th>NIK</th>
+																<th>Tag ID Card</th>
 																<th>Jumlah Anggota</th>
 																<th>Jenis Kelamin</th>
 																<th>Alamat</th>
@@ -152,18 +153,18 @@
 																		<a href="<?= site_url("keluarga/anggota/$p/$o/$data[no_kk]")?>" class="btn bg-purple btn-flat btn-sm"  title="Rincian Anggota Keluarga (KK)"><i class="fa fa-list-ol"></i></a>
 																		<a href="<?= site_url("keluarga/form_a/$p/$o/$data[no_kk]")?>" class="btn btn-success btn-flat btn-sm " title="Tambah Anggota Keluarga" ><i class="fa fa-plus"></i> </a>
 																		<a href="<?= site_url("keluarga/edit_nokk/$p/$o/$data[no_kk]")?>" title="Ubah Data" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Data KK" class="btn bg-orange btn-flat btn-sm"><i class="fa fa-edit"></i></a>
-																		<a href="<?= site_url("keluarga/ajax_penduduk_pindah/$data[no_kk]")?>" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Alamat/Pindah Keluarga (KK) Dalam Desa" class="btn bg-navy btn-flat btn-sm"  title="Ubah Alamat/Pindah Keluarga dalam Desa"><i class="fa fa-location-arrow"></i></a>
 																		<?php if ($this->CI->cek_hak_akses('h')): ?>
 																			<a href="#" data-href="<?= site_url("keluarga/delete/$p/$o/$data[no_kk]")?>" class="btn bg-maroon btn-flat btn-sm"  title="Hapus/Keluar Dari Daftar Keluarga" data-toggle="modal" data-target="#confirm-delete"><i class="fa fa-trash-o"></i></a>
 																		<?php endif; ?>
 																	</td>
 																	<td><a href="<?= site_url("keluarga/kartu_keluarga/$p/$o/$data[id]")?>"><?= $data['no_kk']?></a></td>
-																	<td nowrap><?= strtoupper(unpenetration($data['kepala_kk']))?></td>
-																	<td><?= strtoupper(unpenetration($data['nik']))?></td>
+																	<td nowrap><?= strtoupper($data['kepala_kk'])?></td>
+																	<td><?= strtoupper($data['nik'])?></td>
+																	<td><?= $data['tag_id_card']?></td>
 																	<td><a href="<?= site_url("keluarga/anggota/$p/$o/$data[id]")?>"><?= $data['jumlah_anggota']?></a></td>
 																	<td><?= strtoupper($data['jenis_klmin'])?></td>
 																	<td><?= strtoupper($data['alamat'])?></td>
-																	<td><?= strtoupper(unpenetration(ununderscore($data['dusun'])))?></td>
+																	<td><?= strtoupper($data['dusun'])?></td>
 																	<td><?= strtoupper($data['no_rw'])?></td>
 																	<td><?= strtoupper($data['no_rt'])?></td>
 																	<td><?= tgl_indo($data['tgl_daftar'])?></td>

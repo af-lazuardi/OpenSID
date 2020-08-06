@@ -368,3 +368,18 @@ img { margin-bottom: 5px; }
 	background-color: #ff0505;
 	border-radius: 6px
 }
+
+/* Penduduk */
+img.profile-user-img.penduduk
+{
+	width: auto;
+	max-height: 250px;
+	max-width: 200px;
+}
+
+/* Tabel umum */
+td.bilangan, th.bilangan, td.no_urut
+{
+	text-align: center;
+}
+

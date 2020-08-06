@@ -138,6 +138,7 @@
                                                             <?php else: ?>
                                                                 <th><a href="<?= site_url("penduduk/index/$p/1")?>">NIK <i class='fa fa-sort fa-sm'></i></a></th>
                                                             <?php endif; ?>
+                                                                <th>Tag ID Card</th>
                                                             <?php if ($o==4): ?>
                                                                 <th nowrap><a href="<?= site_url("penduduk/index/$p/3")?>">Nama <i class='fa fa-sort-asc fa-sm'></i></a></th>
                                                             <?php elseif ($o==3): ?>
@@ -201,9 +202,6 @@
                                                                                     <a href="<?= site_url("penduduk/edit_status_dasar/$p/$o/$data[id]")?>" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah Status Dasar" class="btn btn-social btn-flat btn-block btn-sm"><i class='fa fa-sign-out'></i> Ubah Status Dasar</a>
                                                                                 </li>
                                                                                 <li>
-                                                                                    <a href="<?= site_url("penduduk/ajax_penduduk_pindah/$data[id]")?>" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Ubah/Pindah Alamat Penduduk Lepas" class="btn btn-social btn-flat btn-block btn-sm"  title="Ubah Alamat/Pindah Penduduk dalam Desa"><i class="fa fa-location-arrow"></i> Pindah Penduduk Dalam Desa</a>
-                                                                                </li>
-                                                                                <li>
                                                                                     <a href="<?= site_url("penduduk/dokumen/$data[id]")?>" class="btn btn-social btn-flat btn-block btn-sm"><i class="fa fa-upload"></i> Upload Dokumen Penduduk</a>
                                                                                 </li>
                                                                                 <li>
@@ -221,6 +219,7 @@
                                                                 <td>
                                                                     <a href="<?= site_url("penduduk/detail/$p/$o/$data[nik]")?>" id="test" name="<?= $data['id']?>"><?= $data['nik']?></a>
                                                                 </td>
+                                                                <td nowrap><?= $data['tag_id_card']?></td>
                                                                 <td nowrap><?= strtoupper($data['nama'])?></td>
                                                                 <td><a href="<?= site_url("keluarga/kartu_keluarga/$p/$o/$data[no_kk]")?>"><?= $data['no_kk']?> </a></td>
                                                                 <!-- tambah kolom orang tua-->
