@@ -36,7 +36,7 @@
 									<?php foreach ($penduduk as $data): ?>
 										<h3><?=$data['jumlah']?></h3>
 									<?php endforeach; ?>
-									<p>Penduduk terdaftar</p>
+									<p>Penduduk</p>
 								</div>
 								<div class="icon">
 									<i class="ion ion-person"></i>
@@ -45,6 +45,19 @@
 							</div>
 						</div>
 						<div class="col-lg-6 col-xs-6">
+							<div class="small-box bg-green">
+								<div class="inner">
+									<?php foreach ($keluarga as $data): ?>
+										<h3><?=$data['jumlah']?></h3>
+									<?php endforeach; ?>
+									<p>Keluarga</p>
+								</div>
+								<div class="icon">
+									<i class="ion ion-ios-people"></i>
+								</div>
+								<a href="<?=site_url('keluarga/clear')?>" class="small-box-footer">Lihat Detail  <i class="fa fa-arrow-circle-right"></i></a>
+							</div>
+
 							<div class="small-box bg-yellow">
 								<div class="inner">
 									<h3><?=$info_surat['results']['jml_belum_dibaca'];?></h3>
@@ -74,6 +87,54 @@
 							<a class="btn btn-lg btn-success col-md-12" href="/simdes" target="_blank">
 								Aplikasi SIM-Des
 							</a>
+						</div>
+
+						<div class="col-lg-4 col-xs-4">
+							<div class="small-box bg-red">
+								<div class="inner">
+									<?php foreach ($kelompok as $data): ?>
+										<h3><?=$data['jumlah']?></h3>
+									<?php endforeach; ?>
+									<p>Kelompok</p>
+								</div>
+								<div class="icon">
+									<i class="ion ion-android-people"></i>
+								</div>
+								<a href="<?=site_url('kelompok/clear')?>" class="small-box-footer">Lihat Detail  <i class="fa fa-arrow-circle-right"></i></a>
+							</div>
+						</div>
+
+						<div class="col-lg-4 col-xs-4">
+							<div class="small-box bg-gray">
+								<div class="inner">
+									<?php foreach ($rtm as $data): ?>
+										<h3><?=$data['jumlah']?></h3>
+									<?php endforeach; ?>
+									<p>Rumah Tangga</p>
+								</div>
+								<div class="icon">
+									<i class="ion ion-ios-home"></i>
+								</div>
+								<a href="<?=site_url('rtm/clear')?>" class="small-box-footer">Lihat Detail  <i class="fa fa-arrow-circle-right"></i></a>
+							</div>
+						</div>
+
+						<div class="col-lg-4 col-xs-4">
+							<div class="small-box bg-yellow">
+								<div class="inner">
+									<h3><?=$bantuan['jumlah']?></h3>
+									<p><?=$bantuan['nama']?></p>
+								</div>
+								<div class="icon">
+									<i class="ion ion-ios-pie"></i>
+								</div>
+								<div class="small-box-footer">
+									<?php if ($this->CI->cek_hak_akses('u')): ?>
+										<a href="<?= site_url("{$this->controller}/dialog_pengaturan")?>" class="inner text-white pengaturan" title="Pengaturan Program Bantuan" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Pengaturan Program Bantuan"><i class="fa fa-gear"></i></a>
+									<?php endif; ?>
+									<a href="<?=site_url().$bantuan['link_detail']?>" class="inner text-white">Lihat Detail  <i class="fa fa-arrow-circle-right"></i></a>
+								</div>
+							</div>
 						</div>
 
 					</div>

@@ -92,7 +92,7 @@ class First extends Web_Controller {
 		$data['end_paging'] = min($data['paging']->end_link, $p + $data['paging_range']);
 		$data['pages'] = range($data['start_paging'], $data['end_paging']);
 
-		$data['artikel'] = $this->first_artikel_m->artikel_show(0,$data['paging']->offset,$data['paging']->per_page);
+		$data['artikel'] = $this->first_artikel_m->artikel_show(0, $data['paging']->offset, $data['paging']->per_page);
 		$data['headline'] = $this->first_artikel_m->get_headline();
 
 		$cari = trim($this->input->get('cari'));
@@ -197,14 +197,26 @@ class First extends Web_Controller {
 		$this->load->view($this->template, $data);
 	}
 
-	public function artikel($id=0, $p=1)
+	/*
+		Artikel bisa ditampilkan menggunakan parameter pertama sebagai id, dan semua parameter lainnya dikosongkan. Url first/artikel/:id
+
+		Kalau menggunakan slug, dipanggil menggunakan url first/artikel/:thn/:bln/:hri/:slug
+	*/
+	public function artikel($thn, $bln = '', $hri = '', $slug = NULL)
 	{
 		$data = $this->includes;
 
-		$data['p'] = $p;
-		$data['paging']  = $this->first_artikel_m->paging($p);
-		$data['artikel'] = $this->first_artikel_m->list_artikel(0,$data['paging']->offset, $data['paging']->per_page);
-		$data['single_artikel'] = $this->first_artikel_m->get_artikel($id);
+		if (empty($slug))
+		{
+			// Kalau slug kosong, parameter pertama adalah id artikel
+			$id = $thn;
+			$data['single_artikel'] = $this->first_artikel_m->get_artikel($id, true);
+		}
+		else
+		{
+			$data['single_artikel'] = $this->first_artikel_m->get_artikel($slug);
+			$id = $data['single_artikel']['id'];
+		}
 		$data['komentar'] = $this->first_artikel_m->list_komentar($id);
 		$this->_get_common_data($data);
 
@@ -448,39 +460,43 @@ class First extends Web_Controller {
 		$this->load->view($this->template, $data);
 	}
 
-	public function add_comment($id=0)
-	{
+	public function add_comment($id=0, $slug = NULL)
+		{
+			$sql = "SELECT *, YEAR(tgl_upload) AS thn, MONTH(tgl_upload) AS bln, DAY(tgl_upload) AS hri, slug AS slug  FROM artikel a WHERE id=$id ";
+			$query = $this->db->query($sql,1);
+			$data = $query->row_array();
 		// Periksa isian captcha
-		include FCPATH . 'securimage/securimage.php';
-		$securimage = new Securimage();
-		$_SESSION['validation_error'] = false;
-		if ($securimage->check($_POST['captcha_code']) == false)
-		{
-			$this->session->set_flashdata('flash_message', 'Kode anda salah. Silakan ulangi lagi.');
-			$_SESSION['post'] = $_POST;
-			$_SESSION['validation_error'] = true;
-			redirect("first/artikel/$id#kolom-komentar");
-		}
+			include FCPATH . 'securimage/securimage.php';
+			$securimage = new Securimage();
+			$_SESSION['validation_error'] = false;
+			if ($securimage->check($_POST['captcha_code']) == false)
+			{
+				$this->session->set_flashdata('flash_message', 'Kode anda salah. Silakan ulangi lagi.');
+				$_SESSION['post'] = $_POST;
+				$_SESSION['validation_error'] = true;
+				redirect("first/artikel/".$data['thn']."/".$data['bln']."/".$data['hri']."/".$data['slug']."#kolom-komentar");
+			}
 
-		$res = $this->first_artikel_m->insert_comment($id);
-		$data['data_config'] = $this->config_model->get_data();
+			$res = $this->first_artikel_m->insert_comment($id);
+			$data['data_config'] = $this->config_model->get_data();
 		// cek kalau berhasil disimpan dalam database
-		if ($res)
-		{
-			$this->session->set_flashdata('flash_message', 'Komentar anda telah berhasil dikirim dan perlu dimoderasi untuk ditampilkan.');
-		}
-		else
-		{
-			$_SESSION['post'] = $_POST;
-			if (!empty($_SESSION['validation_error']))
-				$this->session->set_flashdata('flash_message', validation_errors());
+			if ($res)
+			{
+				$this->session->set_flashdata('flash_message', 'Komentar anda telah berhasil dikirim dan perlu dimoderasi untuk ditampilkan.');
+			}
 			else
-				$this->session->set_flashdata('flash_message', 'Komentar anda gagal dikirim. Silakan ulangi lagi.');
-		}
+			{
+				$_SESSION['post'] = $_POST;
+				if (!empty($_SESSION['validation_error']))
+					$this->session->set_flashdata('flash_message', validation_errors());
+				else
+					$this->session->set_flashdata('flash_message', 'Komentar anda gagal dikirim. Silakan ulangi lagi.');
+			}
 
-		$_SESSION['sukses'] = 1;
-		redirect("first/artikel/$id#kolom-komentar");
-	}
+			$_SESSION['sukses'] = 1;
+			redirect("first/artikel/".$data['thn']."/".$data['bln']."/".$data['hri']."/".$data['slug']."#kolom-komentar");
+			
+		}
 
 	private function _get_common_data(&$data)
 	{
