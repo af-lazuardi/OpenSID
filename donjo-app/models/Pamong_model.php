@@ -165,7 +165,7 @@
 		cpost('pamong', $data);
 	}
 
-	private function siapkan_data($data)
+	private function siapkan_data(&$data)
 	{
 		$this->data_pamong_asal($data);
 		$data['pamong_nip'] = strip_tags($this->input->post('pamong_nip'));
@@ -211,6 +211,7 @@
 
 	public function update($id=0)
 	{
+		$data = array();
 		unset($_SESSION['validation_error']);
 		$_SESSION['success'] = 1;;
 		unset($_SESSION['error_msg']);
@@ -220,21 +221,18 @@
 		$old_foto = $this->input->post('old_foto');
 		if (!empty($nama_file))
 		{
-		  $nama_file  = urlencode(generator(6)."_".$_FILES['foto']['name']);
 			if (!empty($lokasi_file) AND in_array($tipe_file, unserialize(MIME_TYPE_GAMBAR)))
 			{
-				UploadFoto($nama_file, $old_foto, $tipe_file);
+			  $data['foto'] = urlencode(generator(6)."_".$nama_file);
+				UploadFoto($data['foto'], $old_foto, $tipe_file);
 			}
 			else
 			{
-				$nama_file = '';
 				$_SESSION['success'] = -1;
 				$_SESSION['error_msg'] = " -> Jenis file salah: " . $tipe_file;
 			}
 		}
 
-		$data = array();
-		$data['foto'] = $nama_file;
 		$data = $this->siapkan_data($data);
 
 		$biodata = $this->biodata_model->get_penduduk($this->input->post('nik'));

@@ -54,6 +54,7 @@ class First extends Web_Controller {
 		// added by akhwan to add "Pamong menu in front "
 		$this->load->model('pamong_model');
 		$this->load->model('m_download');
+		$this->load->model('keuangan_model');
 	}
 
 	public function auth()
@@ -92,7 +93,9 @@ class First extends Web_Controller {
 		$data['end_paging'] = min($data['paging']->end_link, $p + $data['paging_range']);
 		$data['pages'] = range($data['start_paging'], $data['end_paging']);
 
+
 		$data['artikel'] = $this->first_artikel_m->artikel_show(0, $data['paging']->offset, $data['paging']->per_page);
+
 		$data['headline'] = $this->first_artikel_m->get_headline();
 
 		$cari = trim($this->input->get('cari'));
@@ -107,7 +110,7 @@ class First extends Web_Controller {
 
 		$this->load->view($this->template, $data);
 	}
-	
+
 	public function cetak_biodata($id='')
 	{
 		if ($_SESSION['mandiri'] != 1)
@@ -204,6 +207,7 @@ class First extends Web_Controller {
 	*/
 	public function artikel($thn, $bln = '', $hri = '', $slug = NULL)
 	{
+		$this->load->model('shortcode_model');
 		$data = $this->includes;
 
 		if (empty($slug))
@@ -217,6 +221,8 @@ class First extends Web_Controller {
 			$data['single_artikel'] = $this->first_artikel_m->get_artikel($slug);
 			$id = $data['single_artikel']['id'];
 		}
+		// replace isi artikel dengan shortcodify
+		$data['single_artikel']['isi'] = $this->shortcode_model->shortcode($data['single_artikel']['isi']);
 		$data['komentar'] = $this->first_artikel_m->list_komentar($id);
 		$this->_get_common_data($data);
 
@@ -380,7 +386,7 @@ class First extends Web_Controller {
 		$this->set_template('layouts/stat.tpl.php');
 		$this->load->view($this->template, $data);
 	}
-	
+
 	public function data_analisis($stat="", $sb=0, $per=0)
 	{
 		$data = $this->includes;
@@ -495,7 +501,7 @@ class First extends Web_Controller {
 
 			$_SESSION['sukses'] = 1;
 			redirect("first/artikel/".$data['thn']."/".$data['bln']."/".$data['hri']."/".$data['slug']."#kolom-komentar");
-			
+
 		}
 
 	private function _get_common_data(&$data)
@@ -510,7 +516,6 @@ class First extends Web_Controller {
 		$this->web_widget_model->get_widget_data($data);
 		$data['data_config'] = $this->config_model->get_data();
 		$data['flash_message'] = $this->session->flashdata('flash_message');
-
 		// Pembersihan tidak dilakukan global, karena artikel yang dibuat oleh
 		// petugas terpecaya diperbolehkan menampilkan <iframe> dsbnya..
 		$list_kolom = array(
@@ -523,7 +528,7 @@ class First extends Web_Controller {
 		}
 
 	}
-	
+
 	public function produkhukum()
 	{
 		$data = $this->includes;
@@ -543,15 +548,15 @@ class First extends Web_Controller {
 
 		$data['prokum'] = $this->db->query("SELECT id,satuan
 										FROM dokumen
-										WHERE kategori = 4 
+										WHERE kategori = 4
 										AND id = ".$id )->result_array();
 		$data['p'] = "dokumen";
 
 		$this->set_template('layouts/perangkat_desa.tpl.php');
 		$this->load->view($this->template,$data);
 	}
-	public function download($id) 
-    {    
+	public function download($id)
+    {
         $fileinfo = $this->m_download->download($id);
         $file = 'desa/upload/dokumen/'.$fileinfo['satuan'];
         force_download($file, NULL);
