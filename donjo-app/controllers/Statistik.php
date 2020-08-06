@@ -493,6 +493,7 @@ $data['export_date'] = $exportDate;
 		$data['aksi'] = 'unduh';
 		$data['lap'] = $lap;
 		$data['stat'] = $this->laporan_penduduk_model->judul_statistik($lap);
+		$data['filename'] = underscore($data['stat']);
 		$data['config']  = $this->laporan_penduduk_model->get_config();
 		$data['pamong_ttd'] = $this->pamong_model->get_data($_POST['pamong_ttd']);
 		$data['laporan_no'] = $this->input->post('laporan_no');
