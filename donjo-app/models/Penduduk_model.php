@@ -314,7 +314,8 @@
 			array('pekerjaan_id','pekerjaan_id'),
 			array('agama','agama_id'),
 			array('warganegara','warganegara_id'),
-			array('golongan_darah','golongan_darah_id')
+			array('golongan_darah','golongan_darah_id'),
+			array('id_asuransi', 'id_asuransi')
 		);
 		foreach ($kolom_kode as $kolom)
 		{
@@ -339,7 +340,7 @@
 				then k.nama
 				else
 					case when u.akta_perkawinan = ''
-						then 'KAWIN TIDAK TERCATAT'
+						then 'KAWIN BELUM TERCATAT'
 						else 'KAWIN TERCATAT'
 					end
 				end) as kawin,
@@ -507,6 +508,7 @@
 		$data['sakit_menahun_id'] = $data['sakit_menahun_id'] ?: NULL;
 		if (empty($data['id_asuransi']) or $data['id_asuransi'] == 1)
 			$data['no_asuransi'] = NULL;
+		if (empty($data['warganegara_id'])) $data['warganegara_id'] = 1; //default WNI
 
 		// Hanya status 'kawin' yang boleh jadi akseptor kb
 		if ($data['status_kawin'] != 2 or empty($data['cara_kb_id'])) $data['cara_kb_id'] = NULL;
@@ -923,7 +925,7 @@
 				then k.nama
 				else
 					case when u.akta_perkawinan = ''
-						then 'KAWIN TIDAK TERCATAT'
+						then 'KAWIN BELUM TERCATAT'
 						else 'KAWIN TERCATAT'
 					end
 				end) as kawin,
@@ -1275,6 +1277,7 @@
 				case 16: $sql = "SELECT * FROM tweb_cara_kb WHERE id = ?";break;
 				case 17: $sql = "SELECT 'ADA AKTA KELAHIRAN' AS nama"; break;
 				case 18: $sql = "SELECT * FROM tweb_status_ktp WHERE id = ?"; break;
+				case 19: $sql = "SELECT * FROM tweb_penduduk_asuransi WHERE id = ?"; break;
 			}
 			$query = $this->db->query($sql, $nomor);
 			$judul = $query->row_array();

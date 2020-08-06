@@ -50,11 +50,13 @@ class First extends Web_Controller {
 		$this->load->model('laporan_penduduk_model');
 		$this->load->model('track_model');
 		$this->load->model('keluar_model');
+		$this->load->model('referensi_model');
 		$this->load->model('agregat_dukcapil_model');
 		// added by akhwan to add "Pamong menu in front "
 		$this->load->model('pamong_model');
 		$this->load->model('m_download');
 		$this->load->model('keuangan_model');
+		$this->load->model('web_dokumen_model');
 	}
 
 	public function auth()
@@ -97,6 +99,7 @@ class First extends Web_Controller {
 		$data['artikel'] = $this->first_artikel_m->artikel_show(0, $data['paging']->offset, $data['paging']->per_page);
 
 		$data['headline'] = $this->first_artikel_m->get_headline();
+		$data['transparansi'] = $this->keuangan_grafik_model->grafik_keuangan_tema();
 
 		$cari = trim($this->input->get('cari'));
 		if ( ! empty($cari))
@@ -196,13 +199,15 @@ class First extends Web_Controller {
 				break;
 		}
 
-		$this->set_template('layouts/mandiri.php');
-		$this->load->view($this->template, $data);
+		//kpV19.10
+		//$this->set_template('layouts/mandiri.php');
+		//$this->load->view($this->template, $data);
+
+		$this->load->view('web/mandiri/layout.mandiri.php', $data);
 	}
 
 	/*
 		Artikel bisa ditampilkan menggunakan parameter pertama sebagai id, dan semua parameter lainnya dikosongkan. Url first/artikel/:id
-
 		Kalau menggunakan slug, dipanggil menggunakan url first/artikel/:thn/:bln/:hri/:slug
 	*/
 	public function artikel($thn, $bln = '', $hri = '', $slug = NULL)
@@ -295,7 +300,7 @@ class First extends Web_Controller {
 
 	public function statistik($stat=0, $tipe=0)
 	{
-
+		parent::clear_cluster_session();
 		$kategori = "";
 		switch ($stat) {
 			case '2':
@@ -417,7 +422,7 @@ class First extends Web_Controller {
 		$data['main'] = $this->dpt_model->statistik_wilayah();
 		$data['total'] = $this->dpt_model->statistik_total();
 		$data['tanggal_pemilihan'] = $this->dpt_model->tanggal_pemilihan();
-		$this->_get_common_data($data);
+		$this->_get_common_data($data);a
 		$data['tipe'] = 4;
 		$this->set_template('layouts/stat.tpl.php');
 		$this->load->view($this->template, $data);
@@ -437,6 +442,74 @@ class First extends Web_Controller {
 
 		$this->set_template('layouts/stat.tpl.php');
 		$this->load->view($this->template, $data);
+	}
+
+	public function peraturan_desa()
+	{
+		$this->load->model('web_dokumen_model');
+		$data = $this->includes;
+		$data['kategori'] = $this->referensi_model->list_data('ref_dokumen', 1);
+		$data['tahun'] = $this->web_dokumen_model->tahun_dokumen();
+		$data['heading']="Produk Hukum";
+		$data['halaman_statis'] = 'web/halaman_statis/peraturan_desa';
+		$this->_get_common_data($data);
+		$this->set_template('layouts/halaman_statis.tpl.php');
+		$this->load->view($this->template, $data);
+	}
+	public function ajax_table_peraturan()
+	{
+		$kategori_dokumen = '';
+		$tahun_dokumen = '';
+		$tentang_dokumen = '';
+		$data = $this->web_dokumen_model->all_peraturan($kategori_dokumen, $tahun_dokumen, $tentang_dokumen);
+		echo json_encode($data);
+	}
+	// function filter peraturan
+	public function filter_peraturan()
+	{
+		$kategori_dokumen = $this->input->post('kategori');
+		$tahun_dokumen = $this->input->post('tahun');
+		$tentang_dokumen = $this->input->post('tentang');
+		$data = $this->web_dokumen_model->all_peraturan($kategori_dokumen, $tahun_dokumen, $tentang_dokumen);
+		echo json_encode($data);
+	}
+	public function informasi_publik()
+	{
+		$this->load->model('web_dokumen_model');
+		$data = $this->includes;
+		$data['kategori'] = $this->referensi_model->list_data('ref_dokumen', 1);
+		$data['tahun'] = $this->web_dokumen_model->tahun_dokumen();
+		$data['heading'] ="Informasi Publik";
+		$data['halaman_statis'] = 'web/halaman_statis/informasi_publik';
+		$this->_get_common_data($data);
+		$this->set_template('layouts/halaman_statis.tpl.php');
+		$this->load->view($this->template, $data);
+	}
+	public function ajax_informasi_publik()
+	{
+		$informasi_publik = $this->web_dokumen_model->get_informasi_publik();
+		$data = array();
+		$no = $_POST['start'];
+		foreach ($informasi_publik as $baris)
+		{
+			$no++;
+			$row = array();
+			$row[] = $no;
+			$row[] = "<a href='".base_url('desa/upload/dokumen/').$baris['satuan']."' target='_blank'>".$baris['nama']."</a>";
+			$row[] = $baris['tahun'];
+			// Ambil judul kategori
+			$kategori_publik = json_decode($baris['attr'], true)['kategori_publik'];
+			$kategori_publik = $this->referensi_model->list_kode_array(KATEGORI_PUBLIK)[$kategori_publik];
+			$row[] = $kategori_publik;
+			$row[] = $baris['tgl_upload'];
+			$data[] = $row;
+		}
+		$output = array(
+		"recordsTotal" => $this->web_dokumen_model->count_informasi_publik_all(),
+		"recordsFiltered" => $this->web_dokumen_model->count_informasi_publik_filtered(),
+		'data' => $data
+		);
+		echo json_encode($output);
 	}
 
 	public function agenda($stat=0)
