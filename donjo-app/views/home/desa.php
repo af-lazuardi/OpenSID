@@ -56,73 +56,26 @@
 								<a href="<?=site_url('surat_masuk_suratku')?>" class="small-box-footer">Lihat Detail  <i class="fa fa-arrow-circle-right"></i></a>
 							</div>
 						</div>
-						
+
+						<div class="col-lg-6 col-xs-6">
+							<div class="small-box bg-blue">
+								<div class="inner">
+									<h3><?=$jumlah_surat?></h3>
+									<p>Surat Tercetak</p>
+								</div>
+								<div class="icon">
+									<i class="ion-ios-paper"></i>
+								</div>
+								<a href="<?=site_url('keluar/clear')?>" class="small-box-footer">Lihat Detail  <i class="fa fa-arrow-circle-right"></i></a>
+							</div>
+						</div>
+
 						<div class="col-lg-6 col-xs-6">
 							<a class="btn btn-lg btn-success col-md-12" href="/simdes" target="_blank">
 								Aplikasi SIM-Des
 							</a>
 						</div>
-						
-						<!-- 
-						<div class="col-lg-6 col-xs-6">
-							<div class="small-box bg-green">
-								<div class="inner">
-									<?php foreach ($keluarga as $data): ?>
-										<h3><?=$data['jumlah']?></h3>
-									<?php endforeach; ?>
-									<p>Keluarga</p>
-								</div>
-								<div class="icon">
-									<i class="ion ion-ios-people"></i>
-								</div>
-								<a href="<?=site_url('keluarga/clear')?>" class="small-box-footer">Lihat Detail  <i class="fa fa-arrow-circle-right"></i></a>
-							</div>
-						</div>
-						<div class="col-lg-6 col-xs-6">
-							<div class="small-box bg-gray">
-								<div class="inner">
-									<?php foreach ($rtm as $data): ?>
-										<h3><?=$data['jumlah']?></h3>
-									<?php endforeach; ?>
-									<p>Rumah Tangga</p>
-								</div>
-								<div class="icon">
-									<i class="ion ion-ios-home"></i>
-								</div>
-								<a href="<?=site_url('rtm/clear')?>" class="small-box-footer">Lihat Detail  <i class="fa fa-arrow-circle-right"></i></a>
-							</div>
-						</div>
-						<div class="col-lg-6 col-xs-6">
-							<div class="small-box bg-yellow">
-								<div class="inner">
-									<h3><?=$miskin['jumlah']?></h3>
-									<p><?=$miskin['nama']?></p>
-								</div>
-								<div class="icon">
-									<i class="ion ion-ios-pie"></i>
-								</div>
-								<div class="small-box-footer">
-									<?php if ($this->CI->cek_hak_akses('u')): ?>
-										<a href="<?= site_url("{$this->controller}/dialog_pengaturan")?>" class="inner text-white pengaturan" title="Pengaturan Program Bantuan" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Pengaturan Program Bantuan"><i class="fa fa-gear"></i></a>
-									<?php endif; ?>
-									<a href="<?=site_url().$miskin['link_detail']?>" class="inner text-white">Lihat Detail  <i class="fa fa-arrow-circle-right"></i></a>
-								</div>
-							</div>
-						</div>
-						<div class="col-lg-6 col-xs-6">
-							<div class="small-box bg-red">
-								<div class="inner">
-									<?php foreach ($kelompok as $data): ?>
-										<h3><?=$data['jumlah']?></h3>
-									<?php endforeach; ?>
-									<p>Kelompok</p>
-								</div>
-								<div class="icon">
-									<i class="ion ion-android-people"></i>
-								</div>
-								<a href="<?=site_url('kelompok/clear')?>" class="small-box-footer">Lihat Detail  <i class="fa fa-arrow-circle-right"></i></a>
-							</div>
-						</div> -->
+
 					</div>
 				</div>
 
@@ -132,12 +85,12 @@
 						<h3 class="box-title"><strong>Info Penting dari Kabupaten Kulon Progo</strong></h3>
 					</div>
 				 	<div class='box-body'>
-				 		<?php 
+				 		<?php
 				 		if (!empty($infodesa)) {
 						?>
 						<ul class="timeline">
 				            <!-- timeline item -->
-				            <?php 
+				            <?php
 				            	foreach ($infodesa as $i) {
 				            ?>
 				            <li>
@@ -160,7 +113,7 @@
 				            <?php
 				            } ?>
 				        </ul>
-				        <?php 
+				        <?php
 				        } else {
 			            	echo '<div class="alert alert-info">Belum ada info</div>';
 			            }
@@ -176,6 +129,3 @@
 		</div>
 	</section>
 </div>
-
-
-

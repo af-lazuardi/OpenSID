@@ -1,3 +1,4 @@
+--HEAD--
 <?php class Pamong_model extends CI_Model {
 
 	public function __construct()
@@ -8,15 +9,18 @@
 
 	public function list_data($aktif = false)
 	{
-		$sql = "SELECT u.*, u.pamong_nama as nama, u.id_pend as nik, u.pamong_tempatlahir as tempatlahir, u.pamong_tanggallahir as tanggallahir, u.pamong_sex AS sex, u.pamong_pendidikan AS pendidikan_kk, u.pamong_agama AS agama, u.pamong_sex AS pamong_sex, u.pamong_pendidikan AS pamong_pendidikan, u.pamong_agama AS pamong_agama
+		$sql = "SELECT u.*, p.nama as nama, p.nik as nik, p.tempatlahir, p.tanggallahir, x.nama AS sex, b.nama AS pendidikan_kk, g.nama AS agama, x2.nama AS pamong_sex, b2.nama AS pamong_pendidikan, g2.nama AS pamong_agama
 			FROM tweb_desa_pamong u
+			LEFT JOIN tweb_biodata_penduduk p ON u.id_pend = p.id
+			LEFT JOIN tweb_penduduk_pendidikan_kk b ON p.pendidikan_kk_id = b.id
+			LEFT JOIN tweb_penduduk_sex x ON p.sex = x.id
+			LEFT JOIN tweb_penduduk_agama g ON p.agama_id = g.id
+			LEFT JOIN tweb_penduduk_pendidikan_kk b2 ON u.pamong_pendidikan = b2.id
+			LEFT JOIN tweb_penduduk_sex x2 ON u.pamong_sex = x2.id
+			LEFT JOIN tweb_penduduk_agama g2 ON u.pamong_agama = g2.id
 			WHERE 1";
-
-    $sql .= $aktif ? " AND u.pamong_status = '1'" : null;
-		//opensid-v19.02
-		//$sql .= $this->search_sql();
-		//$sql .= $this->filter_sql($aktif);
-		$sql .= ' ORDER BY urut';
+		$sql .= $this->search_sql();
+		$sql .= $this->filter_sql($aktif);
 
 		$query = $this->db->query($sql);
 		$data  = $query->result_array();
@@ -121,6 +125,10 @@
 	public function insert()
 	{
 		$_SESSION['success'] = 1;
+
+		$data = array();
+		$data = $this->siapkan_data($data);
+
 		$nama_file = '';
 		$lokasi_file = $_FILES['foto']['tmp_name'];
 		$tipe_file = $_FILES['foto']['type'];
@@ -139,48 +147,14 @@
 				$_SESSION['success'] = -1;
 				$_SESSION['error_msg'] = " -> Jenis file salah: " . $tipe_file;
 			}
+			$data['foto'] = $nama_file;
 		}
 
 		// Beri urutan terakhir
 		$data['urut'] = $this->urut_max() + 1;
-		$data['id_pend'] = $this->input->post('id_pend');
-		$this->data_pamong_asal($data);
-		$data['pamong_nip'] = $this->input->post('pamong_nip');
-		$data['pamong_niap'] = $this->input->post('pamong_niap');
-		$data['jabatan'] = $this->input->post('jabatan');
-		$data['pamong_pangkat'] = $this->input->post('pamong_pangkat');
-		$data['pamong_status'] = $this->input->post('pamong_status');
-		$data['pamong_nosk'] = $this->input->post('pamong_nosk');
-		$data['pamong_tglsk'] = tgl_indo_in($this->input->post('pamong_tglsk'));
-		$data['pamong_nohenti'] = $this->input->post('pamong_nohenti');
-		$data['pamong_tglhenti'] = tgl_indo_in($this->input->post('pamong_tglhenti'));
-		$data['pamong_masajab'] = $this->input->post('pamong_masajab');
-		$data['pamong_tgl_terdaftar'] = tgl_indo_in($this->input->post('pamong_tglsk'));
-		$data['foto'] = $nama_file;
-		$data['urut'] = $this->urut_max() + 1;
-		$data['id_pend'] = $this->input->post('nik');
-		}else{
-		$data['pamong_nama'] = $biodata['nama'];
-		$data['pamong_nik'] = $biodata['nik'];
-		$data['pamong_tempatlahir'] = $biodata['tempatlahir'];
-		$data['pamong_tanggallahir'] = $biodata['tanggallahir'];
-		$data['pamong_sex'] = $biodata['jenis_klmin'];
-		$data['pamong_pendidikan'] = $biodata['pendidikan'];
-		$data['pamong_agama'] = $biodata['agama'];
-		$data['urut'] = $this->urut_max() + 1;
-		$data['id_pend'] = $this->input->post('nik');
-		$data['pamong_nip'] = $this->input->post('pamong_nip');
-		$data['jabatan'] = $this->input->post('jabatan');
-		$data['pamong_status'] = $this->input->post('pamong_status');
-		$data['pamong_nosk'] = $this->input->post('pamong_nosk');
-		$data['pamong_tglsk'] = tgl_indo_in($this->input->post('pamong_tglsk'));
-		$data['pamong_masajab'] = $this->input->post('pamong_masajab');
-		$data['pamong_tgl_terdaftar'] = tgl_indo_in($this->input->post('pamong_tglsk'));
-		$data['foto'] = $nama_file;
-		}
-		//$this->data_pamong_asal($data);
-
+		$data['pamong_tgl_terdaftar'] = date('Y-m-d');
 		$outp = $this->db->insert('tweb_desa_pamong', $data);
+		if (!$outp) $_SESSION['success'] = -1;
 
 		// start api
 		$data = $data;
@@ -189,8 +163,25 @@
 		$data['desa_data_id'] = $this->db->insert_id();
 
 		cpost('pamong', $data);
+	}
 
-		if (!$outp) $_SESSION['success'] = -1;
+	private function siapkan_data($data)
+	{
+		$this->data_pamong_asal($data);
+		$data['pamong_nip'] = $this->input->post('pamong_nip');
+		$data['pamong_niap'] = $this->input->post('pamong_niap');
+		$data['jabatan'] = $this->input->post('jabatan');
+		$data['pamong_pangkat'] = $this->input->post('pamong_pangkat');
+		$data['pamong_status'] = $this->input->post('pamong_status');
+		$data['pamong_nosk'] = $this->input->post('pamong_nosk');
+		$data['pamong_tglsk'] = tgl_indo_in($this->input->post('pamong_tglsk'));
+		$data['pamong_nohenti'] = !empty($this->input->post('pamong_nohenti')) ? $this->input->post('pamong_nohenti') : NULL;
+		$data['pamong_tglhenti'] = !empty($this->input->post('pamong_tglhenti')) ?tgl_indo_in($this->input->post('pamong_tglhenti')) : NULL;
+		$data['pamong_masajab'] = $this->input->post('pamong_masajab');
+		$data['pamong_tgl_terdaftar'] = tgl_indo_in($this->input->post('pamong_tglsk'));
+		$data['id_pend'] = $this->input->post('nik');
+
+		return $data;
 	}
 
 	private function data_pamong_asal(&$data)
@@ -241,45 +232,49 @@
 				$_SESSION['error_msg'] = " -> Jenis file salah: " . $tipe_file;
 			}
 		}
+
+		$data = array();
+		$data = $this->siapkan_data($data);
+
 		$biodata = $this->biodata_model->get_penduduk($this->input->post('nik'));
 		if (empty($biodata['nik'])) {
-		$data['pamong_nama'] = $this->input->post('pamong_nama');
-		$data['pamong_nik'] = $this->input->post('pamong_nik');
-		$data['pamong_tempatlahir'] = $this->input->post('pamong_tempatlahir');
-		$data['pamong_tanggallahir'] = tgl_indo_in($this->input->post('pamong_tanggallahir'));
-		$data['pamong_sex'] = $this->input->post('pamong_sex');
-		$data['pamong_pendidikan'] = $this->input->post('pamong_pendidikan');
-		$data['pamong_agama'] = $this->input->post('pamong_agama');
-		$data['pamong_nip'] = $this->input->post('pamong_nip');
-		$data['jabatan'] = $this->input->post('jabatan');
-		$data['pamong_status'] = $this->input->post('pamong_status');
-		$data['pamong_nosk'] = $this->input->post('pamong_nosk');
-		$data['pamong_tglsk'] = tgl_indo_in($this->input->post('pamong_tglsk'));
-		$data['pamong_masajab'] = $this->input->post('pamong_masajab');
-		$data['urut'] = $this->urut_max() + 1;
-		$data['id_pend'] = $this->input->post('nik');
+			$data['pamong_nama'] = $this->input->post('pamong_nama');
+			$data['pamong_nik'] = $this->input->post('pamong_nik');
+			$data['pamong_tempatlahir'] = $this->input->post('pamong_tempatlahir');
+			$data['pamong_tanggallahir'] = tgl_indo_in($this->input->post('pamong_tanggallahir'));
+			$data['pamong_sex'] = $this->input->post('pamong_sex');
+			$data['pamong_pendidikan'] = $this->input->post('pamong_pendidikan');
+			$data['pamong_agama'] = $this->input->post('pamong_agama');
+			$data['pamong_nip'] = $this->input->post('pamong_nip');
+			$data['jabatan'] = $this->input->post('jabatan');
+			$data['pamong_status'] = $this->input->post('pamong_status');
+			$data['pamong_nosk'] = $this->input->post('pamong_nosk');
+			$data['pamong_tglsk'] = tgl_indo_in($this->input->post('pamong_tglsk'));
+			$data['pamong_masajab'] = $this->input->post('pamong_masajab');
+			$data['urut'] = $this->urut_max() + 1;
+			$data['id_pend'] = $this->input->post('nik');
 
 		}else{
-		$data['pamong_nama'] = $biodata['nama'];
-		$data['pamong_nik'] = $biodata['nik'];
-		$data['pamong_tempatlahir'] = $biodata['tempatlahir'];
-		$data['pamong_tanggallahir'] = $biodata['tanggallahir'];
-		$data['pamong_sex'] = $biodata['jenis_klmin'];
-		$data['pamong_pendidikan'] = $biodata['pendidikan'];
-		$data['pamong_agama'] = $biodata['agama'];
-		$data['urut'] = $this->urut_max() + 1;
-		$data['id_pend'] = $this->input->post('nik');
-		$data['pamong_nip'] = $this->input->post('pamong_nip');
-		$data['pamong_niap'] = $this->input->post('pamong_niap');
-		$data['jabatan'] = $this->input->post('jabatan');
-		$data['jabatan'] = $this->input->post('jabatan');
-		$data['pamong_pangkat'] = $this->input->post('pamong_pangkat');
-		$data['pamong_status'] = $this->input->post('pamong_status');
-		$data['pamong_nosk'] = $this->input->post('pamong_nosk');
-		$data['pamong_tglsk'] = tgl_indo_in($this->input->post('pamong_tglsk'));
-		$data['pamong_nohenti'] = $this->input->post('pamong_nohenti');
-		$data['pamong_tglhenti'] = tgl_indo_in($this->input->post('pamong_tglhenti'));
-		$data['pamong_masajab'] = $this->input->post('pamong_masajab');
+			$data['pamong_nama'] = $biodata['nama'];
+			$data['pamong_nik'] = $biodata['nik'];
+			$data['pamong_tempatlahir'] = $biodata['tempatlahir'];
+			$data['pamong_tanggallahir'] = $biodata['tanggallahir'];
+			$data['pamong_sex'] = $biodata['jenis_klmin'];
+			$data['pamong_pendidikan'] = $biodata['pendidikan'];
+			$data['pamong_agama'] = $biodata['agama'];
+			$data['urut'] = $this->urut_max() + 1;
+			$data['id_pend'] = $this->input->post('nik');
+			$data['pamong_nip'] = $this->input->post('pamong_nip');
+			$data['pamong_niap'] = $this->input->post('pamong_niap');
+			$data['jabatan'] = $this->input->post('jabatan');
+			$data['jabatan'] = $this->input->post('jabatan');
+			$data['pamong_pangkat'] = $this->input->post('pamong_pangkat');
+			$data['pamong_status'] = $this->input->post('pamong_status');
+			$data['pamong_nosk'] = $this->input->post('pamong_nosk');
+			$data['pamong_tglsk'] = tgl_indo_in($this->input->post('pamong_tglsk'));
+			$data['pamong_nohenti'] = $this->input->post('pamong_nohenti');
+			$data['pamong_tglhenti'] = tgl_indo_in($this->input->post('pamong_tglhenti'));
+			$data['pamong_masajab'] = $this->input->post('pamong_masajab');
 		}
 		//$data['id_pend'] = $this->input->post('id_pend');
 		//$this->data_pamong_asal($data);

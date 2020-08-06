@@ -47,16 +47,16 @@
 											<?php endif; ?>
 											<div class="col-sm-12">
 												<div class="form-group">
-													<label class="col-sm-3 control-label" for="id_kepala">Ketua RW</label>
+													<label class="col-sm-3 control-label" for="id_kepala">Ketua RT</label>
 													<div class="col-sm-4">
-														<input class="form-control input-sm" id="id_kepala"  name="id_kepala" style ="width:100%;">	
+														<input class="form-control input-sm" id="id_kepala"  name="id_kepala" style ="width:100%;">
 													</div>
 													<div class="col-sm-2">
 															<button type="button" class="btn btn-sosial btn-flat btn-success btn-sm" onclick="validasinik('id_kepala')"><i class="fa fa-check"></i>Validasi</button>
 													</div>
 												</div>
 											</div>
-											
+
 											<div class="col-sm-12">
 												<div class="form-group">
 													<label for="" class="col-sm-3">&nbsp;</label>

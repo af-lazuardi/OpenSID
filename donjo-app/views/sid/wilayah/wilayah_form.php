@@ -25,14 +25,14 @@
 											<div class="col-sm-12">
 													<div class="form-group">
 														<label for="nik"  class="col-sm-3 control-label">NIK Kepala Dusun</label>
-													
+
 														<div class="col-sm-4">
 															<input class="form-control input-sm" id="id_kepala"  value="<?= $individu['nik']?>" name="id_kepala" style ="width:100%;">
 														</div>
 														<div class="col-sm-2">
 																<button class="btn btn-sosial btn-flat btn-success btn-sm" onclick="formAction('main')"><i class="fa fa-plus"></i>Validasi</button>
 														</div>
-													
+
 													</div>
 											</div>
 										</div>

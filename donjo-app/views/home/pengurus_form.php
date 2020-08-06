@@ -33,13 +33,12 @@
 							<div class="form-group col-sm-12" >
 				  			<label class="col-sm-4 col-lg-2 control-label" for="id_pend">NIK / Nama Penduduk </label>
 								<div class="col-sm-7">
-								<div class="col-sm-7">
-									<input class="form-control input-sm" id="id_pend"  value="<?= $individu['nik']?>" name="id_pend" style ="width:100%;">
-								</div>
+									<div class="col-sm-7">
+										<input class="form-control input-sm" id="id_pend"  value="<?= $individu['nik']?>" name="id_pend" style ="width:100%;">
+									</div>
 									<div class="col-sm-2">
 										<button class="btn btn-sosial btn-flat btn-success btn-sm" onclick="formAction('main')"><i class="fa fa-plus"></i>Validasi</button>
 									</div>
-
 								</div>
 							</div>
 	          </form>

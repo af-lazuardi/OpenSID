@@ -60,7 +60,7 @@ class Program_bantuan extends Admin_Controller {
 			//$data['individu'] = $this->program_bantuan_model->get_peserta($_POST['nik'], $sasaran);
 
 			$data['individu'] = $this->biodata_model->get_penduduk($_POST['nik']);
-	
+
 			if($data['individu']['nik'] == NULL) {
 				$data['individu']['status_data'] = "Data Tidak ditemukan";
 			} else {
@@ -71,12 +71,12 @@ class Program_bantuan extends Admin_Controller {
 					&& $data['individu']['no_kel'] == $kodeKel
 				) {
 					$this->biodata_model->save_biodata($data['individu']);
-					
+
 				} else {
 					$data['individu']['status_data'] = "Mohon Maaf Biodata Penduduk desa ".$data['individu']['kel_name'];
-				}	
+				}
 			}
-			
+
 			$data['individu']['alamat_wilayah']= $data['individu']['alamat'];
 		}
 		else
@@ -106,8 +106,23 @@ class Program_bantuan extends Admin_Controller {
 		$this->load->view('footer');
 	}
 
-	public function detail($p = 1, $id)
+	private function detail_clear()
 	{
+		unset($_SESSION['cari_peserta']);
+		$_SESSION['per_page'] = 20;
+	}
+
+	public function detail($p = 1, $id, $clear=false)
+	{
+		if ($clear)
+			$this->detail_clear();
+		else
+		{
+			if (isset($_SESSION['cari_peserta']))
+				$data['cari_peserta'] = $_SESSION['cari_peserta'];
+			else $data['cari_peserta'] = '';
+		}
+
 		$header = $this->header_model->get_data();
 		$nav['act'] = 6;
 		$header['minsidebar'] = 1;
@@ -119,7 +134,6 @@ class Program_bantuan extends Admin_Controller {
 			$_SESSION['per_page'] = $_POST['per_page'];
 
 		$data['per_page'] = $_SESSION['per_page'];
-
 		$data['program'] = $this->program_bantuan_model->get_program($p, $id);
 		$data['paging'] = $data['program'][0]['paging'];
 		$this->load->view('program_bantuan/detail', $data);
@@ -154,14 +168,14 @@ class Program_bantuan extends Admin_Controller {
 	public function add_peserta($id)
 	{
 		$this->program_bantuan_model->add_peserta($_POST, $id);
-		redirect("program_bantuan/detail/1/$id");
+		redirect("program_bantuan/detail/1/$id/1");
 	}
 
 	public function hapus_peserta($id, $peserta_id)
 	{
 		$this->redirect_hak_akses('h', "program_bantuan/detail/1/$id");
 		$this->program_bantuan_model->hapus_peserta($peserta_id);
-		redirect("program_bantuan/detail/1/$id");
+		redirect("program_bantuan/detail/1/$id/1");
 	}
 
 	public function edit_peserta($id)
@@ -275,4 +289,12 @@ class Program_bantuan extends Admin_Controller {
 		return $query->row_array();
 	}
 
+	public function search_peserta()
+	{
+		$cari = $this->input->post('cari');
+		if ($cari != '')
+			$_SESSION['cari_peserta'] = $cari;
+		else unset($_SESSION['cari_peserta']);
+		redirect("program_bantuan/detail/1/".$this->input->post('id'));
+	}
 }
