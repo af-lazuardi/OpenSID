@@ -26,7 +26,8 @@
 		'19.04' => array('migrate' => 'migrasi_1904_ke_1905', 'nextVersion' => '19.05'),
 		'19.05' => array('migrate' => 'migrasi_1905_ke_1906', 'nextVersion' => '19.06'),
 		'19.06' => array('migrate' => 'migrasi_1906_ke_1907', 'nextVersion' => '19.07'),
-		'19.07' => array('migrate' => NULL, 'nextVersion' => NULL)
+		'19.07' => array('migrate' => 'migrasi_1907_ke_1908', 'nextVersion' => '19.08'),
+		'19.08' => array('migrate' => NULL, 'nextVersion' => NULL)
 	);
 
 	public function __construct()
@@ -184,6 +185,13 @@
 	$this->migrasi_1904_ke_1905();
 	$this->migrasi_1905_ke_1906();
 	$this->migrasi_1906_ke_1907();
+	$this->migrasi_1907_ke_1908();
+  }
+
+  private function migrasi_1907_ke_1908()
+  {
+  	$this->load->model('migrations/migrasi_1907_ke_1908');
+  	$this->migrasi_1907_ke_1908->up();
   }
 
   private function migrasi_1906_ke_1907()
@@ -211,25 +219,18 @@
   	{
 			// Tambah kolom
 			$this->dbforge->add_field("updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP");
-			$fields = array();
-			$fields['updated_by'] = array(
-					'type' => 'int',
-					'constraint' => 11,
-				  'null' => FALSE,
-			);
+		}
+		$fields = array();
+		$fields['updated_by'] = array(
+				'type' => 'int',
+				'constraint' => 11,
+			  'null' => TRUE,
+				'default' => NULL
+		);
+  	if (!$this->db->field_exists('updated_by', 'tweb_penduduk'))
 			$this->dbforge->add_column('tweb_penduduk', $fields);
-		}
 		else
-		{
-			$fields = array();
-			$fields['updated_by'] = array(
-					'type' => 'INT',
-					'constraint' => 11,
-				  'null' => TRUE,
-					'default' => NULL
-			);
 		  $this->dbforge->modify_column('tweb_penduduk', $fields);
-		}
 
   	// Tambah menu teks berjalan
 		$data = array(

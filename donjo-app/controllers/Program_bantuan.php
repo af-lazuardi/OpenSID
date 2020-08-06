@@ -201,10 +201,13 @@ class Program_bantuan extends Admin_Controller {
 		$this->form_validation->set_rules('nama', 'Nama Program', 'required');
 		$this->form_validation->set_rules('sdate', 'Tanggal awal', 'required');
 		$this->form_validation->set_rules('edate', 'Tanggal akhir', 'required');
+		$this->form_validation->set_rules('asaldana', 'Asal Dana', 'required');
+		$this->form_validation->set_rules('status', 'Status', 'required');
 
 		$header = $this->header_model->get_data();
 
-		$nav['act'] = 6;
+		$nav['act'] = 6;		
+		$data['asaldana'] = unserialize(ASALDANA);
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 		if ($this->form_validation->run() === FALSE){
@@ -227,10 +230,13 @@ class Program_bantuan extends Admin_Controller {
 		$this->form_validation->set_rules('nama', 'Nama Program', 'required');
 		$this->form_validation->set_rules('sdate', 'Tanggal awal', 'required');
 		$this->form_validation->set_rules('edate', 'Tanggal akhir', 'required');
+		$this->form_validation->set_rules('asaldana', 'Asal Dana', 'required');
+		$this->form_validation->set_rules('status', 'Status', 'required');
 
 		$header = $this->header_model->get_data();
 
 		$nav['act'] = 6;
+		$data['asaldana'] = unserialize(ASALDANA);
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 		$data['program'] = $this->program_bantuan_model->get_program(1, $id);
