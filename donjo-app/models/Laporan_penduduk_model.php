@@ -216,6 +216,8 @@
 			"statistik/21"  => "Pendidikan Kepala Keluarga",
 			"statistik/22"  => "Pekerjaan Kepala Keluarga",
 			"statistik/23"  => "Umur Kepala Keluarga"
+			//19.12
+			//"statistik/19" => "Asuransi"
 		);
 		return $statistik;
 	}

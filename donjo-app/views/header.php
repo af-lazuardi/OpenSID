@@ -58,6 +58,8 @@
 		<script src="<?= base_url()?>assets/js/leaflet-geoman.min.js"></script>
     <script src="<?= base_url()?>assets/js/leaflet.filelayer.js"></script>
     <script src="<?= base_url()?>assets/js/togeojson.js"></script>
+		<script src="<?= base_url()?>assets/js/togpx.js"></script>
+		<script src="<?= base_url()?>assets/js/leaflet-providers.js"></script>
 
     <!-- Diperlukan untuk script jquery khusus halaman -->
 		<script src="<?= base_url() ?>assets/bootstrap/js/jquery.min.js"></script>
@@ -138,7 +140,7 @@
 				</nav>
 			</header>
 			<input id="success-code" type="hidden" value="<?= $_SESSION['success']?>">
-			<!-- Untuk menampilkan modal bootstrap info pengguna login  -->
+			<!-- Untuk menampilkan modal bootstrap umum  -->
 			<div  class="modal fade" id="modalBox" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 				<div class='modal-dialog'>
 					<div class='modal-content'>
