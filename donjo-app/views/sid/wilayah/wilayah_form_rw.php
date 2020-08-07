@@ -27,6 +27,9 @@
 												<div class="form-group">
 													<label class="col-sm-3 control-label" for="rw">Nama RW</label>
 													<div class="col-sm-7">
+														<?php if ($id_rw): ?>
+															<input type="hidden" name="id_rw" value="<?= $id_rw?>">
+														<?php endif; ?>
 														<input  id="rw" class="form-control input-sm required" type="text" placeholder="Nama RW" name="rw" value="<?= $rw?>">
 													</div>
 												</div>
@@ -53,6 +56,16 @@
 													<div class="col-sm-2">
 															<button type="button" class="btn btn-sosial btn-flat btn-success btn-sm" onclick="validasinik('id_kepala')"><i class="fa fa-check"></i>Validasi</button>
 													</div>
+													<!-- v20.04
+													<label class="col-sm-3 control-label" for="id_kepala">NIK / Nama Kepala RW</label>
+													<div class="col-sm-7">
+														<select class="form-control select2" style="width: 100%;" id="id_kepala" name="id_kepala">
+															<option selected="selected">-- Silakan Masukan NIK / Nama--</option>
+															<?php foreach ($penduduk as $data): ?>
+																<option value="<?= $data['id']?>">NIK :<?= $data['nik']." - ".$data['nama']." - ".$data['dusun']?></option>
+															<?php endforeach; ?>
+														</select>
+													</div>-->
 												</div>
 											</div>
 											<div class="col-sm-12">

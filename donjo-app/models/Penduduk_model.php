@@ -549,8 +549,21 @@
 				break;
 		}
 
+		// Sterilkan data
+		$data['no_kk_sebelumnya'] = preg_replace('/[^0-9\.]/', '', strip_tags($data['no_kk_sebelumnya']));
+		$data['akta_lahir'] =  nomor_surat_keputusan($data['akta_lahir']);
+		$data['tempatlahir'] = strip_tags($data['tempatlahir']);
+		$data['dokumen_pasport'] = nomor_surat_keputusan($data['dokumen_pasport']);
+		$data['nama_ayah'] = nama($data['nama_ayah']);
+		$data['nama_ibu'] = nama($data['nama_ibu']);
+		$data['telepon'] = preg_replace('/[^0-9 \-\+\.]/', '', strip_tags($data['telepon']));
+		$data['alamat_sebelumnya'] = strip_tags($data['alamat_sebelumnya']);
+		$data['alamat_sekarang'] = strip_tags($data['alamat_sebelumnya']);
+		$data['akta_perkawinan'] = nomor_surat_keputusan($data['akta_perkawinan']);
+		$data['akta_perceraian'] = nomor_surat_keputusan($data['akta_perceraian']);
+
 		$valid = array();
-		if (preg_match("/[^a-zA-Z '\.,-]/", $data['nama']))
+		if (preg_match("/[^a-zA-Z '\.,\-]/", $data['nama']))
 		{
 			array_push($valid, "Nama hanya boleh berisi karakter alpha, spasi, titik, koma, tanda petik dan strip");
 		}
@@ -678,8 +691,7 @@
 
 		$outp = $this->db->insert('log_perubahan_penduduk', $log1);
 
-		if ($outp) $_SESSION['success'] = 1;
-		else $_SESSION['success'] = -1;
+		status_sukses($outp); //Tampilkan Pesan
 
 		return $idku;
 	}
@@ -773,8 +785,7 @@
     $this->db->where('id', $id);
     $outp = $this->db->update('tweb_penduduk', $data);
 
-    if ($outp) $_SESSION['success'] = 1;
-    else $_SESSION['success'] = -1;
+    status_sukses($outp); //Tampilkan Pesan
 	}
 
 	public function update_position($id=0)
@@ -807,8 +818,7 @@
         $outp = $this->db->insert('tweb_penduduk_map', $data);
       }
     }
-    if ($outp) $_SESSION['success'] = 1;
-    else $_SESSION['success'] = -1;
+    status_sukses($outp); //Tampilkan Pesan
 	}
 
 	public function get_penduduk_map($id=0)
@@ -865,31 +875,24 @@
 			$_SESSION['success'] = - 1;
 	}
 
-	public function delete($id='')
+	public function delete($id='', $semua=false)
 	{
-		$sql = "DELETE FROM tweb_penduduk WHERE id = ?";
-		$outp = $this->db->query($sql, array($id));
+		if (!$semua) $this->session->success = 1;
+		
+		$outp = $this->db->where('id', $id)->delete('tweb_penduduk');
 
-		if ($outp) $_SESSION['success'] = 1;
-		else $_SESSION['success'] = -1;
+		status_sukses($outp, $gagal_saja=true); //Tampilkan Pesan
 	}
 
 	public function delete_all()
 	{
+		$this->session->success = 1;
+
 		$id_cb = $_POST['id_cb'];
-
-		if (count($id_cb))
+		foreach ($id_cb as $id)
 		{
-			foreach ($id_cb as $id)
-			{
-				$sql = "DELETE FROM tweb_penduduk WHERE id = ?";
-				$outp = $this->db->query($sql, array($id));
-			}
+			$this->delete($id, $semua=true);
 		}
-		else $outp = false;
-
-		if ($outp) $_SESSION['success'] = 1;
-		else $_SESSION['success'] = -1;
 	}
 
 	public function adv_search_proses()
@@ -1224,13 +1227,6 @@
 		return $data;
 	}
 
-	public function get_desa()
-	{
-		$sql = "SELECT * FROM config WHERE 1";
-		$query = $this->db->query($sql);
-		return $query->row_array();
-	}
-
 	public function is_anggota_keluarga($id)
 	{
 		$this->db->select('id_kk');
@@ -1328,7 +1324,7 @@
 
 	public function list_dokumen($id="")
 	{
-		$sql = "SELECT * FROM dokumen_hidup WHERE id_pend = ? ";
+		$sql = "SELECT * FROM dokumen_hidup WHERE id_pend = ? AND deleted = 0";
 		$query = $this->db->query($sql, $id);
 		$data = null;
 		if ($query)
@@ -1404,6 +1400,5 @@
 		}
 		return $data;
 	}
-
 
 }
