@@ -12,6 +12,7 @@ class Penduduk extends Admin_Controller {
 		$this->load->model('web_dokumen_model');
 		$this->load->model('header_model');
 		$this->load->model('biodata_model');
+		$this->load->model('config_model');
 		$this->modul_ini = 2;
 	}
 
@@ -99,7 +100,6 @@ class Penduduk extends Admin_Controller {
 		$data['per_page'] = $_SESSION['per_page'];
 		$data['paging'] = $this->penduduk_model->paging($p, $o);
 		$data['main'] = $this->penduduk_model->list_data($o, $data['paging']->offset, $data['paging']->per_page);
-		$data['keyword'] = $this->penduduk_model->autocomplete();
 		$data['list_agama'] = $this->penduduk_model->list_agama();
 		$data['list_dusun'] = $this->penduduk_model->list_dusun();
 		$data['list_status_dasar'] = $this->referensi_model->list_data('tweb_status_dasar');
@@ -614,6 +614,11 @@ class Penduduk extends Admin_Controller {
 
 		$data['penduduk'] = $this->penduduk_model->get_penduduk_map($id);
 		$data['desa'] = $this->penduduk_model->get_desa();
+		$sebutan_desa = ucwords($this->setting->sebutan_desa);
+		$data['wil_atas'] = $this->config_model->get_data();
+		$data['dusun_gis'] = $this->wilayah_model->list_dusun();
+		$data['rw_gis'] = $this->wilayah_model->list_rw_gis();
+		$data['rt_gis'] = $this->wilayah_model->list_rt_gis();
 		$data['form_action'] = site_url("penduduk/update_maps/$p/$o/$id/$edit");
 		$header = $this->header_model->get_data();
 
@@ -851,5 +856,11 @@ class Penduduk extends Admin_Controller {
 		$sql = "SELECT * FROM config WHERE 1";
 		$query = $this->db->query($sql);
 		return $query->row_array();
+	}
+
+	public function autocomplete()
+	{
+		$data = $this->penduduk_model->autocomplete($this->input->post('cari'));
+		echo json_encode($data);
 	}
 }

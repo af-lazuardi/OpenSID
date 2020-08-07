@@ -12,9 +12,16 @@
 		$this->penolong_kelahiran = array_flip(unserialize(PENOLONG_KELAHIRAN));
 	}
 
-	public function autocomplete()
+	public function autocomplete($cari='')
 	{
-		$str = autocomplete_str('nama', 'tweb_penduduk');
+		$this->db->select('nama')
+			->distinct()
+			->order_by('nama')
+			->from('tweb_penduduk');
+		if ($cari) $this->db->where("nama like '%$cari%'");
+		$data = $this->db->get()->result_array();
+
+		$str = autocomplete_data_ke_str($data);
 		return $str;
 	}
 
@@ -1321,7 +1328,7 @@
 
 	public function list_dokumen($id="")
 	{
-		$sql = "SELECT * FROM dokumen WHERE id_pend = ? ";
+		$sql = "SELECT * FROM dokumen_hidup WHERE id_pend = ? ";
 		$query = $this->db->query($sql, $id);
 		$data = null;
 		if ($query)
