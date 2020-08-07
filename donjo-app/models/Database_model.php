@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 class Database_model extends CI_Model {
 
@@ -38,7 +38,8 @@ class Database_model extends CI_Model {
 		'20.02' => array('migrate' => 'migrasi_2002_ke_2003', 'nextVersion' => '20.03'),
 		'20.03' => array('migrate' => 'migrasi_2003_ke_2004', 'nextVersion' => '20.04'),
 		'20.04' => array('migrate' => 'migrasi_2004_ke_2005', 'nextVersion' => '20.05'),
-		'20.05' => array('migrate' => NULL, 'nextVersion' => NULL)
+		'20.05' => array('migrate' => 'migrasi_2005_ke_2006', 'nextVersion' => '20.06'),
+		'20.06' => array('migrate' => NULL, 'nextVersion' => NULL)
 	);
 
 	public function __construct()
@@ -106,7 +107,7 @@ class Database_model extends CI_Model {
 				if (function_exists(__NAMESPACE__ .'\Database_model::'.$migrate))
 					call_user_func(__NAMESPACE__ .'\Database_model::'.$migrate);
 				else
-					$this->jalankan_migrasi($migrate);					
+					$this->jalankan_migrasi($migrate);
 			}
 		}
 		else
@@ -217,6 +218,7 @@ class Database_model extends CI_Model {
 		$this->jalankan_migrasi('migrasi_2002_ke_2003');
 		$this->jalankan_migrasi('migrasi_2003_ke_2004');
 		$this->jalankan_migrasi('migrasi_2004_ke_2005');
+		$this->jalankan_migrasi('migrasi_2005_ke_2006');
   }
 
   private function jalankan_migrasi($migrasi)
@@ -3614,6 +3616,7 @@ class Database_model extends CI_Model {
 			"ref_dokumen",
 			"ref_pindah",
 			"ref_syarat_surat",
+			"ref_status_covid",
 			"setting_modul",
 			"setting_aplikasi",
 			"setting_aplikasi_options",

@@ -1,4 +1,3 @@
---HEAD--
 <?php class Pamong_model extends CI_Model {
 
 	private $urut_model;
@@ -371,6 +370,31 @@
 			->where('u.id NOT IN (SELECT id_pend FROM tweb_desa_pamong WHERE id_pend IS NOT NULL)')
 			->get()
 			->result_array();
+
+		return $data;
+	}
+
+	/*
+	 * Ambil data untuk widget aparatur desa
+	 */
+	public function list_aparatur_desa()
+	{
+		$data['daftar_perangkat'] = $this->db->select('dp.jabatan, dp.foto,
+			CASE WHEN dp.id_pend IS NULL THEN dp.pamong_nama
+			ELSE p.nama END AS nama', FALSE)
+			->from('tweb_desa_pamong dp')
+			->join('tweb_penduduk p', 'p.id = dp.id_pend', 'left')
+			->where('dp.pamong_status', '1')
+			->order_by('dp.urut')
+			->get()
+			->result_array();
+
+		foreach ($data['daftar_perangkat'] as $key => $perangkat)
+		{
+			$perangkat['foto'] = AmbilFoto($perangkat['foto'], "besar");
+			if (!$data['foto_pertama'] and $perangkat['foto'] != FOTO_DEFAULT) $data['foto_pertama'] = $key;
+		 	$data['daftar_perangkat'][$key] = $perangkat;
+		}
 
 		return $data;
 	}

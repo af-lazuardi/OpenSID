@@ -28,7 +28,7 @@
 							</div> -->
 							<div class="row">
 								<div class="col-sm-6">
-									<select class="form-control select2 " id="nik" name="nik" onchange="formAction('main')">
+									<select class="form-control select2 " id="nik" name="nik" onchange="formAction('main')" style="width: 100%;">
 										<option selected="selected">-- Cari Judul Surat--</option>
 										<?php foreach ($menu_surat2 as $data): ?>
 											<option value="<?= $data['url_surat']?>"><?= strtoupper($data['nama'])?></option>

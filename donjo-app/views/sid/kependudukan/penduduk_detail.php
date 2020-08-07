@@ -23,9 +23,9 @@
 							<?php if ($penduduk['status_dasar_id']==1): ?>
 								<a href="<?= site_url("penduduk/form/$p/$o/$penduduk[id]")?>" class="btn btn-social btn-flat btn-warning btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Ubah Biodata" ><i class="fa fa-edit"></i> Ubah Biodata</a>
 							<?php endif; ?>
-              <a href="<?= site_url("penduduk/cetak_biodata/$penduduk[nik]")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Biodata" target="_blank"><i class="fa fa-print"></i>Cetak Biodata</a>
-              <?php if ($penduduk['status_dasar_id'] == 1 and !empty($penduduk['id_kk'])): ?>
-							<a href="<?= site_url("keluarga/anggota/$p/$o/$penduduk[id_kk]")?>" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Anggota Keluarga" ><i class="fa fa-users"></i> Anggota Keluarga</a>
+							<a href="<?= site_url("penduduk/cetak_biodata/$penduduk[nik]")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Cetak Biodata" target="_blank"><i class="fa fa-print"></i>Cetak Biodata</a>
+							<?php if ($penduduk['status_dasar_id'] == 1 and !empty($penduduk['id_kk'])): ?>
+								<a href="<?= site_url("keluarga/anggota/$p/$o/$penduduk[id_kk]")?>" class="btn btn-social btn-flat btn-danger btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Anggota Keluarga" ><i class="fa fa-users"></i> Anggota Keluarga</a>
 							<?php endif; ?>
 							<a href="<?= site_url("penduduk/clear")?>" class="btn btn-social btn-flat btn-info btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"  title="Kembali Ke Daftar Penduduk">
 								<i class="fa fa-arrow-circle-left"></i>Kembali Ke Daftar Penduduk
@@ -36,26 +36,26 @@
 								<div class="col-md-12">
 									<div class="box-header with-border">
 										<h3 class="box-title">Biodata Penduduk (NIK : <?= $penduduk['nik']?>)</h3>
-											<br>
-											<?php if (!empty($penduduk['nama_pendaftar'])): ?>
-												<p class="kecil">
-													Terdaftar pada:
-													<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['created_at']);?>
-													<i class="fa fa-user"></i> <?= $penduduk['nama_pengubah']?>
-												</p>
-												<?php else: ?>
-												<p class="kecil">
-													Terdaftar sebelum:
-													<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['created_at']);?>
-												</p>
-												<?php endif; ?>
-												<?php if (!empty($penduduk['nama_pengubah'])): ?>
-												<p class="kecil">
-													Terakhir diubah:
-													<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['updated_at']);?>
-													<i class="fa fa-user"></i> <?= $penduduk['nama_pengubah']?>
-												</p>
-											<?php endif; ?>
+										<br>
+										<?php if (!empty($penduduk['nama_pendaftar'])): ?>
+											<p class="kecil">
+												Terdaftar pada:
+												<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['created_at']);?>
+												<i class="fa fa-user"></i> <?= $penduduk['nama_pengubah']?>
+											</p>
+										<?php else: ?>
+											<p class="kecil">
+												Terdaftar sebelum:
+												<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['created_at']);?>
+											</p>
+										<?php endif; ?>
+										<?php if (!empty($penduduk['nama_pengubah'])): ?>
+											<p class="kecil">
+												Terakhir diubah:
+												<i class="fa fa-clock-o"></i><?= tgl_indo2($penduduk['updated_at']);?>
+												<i class="fa fa-user"></i> <?= $penduduk['nama_pengubah']?>
+											</p>
+										<?php endif; ?>
 									</div>
 								</div>
 								<div class="col-md-12">
@@ -63,11 +63,11 @@
 										<table class="table table-bordered table-striped table-hover" >
 											<tr>
 												<td colspan="3">
-												<?php if ($penduduk['foto']): ?>
-													<img class="penduduk profile-user-img img-responsive img-circle" src="data:image/png;base64, <?=$photo[content]?>" width="25%" alt="Foto">
+													<?php if ($penduduk['foto']): ?>
+														 <img class="penduduk profile-user-img img-responsive img-circle" src="data:image/png;base64, <?=$photo[content]?>" width="25%" alt="Foto">
 													<?php else: ?>
-													<img class="penduduk profile-user-img img-responsive img-circle" src="<?= base_url()?>assets/files/user_pict/kuser.png" alt="Foto">
-												<?php endif; ?>
+														<img class="penduduk profile-user-img img-responsive img-circle" src="<?= base_url()?>assets/files/user_pict/kuser.png" alt="Foto">
+  												<?php endif; ?>
 												</td>
 											</tr>
 										</table>
@@ -199,6 +199,9 @@
 												</tr>
 												<tr>
 													<td>Nomor Telepon</td><td >:</td><td><?= strtoupper($penduduk['telepon'])?></td>
+												</tr>
+												<tr>
+													<td>Alamat Email</td><td >:</td><td><?= strtoupper($penduduk['email'])?></td>
 												</tr>
 												<tr>
 													<td>Alamat</td><td >:</td><td><?= strtoupper($penduduk['alamat'])?></td>
