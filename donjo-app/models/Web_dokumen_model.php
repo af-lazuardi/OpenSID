@@ -224,7 +224,7 @@ class Web_dokumen_model extends CI_Model {
 		return $semua_ext;
 	}
 
-	private function upload_dokumen(&$data, $file_lama="")
+	private function upload_dokumen($data, $file_lama="")
 	{
 		$_SESSION['error_msg'] = "";
 		$_SESSION['success'] = 1;
@@ -233,14 +233,14 @@ class Web_dokumen_model extends CI_Model {
 		{
 			$_SESSION['success'] = -1;
 			$_SESSION['error_msg'] .= ' -> Error upload file. Periksa apakah melebihi ukuran maksimum';
-			return false;
+			return null;
 		}
 
 		$lokasi_file = $_FILES['satuan']['tmp_name'];
 		if (empty($lokasi_file))
 		{
 			$_SESSION['success'] = -1;
-			return false;
+			return null;
 		}
 		if (function_exists('finfo_open'))
 		{
@@ -257,13 +257,13 @@ class Web_dokumen_model extends CI_Model {
 		{
 			$_SESSION['error_msg'] .= " -> Jenis file salah: " . $tipe_file . " " . $ext;
 			$_SESSION['success'] = -1;
-			return false;
+			return null;
 		}
 		elseif (isPHP($lokasi_file, $nama_file))
 		{
 			$_SESSION['error_msg'].= " -> File berisi script ";
 			$_SESSION['success']=-1;
-			return false;
+			return null;
 		}
 
 		$nama = $data['nama'];
@@ -275,75 +275,162 @@ class Web_dokumen_model extends CI_Model {
 			// $nama_file = $data['nama']."_".generator(6)."_".$nama_file;
 		$nama_file = bersihkan_namafile($nama_file);
 		UploadDocument($nama_file, $file_lama);
-		$data['satuan'] = $nama_file;
-		return true;
+		return $nama_file;
 	}
 
 	public function insert()
 	{
-		$data = $_POST;
-		if ($this->upload_dokumen($data))
+		$retval = false;
+		$post = $this->input->post();
+		$satuan = $this->upload_dokumen($post);
+		if ($satuan)
 		{
-			$this->validasi($data);
+			$data = $this->validasi($post);
+			$data['satuan'] = $satuan;
 			$data['attr'] = json_encode($data['attr']);
-			return $this->db->insert('dokumen', $data);
+
+			unset($data['anggota_kk']);
+			$retval = $this->db->insert('dokumen', $data);
+			$insert_id = $this->db->insert_id();
+
+			if ($retval)
+			{
+				$data['id_parent'] = $insert_id;
+				foreach ($post['anggota_kk'] as $key => $value) 
+				{
+					$data['id_pend'] = $value;
+					$this->db->insert('dokumen', $data);
+				}
+			}
 		}
-		else return false;
+		else return $retval;
 	}
 
-	private function validasi(&$data)
+	private function validasi($post)
 	{
-		$data['nama'] = alfanumerik_spasi($data['nama']);
+		$data = array();
+		$data['nama'] = alfanumerik_spasi($post['nama']);
+		$data['kategori'] = $post['kategori'] ?: 1;
+		$data['kategori_info_publik'] = $post['kategori_info_publik'] ?: null;
+		$data['id_syarat'] = $post['id_syarat'] ?: null;
+		$data['id_pend'] = $post['id_pend'] ?: 0;
 		switch ($data['kategori'])
 		{
 			case 1: //Informsi Publik
-				$data['tahun'] = $this->input->post('tahun');
+				$data['tahun'] = $post['tahun'];
 				break;
 			case 2: //SK Kades
-				$data['tahun'] = date('Y', strtotime($data['attr']['tgl_kep_kades']));
+				$data['tahun'] = date('Y', strtotime($post['attr']['tgl_kep_kades']));
 				$data['kategori_info_publik'] = '3';
-				$data['attr']['uraian'] = strip_tags($data['attr']['uraian']);
-				$data['attr']['no_kep_kades'] = nomor_surat_keputusan($data['attr']['no_kep_kades']);
-				$data['attr']['no_lapor'] = nomor_surat_keputusan($data['attr']['no_lapor']);
-				$data['attr']['keterangan'] = strip_tags($data['attr']['keterangan']);
+				$data['attr']['tgl_kep_kades'] = $post['attr']['tgl_kep_kades'];
+				$data['attr']['uraian'] = strip_tags($post['attr']['uraian']);
+				$data['attr']['no_kep_kades'] = nomor_surat_keputusan($post['attr']['no_kep_kades']);
+				$data['attr']['no_lapor'] = nomor_surat_keputusan($post['attr']['no_lapor']);
+				$data['attr']['tgl_lapor'] = $post['attr']['tgl_lapor'];
+				$data['attr']['keterangan'] = strip_tags($post['attr']['keterangan']);
 				break;
 			case 3: //Perdes
-				$data['tahun'] = date('Y', strtotime($data['attr']['tgl_ditetapkan']));
+				$data['tahun'] = date('Y', strtotime($post['attr']['tgl_ditetapkan']));
 				$data['kategori_info_publik'] = '3';
-				$data['attr']['uraian'] = strip_tags($data['attr']['uraian']);
-				$data['attr']['jenis_peraturan'] = strip_tags($data['attr']['jenis_peraturan']);
-				$data['attr']['no_ditetapkan'] = nomor_surat_keputusan($data['attr']['no_ditetapkan']);
-				$data['attr']['no_lapor'] = nomor_surat_keputusan($data['attr']['no_lapor']);
-				$data['attr']['no_lembaran_desa'] = nomor_surat_keputusan($data['attr']['no_lembaran_desa']);
-				$data['attr']['no_berita_desa'] = nomor_surat_keputusan($data['attr']['no_berita_desa']);
-				$data['attr']['keterangan'] = strip_tags($data['attr']['keterangan']);
+				$data['attr']['tgl_ditetapkan'] = $post['attr']['tgl_ditetapkan'];
+				$data['attr']['tgl_lapor'] = $post['attr']['tgl_lapor'];
+				$data['attr']['tgl_kesepakatan'] = $post['attr']['tgl_kesepakatan'];
+				$data['attr']['uraian'] = strip_tags($post['attr']['uraian']);
+				$data['attr']['jenis_peraturan'] = strip_tags($post['attr']['jenis_peraturan']);
+				$data['attr']['no_ditetapkan'] = nomor_surat_keputusan($post['attr']['no_ditetapkan']);
+				$data['attr']['no_lapor'] = nomor_surat_keputusan($post['attr']['no_lapor']);
+				$data['attr']['no_lembaran_desa'] = nomor_surat_keputusan($post['attr']['no_lembaran_desa']);
+				$data['attr']['no_berita_desa'] = nomor_surat_keputusan($post['attr']['no_berita_desa']);
+				$data['attr']['tgl_lembaran_desa'] = $post['attr']['tgl_lembaran_desa'];
+				$data['attr']['tgl_berita_desa'] = $post['attr']['tgl_berita_desa'];
+				$data['attr']['keterangan'] = strip_tags($post['attr']['keterangan']);
 				break;
 
 			default:
 				$data['tahun'] = date('Y');
 				break;
 		}
+		return $data;
 	}
 
-	public function update($id=0)
+	public function update($id=0, $id_pend=null)
 	{
-		$data = $_POST;
-		if (empty($data['satuan']) or !$this->upload_dokumen($data, $data['old_file']))
-		{
-			unset($data['satuan']);
-			unset($data['old_file']);
+		$retval = false;
+
+		$post = $this->input->post();
+		$data = $this->validasi($post);
+		$old_file = $this->db->select('satuan')
+				->where('id', $id)
+				->get('dokumen')->row()->satuan;
+		$data['satuan'] = $old_file;
+		if (!empty($post['satuan'])) 
+		{	
+			$data['satuan'] = $this->upload_dokumen($post, $old_file);
 		}
-		$this->validasi($data);
 		$data['attr'] = json_encode($data['attr']);
 		$data['updated_at'] = date('Y-m-d H:i:s');
-		return $this->db->where('id',$id)->update('dokumen', $data);
+
+		unset($data['anggota_kk']);
+
+		if ($id_pend) $this->db->where('id_pend', $id_pend);
+		$this->db->where('id',$id)->update('dokumen', $data);
+
+		$this->update_dok_anggota($id, $post, $data);
+
+		$retval = $this->db->affected_rows();
+		status_sukses($retval);
+		return $retval;
+	}
+	
+	private function update_dok_anggota($id, $post, $data)
+	{
+		// cek jika dokumen ini juga ada di anggota yang lain
+		$anggota_kk = $post['anggota_kk'];
+		$anggota_lain = array_column($this->get_dokumen_di_anggota_lain($id), 'id_pend');
+		
+		// cari intersect anggota
+		unset($data['id_pend']);
+		$intersect_id_pend = array_intersect($anggota_kk, $anggota_lain);
+		foreach ($intersect_id_pend as $key => $value) 
+		{
+			$this->db->where('id_pend',$value);
+			$this->db->where('id_parent',$id);
+			$this->db->update('dokumen', $data);
+		}
+
+		// cari diff anggota (jika ada anggota yang diuncheck - delete)	
+		if (isset($anggota_kk))
+		{
+			$diff_id_pend = array_diff($anggota_lain, $anggota_kk);
+			foreach ($diff_id_pend as $key => $value) 
+				$this->db->delete('dokumen', array('id_pend' => $value, 'id_parent' => $id));  // hard delete
+		}
+		else 
+		{
+			foreach ($anggota_lain as $key => $value) 
+				$this->db->delete('dokumen', array('id_pend' => $value, 'id_parent' => $id));  // hard delete
+		}	
+		
+		// cari diff anggota (jika ada anggota tambahan yang dicheck -> insert)	
+		$diff_id_pend = array_diff($anggota_kk, $anggota_lain);
+		if (isset($diff_id_pend)) 
+		{
+			unset($data['updated_at']);
+
+			foreach ($diff_id_pend as $key => $value) 
+			{
+				$data["id_pend"] = $value;
+				$data["id_parent"] = $id;
+				$this->db->insert('dokumen', $data);	// insert new data
+			}
+		}
 	}
 
 	// Soft delete, tapi hapus berkas dokumen
 	public function delete($id='', $semua=false)
 	{
 		if (!$semua) $this->session->success = 1;
-		
+
 		$old_dokumen = $this->db->select('satuan')->
 			where('id',$id)->
 			get('dokumen')->row()->satuan;
@@ -355,6 +442,17 @@ class Web_dokumen_model extends CI_Model {
 		if ($outp)
 			unlink(LOKASI_DOKUMEN . $old_dokumen);
 		else $_SESSION['success'] = -1;
+
+		// cek jika dokumen ini juga ada di anggota yang lain
+		$anggota_lain = $this->get_dokumen_di_anggota_lain($id);
+		// soft delete dokumen anggota lain jika ada
+		foreach ($anggota_lain as $item) 
+			$this->db->where('id', $item['id'])->update('dokumen', $data);
+	}
+
+	public function hard_delete_dokumen_bersama($id_pend)
+	{
+		$this->db->delete('dokumen', array('id_pend' => $id_pend, 'id_parent >' => '0'));
 	}
 
 	public function delete_all()
@@ -376,14 +474,31 @@ class Web_dokumen_model extends CI_Model {
 		status_sukses($outp); //Tampilkan Pesan
 	}
 
-	public function get_dokumen($id=0)
+	public function get_dokumen($id=0, $id_pend=null)
 	{
+		if ($id_pend) $this->db->where('id_pend', $id_pend);
 		$data = $this->db->from($this->table)
 			->where('id', $id)
 			->get()->row_array();
 		$data['attr'] = json_decode($data['attr'], true);
+		$data = array_filter($data);
 		return $data;
 	}
+
+	public function get_dokumen_di_anggota_lain($id_dokumen=0)
+	{
+		$data = $this->db->from($this->table)
+			->where('id_parent', $id_dokumen)
+			->get()->result_array();
+
+		foreach ($data as $key => $value) {
+			$data[$key]['attr'] = json_decode($data[$key]['attr'], true);
+			$data[$key] = array_filter($data[$key]);
+		}
+		
+		return $data;
+	}
+	
 
 	/**
 	 * Ambil nama berkas dari database berdasarkan id dokumen

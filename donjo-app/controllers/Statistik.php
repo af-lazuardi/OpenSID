@@ -14,6 +14,7 @@ class Statistik extends Admin_Controller {
 		$this->load->model('config_model');
 		$_SESSION['per_page'] = 500;
 		$this->modul_ini = 3;
+		$this->sub_modul_ini = 27;
 	}
 
 
@@ -99,12 +100,12 @@ class Statistik extends Admin_Controller {
 		//$data['main'] = $this->laporan_penduduk_model->list_data($lap, $o);
 		$data['list_dusun'] = $this->laporan_penduduk_model->list_dusun();
 		$data['lap'] = $lap;
+		$data['jenis_laporan'] = $this->laporan_penduduk_model->jenis_laporan($lap);
 		$data['judul_kelompok'] = "Jenis Kelompok";
 		$data['o'] = $o;
 		$this->get_data_stat($data, $lap);
-		$nav['act'] = 3;
-		$nav['act_sub'] = 27;
 		$header = $this->header_model->get_data();
+
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 		$this->load->view('statistik/penduduk', $data);
@@ -240,9 +241,8 @@ class Statistik extends Admin_Controller {
 		//$data['main'] = $this->laporan_penduduk_model->list_data($lap);
 		$data['list_dusun'] = $this->laporan_penduduk_model->list_dusun();
 		$data['lap'] = $lap;
+		$data['jenis_laporan'] = $this->laporan_penduduk_model->jenis_laporan($lap);
 		$this->get_data_stat($data, $lap);
-		$nav['act'] = 3;
-		$nav['act_sub'] = 27;
 		$header = $this->header_model->get_data();
 
 		$this->load->view('header', $header);
@@ -333,11 +333,10 @@ class Statistik extends Admin_Controller {
 		$data['list_dusun'] = $this->laporan_penduduk_model->list_dusun();
 
 		$data['lap'] = $lap;
+		$data['jenis_laporan'] = $this->laporan_penduduk_model->jenis_laporan($lap);
 		$this->get_data_stat($data, $lap);
-		$nav['act'] = 3;
-		$nav['act_sub'] = 27;
 		$header = $this->header_model->get_data();
-
+		
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 		$this->load->view('statistik/penduduk_pie', $data);
@@ -465,6 +464,7 @@ class Statistik extends Admin_Controller {
 		}
 
 		$data['lap'] = $lap;
+		$data['jenis_laporan'] = $this->laporan_penduduk_model->jenis_laporan($lap);
 		$data['stat'] = $this->laporan_penduduk_model->judul_statistik($lap);
 		$data['config'] = $this->config_model->get_data();
 		//v20.04
@@ -554,6 +554,7 @@ class Statistik extends Admin_Controller {
 
 		$data['aksi'] = 'unduh';
 		$data['lap'] = $lap;
+		$data['jenis_laporan'] = $this->laporan_penduduk_model->jenis_laporan($lap);
 		$data['stat'] = $this->laporan_penduduk_model->judul_statistik($lap);
 		$data['filename'] = underscore($data['stat']);
 		$data['config']  = $this->config_model->get_data();
@@ -567,10 +568,7 @@ class Statistik extends Admin_Controller {
 	{
 		$data['lap'] = 13;
 		$data['main'] = $this->laporan_penduduk_model->list_data_rentang();
-
 		$header = $this->header_model->get_data();
-		$nav['act'] = 3;
-		$nav['act_sub'] = 27;
 
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
@@ -683,6 +681,7 @@ class Statistik extends Admin_Controller {
 		}
 		$data['main'] = $this->laporan_penduduk_model->list_data($lap);
 		$data['lap'] = $lap;
+		$data['jenis_laporan'] = $this->laporan_penduduk_model->jenis_laporan($lap);
 		$data['jenis_chart'] = $chart;
 		$this->get_data_stat($data, $lap);
 		$this->load->view('statistik/penduduk_gis', $data);

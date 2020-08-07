@@ -43,7 +43,10 @@ $(document).ready(function() {
 			nomor: {
 				remote: "Nomor surat itu sudah digunakan",
 			},
-		}
+		},
+    success: function() {
+	    csrf_semua_form();
+    }
 	});
 
 	// Untuk form surat masuk/keluar memeriksa nomor urut secara remote/ajax
@@ -194,4 +197,17 @@ $(document).ready(function() {
 				bilangan_titik: true,
 			});
 	});
+
+	jQuery.validator.addMethod("bilangan_spasi", function(value, element) {
+		valid = /^[0-9 ]+$/.test(value);
+		return this.optional(element) || valid;
+	}, "Hanya boleh berisi karakter numerik dan spasi");
+
+	$('.bilangan_spasi').each(function() {
+		$(this).rules("add",
+			{
+				bilangan_spasi: true,
+			});
+	});
+
 })

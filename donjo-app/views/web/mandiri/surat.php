@@ -45,7 +45,7 @@
       <div class="form-group">
         <label for="no_hp_aktif" class="col-sm-3 control-label">No. HP aktif</label>
         <div class="col-sm-6 col-lg-8">
-          <input class="form-control input-sm required" type="text" name="no_hp_aktif" placeholder="ketik no. HP" size="14" value="<?= $permohonan['no_hp_aktif']?>"/>
+          <input class="form-control input-sm bilangan_spasi required" type="text" name="no_hp_aktif" placeholder="Ketik No. HP" maxlength="14" value="<?= $permohonan['no_hp_aktif']?>"/>
         </div>
       </div>
     </div>
@@ -139,13 +139,12 @@
                     <label for="nama_dokumen">Nama / Jenis Dokumen</label>
                     <input id="nama_dokumen" name="nama" class="form-control input-sm required" type="text" placeholder="Nama Dokumen" value=""/>
                     <input type="text" class="hidden" name="id" id="id_dokumen" value=""/>
-                    <input type="hidden" name="id_pend" value="<?= $this->session->userdata('id'); ?>">
                   </div>
                   <div class="form-group">
                   <select class="form-control required input-sm" name="id_syarat" id="id_syarat">
                     <option> -- Pilih Jenis Dokumen -- </option>
                     <?php foreach ($menu_dokumen_mandiri AS $data): ?>
-                      <option value="<?= $data['ref_syarat_id']?>"><?= $data['ref_syarat_nama']?></option>
+                      <option value="<?= $data['ref_syarat_id']?>" ><?= $data['ref_syarat_nama']?></option>
                     <?php endforeach;?>
                   </select>
                   </div>
@@ -154,13 +153,38 @@
                     <div class="input-group input-group-sm">
                       <input type="text" class="form-control" id="file_path" name="satuan">
                       <input type="file" class="hidden" id="file" name="satuan">
-                      <input type="text" class="hidden" name="old_file" id="old_file" value="">
                       <span class="input-group-btn">
                         <button type="button" class="btn btn-info btn-flat" id="file_browser"><i class="fa fa-search"></i> Browse</button>
                       </span>
                     </div>
                     <p class="help-block">Kosongkan jika tidak ingin mengubah dokumen.</p>
-                  </div>
+                  </div>                  
+                  <?php if (!empty($kk)): ?>
+                    <hr>
+                    <p><strong>Centang jika dokumen yang diupload berlaku juga untuk anggota keluarga di bawah ini. </strong></p>
+                    <div class="table-responsive">
+                      <table class="table table-bordered table-hover table-striped table-sm">
+                        <thead>
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">NIK</th>
+                            <th scope="col">Nama</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <?php foreach ($kk as $item): ?>
+                            <?php if ($item['nik'] != $penduduk['nik']): ?>
+                              <tr>
+                                <td><input class='anggota_kk' id="anggota_<?=$item['id']?>" type='checkbox' name='anggota_kk[]' value="<?=$item['id']?>"></td>
+                                <td><?=$item['nik']?></td>
+                                <td><?=$item['nama']?></td>
+                              </tr>
+                            <?php endif; ?>
+                          <?php endforeach; ?>
+                        </tbody>
+                      </table>
+                    </div>
+                  <?php endif ?>
                 </div>
               </div>
             </div>

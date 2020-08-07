@@ -558,6 +558,10 @@ function modalBox()
 		var modal = $(this)
 		modal.find('.modal-title').text(title)
 		$(this).find('.fetched-data').load(link.attr('href'));
+		setTimeout(function() {
+			// tambahkan csrf token
+			addCsrfField(modal.find("form")[0]);		
+		}, 500);
 	});
 	return false;
 }
@@ -572,6 +576,7 @@ function mapBox()
 }
 function formAction(idForm, action, target = '')
 {
+	csrf_semua_form();
 	if (target != '')
 	{
 		$('#'+idForm).attr('target', target);
@@ -709,5 +714,4 @@ $('document').ready(function()
     $(this).css("padding-bottom", 0);
   })
 });
-
 

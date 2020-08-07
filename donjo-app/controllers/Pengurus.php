@@ -12,6 +12,7 @@ class Pengurus extends Admin_Controller {
 		$this->load->model('biodata_model');
 		$this->load->model('config_model');
 		$this->modul_ini = 200;
+		$this->sub_modul_ini = 18;
 	}
 
 	public function clear()
@@ -34,11 +35,7 @@ class Pengurus extends Admin_Controller {
 		$data['main'] = $this->pamong_model->list_data();
 		$data['keyword'] = $this->pamong_model->autocomplete();
 		$header = $this->header_model->get_data();
-
-		// Menampilkan menu dan sub menu aktif
 		$header['minsidebar'] = 1;
-		$nav['act'] = 1;
-		$nav['act_sub'] = 18;
 
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
@@ -66,8 +63,10 @@ class Pengurus extends Admin_Controller {
 			$data['form_action'] = site_url("pengurus/insert");
 		}
 
+		$data['penduduk'] = $this->pamong_model->list_penduduk();
 		$data['pendidikan_kk'] = $this->penduduk_model->list_pendidikan_kk();
 		$data['agama'] = $this->penduduk_model->list_agama();
+
 		$data['penduduk'] = $this->penduduk_model->list_penduduk();
 		if (!empty($_POST['id_pend'])) {
 			$data['individu'] = $this->biodata_model->get_penduduk($_POST['id_pend']);
@@ -90,13 +89,13 @@ class Pengurus extends Admin_Controller {
 
 			$data['individu']['alamat_wilayah']= $data['individu']['alamat'];
 
+			//v20.05
+			//$data['individu'] = $this->penduduk_model->get_penduduk($_POST['id_pend']);
+
 		} else {
 			$data['individu'] = NULL;
 		}
 		$header = $this->header_model->get_data();
-		// Menampilkan menu dan sub menu aktif
-		$nav['act'] = 1;
-		$nav['act_sub'] = 18;
 
 		// $data['p_jabatan'] = array(
 		// 	""=>" - ",

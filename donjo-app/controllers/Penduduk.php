@@ -7,6 +7,7 @@ class Penduduk extends Admin_Controller {
 		parent::__construct();
 		session_start();
 		$this->load->model('penduduk_model');
+		$this->load->model('keluarga_model');
 		$this->load->model('wilayah_model');
 		$this->load->model('referensi_model');
 		$this->load->model('web_dokumen_model');
@@ -14,6 +15,7 @@ class Penduduk extends Admin_Controller {
 		$this->load->model('biodata_model');
 		$this->load->model('config_model');
 		$this->modul_ini = 2;
+		$this->sub_modul_ini = 21;
 	}
 
 	private function clear_session()
@@ -42,6 +44,7 @@ class Penduduk extends Admin_Controller {
 		unset($_SESSION['akta_kelahiran']);
 		unset($_SESSION['status_ktp']);
 		unset($_SESSION['id_asuransi']);
+		unset($_SESSION['status_covid']);
 	}
 
 	public function clear()
@@ -57,7 +60,7 @@ class Penduduk extends Admin_Controller {
 		$data['p'] = $p;
 		$data['o'] = $o;
 
-		$list_session = array('cari', 'judul_statistik', 'filter', 'sex', 'agama', 'cacat', 'cara_kb_id', 'akta_kelahiran', 'pekerjaan_id', 'status', 'pendidikan_sedang_id', 'pendidikan_kk_id', 'status_penduduk', 'status_ktp', 'id_asuransi');
+		$list_session = array('cari', 'judul_statistik', 'filter', 'sex', 'agama', 'cacat', 'cara_kb_id', 'akta_kelahiran', 'pekerjaan_id', 'status', 'pendidikan_sedang_id', 'pendidikan_kk_id', 'status_penduduk', 'status_ktp', 'id_asuransi', 'status_covid');
 		foreach ($list_session as $session)
 		{
 			$data[$session] = $this->session->userdata($session) ?: '';
@@ -104,9 +107,6 @@ class Penduduk extends Admin_Controller {
 		$data['list_dusun'] = $this->penduduk_model->list_dusun();
 		$data['list_status_dasar'] = $this->referensi_model->list_data('tweb_status_dasar');
 		$header = $this->header_model->get_data();
-
-		$nav['act'] = 2;
-		$nav['act_sub'] = 21;
 		$header['minsidebar'] = 1;
 
 		$this->load->view('header', $header);
@@ -244,11 +244,9 @@ class Penduduk extends Admin_Controller {
 		$data['jenis_kelahiran'] = $this->referensi_model->list_kode_array(JENIS_KELAHIRAN);
 		$data['penolong_kelahiran'] = $this->referensi_model->list_kode_array(PENOLONG_KELAHIRAN);
 		$data['pilihan_asuransi'] = $this->referensi_model->list_data('tweb_penduduk_asuransi');
-
-		$nav['act']= 2;
-		$nav['act_sub'] = 21;
 		$header['minsidebar'] = 1;
 		unset($_SESSION['dari_internal']);
+
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
 		$this->load->view('sid/kependudukan/penduduk_form', $data);
@@ -263,8 +261,6 @@ class Penduduk extends Admin_Controller {
 		$data['penduduk'] = $this->penduduk_model->get_penduduk($id);
 		$header = $this->header_model->get_data();
 		$header['minsidebar'] = 1;
-		$nav['act']= 2;
-		$nav['act_sub'] = 21;
 
 		$data['photo'] = $this->biodata_model->get_photo($id);
 
@@ -278,9 +274,8 @@ class Penduduk extends Admin_Controller {
 	{
 		$data['list_dokumen'] = $this->penduduk_model->list_dokumen($id);
 		$data['penduduk'] = $this->penduduk_model->get_penduduk($id);
+
 		$header = $this->header_model->get_data();
-		$nav['act']= 2;
-		$nav['act_sub'] = 21;
 
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
@@ -291,9 +286,35 @@ class Penduduk extends Admin_Controller {
 	public function dokumen_form($id = 0, $id_dokumen = 0)
 	{
 		$data['penduduk'] = $this->penduduk_model->get_penduduk($id);
+
+		if ($data['penduduk']['kk_level'] === '1') //Jika Kepala Keluarga
+		{
+			$data['kk'] = $this->keluarga_model->list_anggota($data['penduduk']['id_kk']);
+		}
+		
 		if ($id_dokumen)
 		{
 			$data['dokumen'] = $this->web_dokumen_model->get_dokumen($id_dokumen);
+			
+			// Ambil data anggota KK
+			if ($data['penduduk']['kk_level'] === '1') //Jika Kepala Keluarga
+			{
+				$data['dokumen_anggota'] = $this->web_dokumen_model->get_dokumen_di_anggota_lain($id_dokumen);
+
+				if (count($data['dokumen_anggota'])>0)
+				{
+					$id_pend_anggota = array();
+					foreach ($data['dokumen_anggota'] as $item_dokumen) 
+						$id_pend_anggota[] = $item_dokumen['id_pend'];
+
+					foreach ($data['kk'] as $key => $value)  
+					{
+						if (in_array($value['id'], $id_pend_anggota))
+							$data['kk'][$key]['checked'] = 'checked';
+					}
+				}
+			}
+
 			$data['form_action'] = site_url("penduduk/dokumen_update/$id_dokumen");
 		}
 		else
@@ -689,7 +710,7 @@ class Penduduk extends Admin_Controller {
 
 		switch ($tipe)
 		{
-			case 0: $_SESSION['pendidikan_kk_id'] = $nomor; $pre = "PENDIDIKAN DALAM KK : "; break;
+			case '0': $_SESSION['pendidikan_kk_id'] = $nomor; $pre = "PENDIDIKAN DALAM KK : "; break;
 			case 1: $_SESSION['pekerjaan_id'] = $nomor; $pre = "PEKERJAAN : "; break;
 			case 2: $_SESSION['status'] = $nomor; $pre = "STATUS PERKAWINAN : "; break;
 			case 3: $_SESSION['agama'] = $nomor; $pre = "AGAMA : "; break;
@@ -721,6 +742,9 @@ class Penduduk extends Admin_Controller {
 				break;
 			case 19:
 				$_SESSION['id_asuransi'] = $nomor; $pre = "JENIS ASURANSI : ";
+				break;
+			case 'covid':
+				$_SESSION['status_covid'] = $nomor; $pre = "STATUS COVID : ";
 				break;
 		}
 		$judul = $this->penduduk_model->get_judul_statistik($tipe, $nomor, $sex);

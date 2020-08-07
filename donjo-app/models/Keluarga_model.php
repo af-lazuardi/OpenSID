@@ -5,6 +5,7 @@
 		parent::__construct();
 		$this->load->model('program_bantuan_model');
 		$this->load->model('penduduk_model');
+		$this->load->model('web_dokumen_model');
 		$this->load->model('config_model');
 	}
 
@@ -233,7 +234,7 @@
 
 		$log['id_pend'] = 1;
 		$log['id_cluster'] = 1;
-		$log['tanggal'] = date("m-d-y");
+		$log['tanggal'] = date('Y-m-d H:i:s');
 		$outp = $this->db->insert('log_perubahan_penduduk', $log);
 
 		// Untuk statistik perkembangan keluarga
@@ -522,6 +523,9 @@
 			$outp = $this->db->update('tweb_keluarga', $temp2);
 		}
 
+		// hapus dokumen bersama dengan kepala KK sebelumnya
+		$this->web_dokumen_model->hard_delete_dokumen_bersama($id);
+		
 		$this->penduduk_model->tulis_log_penduduk($id, '7', date('m'), date('Y'));
 	}
 

@@ -26,6 +26,7 @@
 						<a href="<?= site_url('keluar/graph')?>" class="btn btn-social btn-flat bg-orange btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-pie-chart"></i> Pie Surat Keluar</a>
 						<a href="<?= site_url('keluar/dialog_cetak')?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Cetak Arsip Layanan Surat"><i class="fa fa-print"></i> Cetak</a>
 						<a href="<?= site_url('keluar/dialog_unduh')?>" class="btn btn-social btn-flat bg-navy btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" data-remote="false" data-toggle="modal" data-target="#modalBox" data-title="Unduh Arsip Layanan Surat"><i class="fa fa-download"></i> Unduh</a>
+						<a href="<?= site_url("{$this->controller}/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan Filter</a>
 					</div>
 					<div class="box-body">
 						<div class="row">
@@ -187,29 +188,10 @@
 								</div>
 							</div>
 						</div>
-						<div class='modal fade' id='confirm-delete' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-							<div class='modal-dialog'>
-								<div class='modal-content'>
-									<div class='modal-header'>
-										<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
-										<h4 class='modal-title' id='myModalLabel'><i class='fa fa-exclamation-triangle text-red'></i> Konfirmasi</h4>
-									</div>
-									<div class='modal-body btn-info'>
-										Apakah Anda yakin ingin menghapus data ini?
-									</div>
-									<div class='modal-footer'>
-										<button type="button" class="btn btn-social btn-flat btn-warning btn-sm" data-dismiss="modal"><i class='fa fa-sign-out'></i> Tutup</button>
-										<a class='btn-ok'>
-											<button type="button" class="btn btn-social btn-flat btn-danger btn-sm" id="ok-delete"><i class='fa fa-trash-o'></i> Hapus</button>
-										</a>
-									</div>
-								</div>
-							</div>
-						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</section>
 </div>
-
+<?php $this->load->view('global/confirm_delete');?>

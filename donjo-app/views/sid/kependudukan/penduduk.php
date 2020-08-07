@@ -1,13 +1,22 @@
 <script>
-    $(function()
-    {
-        var keyword = <?= $keyword?> ;
-        $( "#cari" ).autocomplete(
-            {
-                source: keyword,
-                maxShowItems: 10,
-            });
-    });
+    $( function() {
+        $( "#cari" ).autocomplete({
+            source: function( request, response ) {
+                $.ajax( {
+                    type: "POST",
+                    url: '<?= site_url("penduduk/autocomplete")?>',
+                    dataType: "json",
+                    data: {
+                        cari: request.term
+                    },
+                    success: function( data ) {
+                     response( JSON.parse( data ));
+                    }
+                } );
+            },
+            minLength: 2,
+        } );
+    } );
 
 </script>
 <style>
@@ -62,7 +71,7 @@
                                 </li>
                             </ul>
                         </div>
-                        <a href="<?= site_url("penduduk/clear")?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan</a>
+                        <a href="<?= site_url("{$this->controller}/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan Filter</a>
                     </div>
                     <div class="box-body">
                         <div class="row">
@@ -302,26 +311,10 @@
                                 </div>
                             </div>
                         </div>
+
+                        <?php $this->load->view('global/confirm_delete');?>
+
                         <div class='modal fade' id='confirm-status' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
-                                                    <div class='modal-dialog'>
-                                                        <div class='modal-content'>
-                                                            <div class='modal-header'>
-                                                                <button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>
-                                                                <h4 class='modal-title' id='myModalLabel'><i class='fa fa-exclamation-triangle text-red'></i> Konfirmasi</h4>
-                                                            </div>
-                                                            <div class='modal-body btn-info'>
-                                                                Apakah Anda yakin ingin mengembalikan status data penduduk ini?
-                                                            </div>
-                                                            <div class='modal-footer'>
-                                                                <button type="button" class="btn btn-social btn-flat btn-danger btn-sm" data-dismiss="modal"><i class='fa fa-sign-out'></i> Tutup</button>
-                                                                <a class='btn-ok'>
-                                                                    <button type="button" class="btn btn-social btn-flat btn-info btn-sm" id="ok-status"><i class='fa fa-check'></i> Simpan</button>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                        <div class='modal fade' id='confirm-delete' tabindex='-1' role='dialog' aria-labelledby='myModalLabel' aria-hidden='true'>
                             <div class='modal-dialog'>
                                 <div class='modal-content'>
                                     <div class='modal-header'>
@@ -329,12 +322,12 @@
                                         <h4 class='modal-title' id='myModalLabel'><i class='fa fa-exclamation-triangle text-red'></i> Konfirmasi</h4>
                                     </div>
                                     <div class='modal-body btn-info'>
-                                        Apakah Anda yakin ingin menghapus data ini?
+                                        Apakah Anda yakin ingin mengembalikan status data penduduk ini?
                                     </div>
                                     <div class='modal-footer'>
-                                        <button type="button" class="btn btn-social btn-flat btn-warning btn-sm" data-dismiss="modal"><i class='fa fa-sign-out'></i> Tutup</button>
+                                        <button type="button" class="btn btn-social btn-flat btn-danger btn-sm" data-dismiss="modal"><i class='fa fa-sign-out'></i> Tutup</button>
                                         <a class='btn-ok'>
-                                            <button type="button" class="btn btn-social btn-flat btn-danger btn-sm" id="ok-delete"><i class='fa fa-trash-o'></i> Hapus</button>
+                                            <button type="button" class="btn btn-social btn-flat btn-info btn-sm" id="ok-status"><i class='fa fa-check'></i> Simpan</button>
                                         </a>
                                     </div>
                                 </div>

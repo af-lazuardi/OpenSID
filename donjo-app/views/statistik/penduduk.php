@@ -32,7 +32,12 @@
 							<a href="<?=site_url("statistik/pie/$lap/$export_date[tahun]/$export_date[semester]")?>" class="btn btn-social btn-flat btn-primary btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Pie Data">
 								<i class="fa fa-pie-chart"></i>Pie Data
             	</a>
-
+							<?php if ($lap=='13'): ?>
+								<a href="<?=site_url("statistik/rentang_umur")?>" class="btn btn-social btn-flat bg-olive btn-sm btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block" title="Rentang Umur">
+									<i class="fa fa-arrows-h"></i>Rentang Umur
+								</a>
+							<?php endif; ?>
+							<a href="<?= site_url("{$this->controller}/clear") ?>" class="btn btn-social btn-flat bg-purple btn-sm visible-xs-block visible-sm-inline-block visible-md-inline-block visible-lg-inline-block"><i class="fa fa-refresh"></i>Bersihkan Filter</a>
 						</div>
 						<div class="box-body">
               <div>
@@ -132,7 +137,7 @@
                           <th nowrap colspan="2"><a href="<?= site_url("statistik/index/$lap/5")?>">Jumlah <i class='fa fa-sort fa-sm'></i></a></th>
                         <?php endif; ?>
 
-												<?php if ($lap<20 OR ($lap>50 AND $program['sasaran']==1)): ?>
+												<?php if ($jenis_laporan == 'penduduk'): ?>
 													<?php if ($o==4): ?>
                             <th nowrap colspan="2"><a href="<?= site_url("statistik/index/$lap/3")?>">Laki-Laki <i class='fa fa-sort-asc fa-sm'></i></a></th>
                           <?php elseif ($o==3): ?>
@@ -169,7 +174,7 @@
 															$tautan_jumlah = site_url("keluarga/statistik/$lap/$data[id]");
 															elseif ($lap<50): $tautan_jumlah = site_url("penduduk/statistik/$lap/$data[id]");endif;
 													?>
-													<?php if ($lap<20 OR ($lap>50 AND $program['sasaran']==1)): ?>
+													<?php if ($jenis_laporan == 'penduduk'): ?>
 														<td><a href="<?= $tautan_jumlah?>/1" <?php if ($data['id']=='JUMLAH'): ?>class="disabled"<?php endif; ?>><?= $data['laki']?></a></td>
 														<td><?= $data['persen1'];?></td>
 														<td><a href="<?= $tautan_jumlah?>/2" <?php if ($data['id']=='JUMLAH'): ?>class="disabled"<?php endif; ?>><?= $data['perempuan']?></a></td>
