@@ -2,11 +2,7 @@
 <script src="<?= base_url()?>assets/js/localization/messages_id.js"></script>
 <div class="content-wrapper">
 	<section class="content-header">
-		<?php if ($tampil == 0): ?>
-			<h1>Pengelolaan Program Bantuan</h1>
-		<?php else: ?>
-			<h1>Pengelolaan Program Bantuan dengan Sasaran <?=$sasaran[$tampil];?></h1>
-		<?php endif; ?>
+		<h1>Pengelolaan Program Bantuan</h1>
 		<ol class="breadcrumb">
 			<li><a href="<?=site_url('hom_sid')?>"><i class="fa fa-home"></i> Home</a></li>
 			<li><a href="<?=site_url('program_bantuan')?>"> Daftar Program Bantuan</a></li>
@@ -38,7 +34,7 @@
 							<div class="form-group">
 								<label class="control-label col-sm-3" for="nama">Nama Program</label>
 								<div class="col-sm-8">
-									<input name="nama" class="form-control input-sm required" placeholder="Nama Program"  type="text"></input>
+									<input name="nama" class="form-control input-sm nomor_sk required" maxlength="100" placeholder="Nama Program"  type="text"></input>
 								</div>
 							</div>
 							<div class="form-group">
