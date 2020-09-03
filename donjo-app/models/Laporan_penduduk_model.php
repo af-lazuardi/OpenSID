@@ -273,17 +273,18 @@ class Laporan_penduduk_model extends MY_Model {
 			case "16": return "Akseptor KB"; break;
 			case "17": return "Akte Kelahiran"; break;
 			case "18": return "Kepemilikan Wajib KTP"; break;
-			case "99": return "Status Hub Dalam  Keluarga"; break; //CASE 99
-			case "20": return "Jenis Kelamin Kepala Keluarga"; break;
-			case "91": return "Pendidikan Kepala Keluarga"; break; //CASE 91
-			case "22": return "Pekerjaan Kepala Keluarga"; break;
-			case "23": return "Umur Kepala Keluarga"; break;
 			case "19": return "Jenis Asuransi"; break;
 			case "covid": return "Status Covid"; break;
 			case "21": return "Klasifikasi Sosial"; break;
 			case "24": return "Penerima BOS"; break;
 			case "bantuan_penduduk": return "Penerima Bantuan (Penduduk)"; break;
 			case "bantuan_keluarga": return "Penerima Bantuan (Keluarga)"; break;
+			//dari kulonprogo
+			case "99": return "Status Hub Dalam  Keluarga"; break; //CASE 19
+			case "20": return "Jenis Kelamin Kepala Keluarga"; break;
+			case "91": return "Pendidikan Kepala Keluarga"; break; //CASE 21
+			case "22": return "Pekerjaan Kepala Keluarga"; break;
+			case "23": return "Umur Kepala Keluarga"; break;
 			default: return NULL;
 		}
 	}
