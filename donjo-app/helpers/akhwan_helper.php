@@ -7,6 +7,7 @@ function j($data) {
 }
 
 function cpost($url, $data) {
+  /*
   $ch = curl_init();
   curl_setopt($ch, CURLOPT_URL, "http://192.168.64.23/stat/index.php/api/".$url);
   curl_setopt($ch, CURLOPT_POST, 1);
@@ -16,9 +17,11 @@ function cpost($url, $data) {
   $error = curl_error($ch);
   curl_close ($ch);
 
-  return (["result"=>$result, "error"=>$error]);
+  return (["result"=>$result, "error"=>$error]);*/
+  return null;
 }
 function cget($url) {
+  /*
   $ch = curl_init();  
  
   curl_setopt($ch,CURLOPT_URL,"http://192.168.64.23/stat/index.php/api/".$url);
@@ -30,5 +33,6 @@ function cget($url) {
 
   curl_close ($ch);
 
-  return (["result"=>$result, "error"=>$error]);
+  return (["result"=>$result, "error"=>$error]);*/
+  return null;
 }

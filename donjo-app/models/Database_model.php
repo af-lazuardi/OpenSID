@@ -99,14 +99,21 @@ class Database_model extends CI_Model {
 
 	public function migrasi_db_cri()
 	{
+		/*
+			Update current_version di db.
+			'pasca-<versi>' atau '<versi>-pasca disimpan sebagai '<versi>' */	
+
 		$versi = $this->getCurrentVersion();
 		$nextVersion = $versi;
 		$versionMigrate = $this->versionMigrate;
+			
 		if (isset($versionMigrate[$versi]))
 		{
+			
 			while (!empty($nextVersion) AND !empty($versionMigrate[$nextVersion]['migrate']))
 			{
 				$migrate = $versionMigrate[$nextVersion]['migrate'];
+
 				log_message('error', 'Jalankan '.$migrate);
 				$nextVersion = $versionMigrate[$nextVersion]['nextVersion'];
 				if (method_exists($this, $migrate))
@@ -122,10 +129,7 @@ class Database_model extends CI_Model {
 		$this->folder_desa_model->amankan_folder_desa();
 		$this->surat_master_model->impor_surat_desa();
 		$this->db->where('id', 13)->update('setting_aplikasi', array('value' => TRUE));
-		/*
-			Update current_version di db.
-			'pasca-<versi>' atau '<versi>-pasca disimpan sebagai '<versi>'
-		*/
+		
 		$versi = AmbilVersi();
 		$versi = preg_replace('/pasca-|-pasca/', '', $versi);
 		$newVersion = array(
@@ -133,7 +137,7 @@ class Database_model extends CI_Model {
 		);
 		$this->db->where(array('key'=>'current_version'))->update('setting_aplikasi', $newVersion);
 		$this->load->model('track_model');
-		$this->track_model->kirim_data();
+		//$this->track_model->kirim_data();
 		$this->catat_versi_database();
 	 	$_SESSION['success'] = 1;
   }
@@ -345,7 +349,7 @@ class Database_model extends CI_Model {
 				`urut` int(5),
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11),
 				`status` int(1) NOT NULL DEFAULT '0',
 				PRIMARY KEY (id)
@@ -758,6 +762,12 @@ class Database_model extends CI_Model {
 
   private function migrasi_1811_ke_1812()
   {
+  	// script tambahan migrasi untuk KulonProgo
+  	$this->migrasi_1806_ke_1807();
+	$this->migrasi_1808_ke_1809();
+	$this->migrasi_1809_ke_1810();
+	$this->migrasi_1810_ke_1811();
+
   	// Ubah struktur tabel tweb_desa_pamong
   	if (!$this->db->field_exists('id_pend', 'tweb_desa_pamong'))
   	{
@@ -808,6 +818,7 @@ class Database_model extends CI_Model {
 			$this->dbforge->add_column('tweb_desa_pamong', $fields);
   	}
 
+  	
   	// Pada tweb_keluarga kosongkan nik_kepala kalau tdk ada penduduk dgn kk_level=1 dan id=nik_kepala untuk keluarga itu
   	$kk_kosong = $this->db->select('k.id')
   	  ->where('p.id is NULL')
@@ -902,6 +913,7 @@ class Database_model extends CI_Model {
 				)
 			);
 		}
+		
 	}
 
   private function migrasi_1810_ke_1811()
@@ -1203,31 +1215,32 @@ class Database_model extends CI_Model {
 	  $this->db->query($query);
 	}
 
-	if ($this->db->table_exists('anggota_grup_kontak'))
-		return;
-	// Perubahan tabel untuk modul SMS
-	// buat table anggota_grup_kontak
-	$sql = array(
-	  'id_grup_kontak'  =>  array(
-		  'type' => 'INT',
-		  'constraint' => 11,
-		  'unsigned' => FALSE,
-		  'auto_increment' => TRUE
-		),
-	  'id_grup'  =>  array(
-		  'type' => 'INT',
-		  'constraint' => 11,
-		  'unsigned' => FALSE
-		),
-	  'id_kontak'  =>  array(
-		  'type' => 'INT',
-		  'constraint' => 11,
-		  'unsigned' => FALSE
-		)
-	  );
-	$this->dbforge->add_field($sql);
-	$this->dbforge->add_key("id_grup_kontak", TRUE);
-	$this->dbforge->create_table('anggota_grup_kontak', FALSE, array('ENGINE' => $this->engine));
+	if (!$this->db->table_exists('anggota_grup_kontak'))
+	{
+		// Perubahan tabel untuk modul SMS
+		// buat table anggota_grup_kontak
+		$sql = array(
+		  'id_grup_kontak'  =>  array(
+			  'type' => 'INT',
+			  'constraint' => 11,
+			  'unsigned' => FALSE,
+			  'auto_increment' => TRUE
+			),
+		  'id_grup'  =>  array(
+			  'type' => 'INT',
+			  'constraint' => 11,
+			  'unsigned' => FALSE
+			),
+		  'id_kontak'  =>  array(
+			  'type' => 'INT',
+			  'constraint' => 11,
+			  'unsigned' => FALSE
+			)
+		  );
+		$this->dbforge->add_field($sql);
+		$this->dbforge->add_key("id_grup_kontak", TRUE);
+		$this->dbforge->create_table('anggota_grup_kontak', FALSE, array('ENGINE' => $this->engine));
+	}
 
 	//perbaikan penamaan grup agar tidak ada html url code
 	$this->db->query("UPDATE kontak_grup SET nama_grup = REPLACE(nama_grup, '%20', ' ')");
@@ -1315,7 +1328,7 @@ class Database_model extends CI_Model {
 				`keterangan` text NOT NULL,
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11) NOT NULL,
 				`status` int(1) NOT NULL DEFAULT '0',
 				`visible` int(1) NOT NULL DEFAULT '1',
@@ -1338,7 +1351,7 @@ class Database_model extends CI_Model {
 				`keterangan` text NOT NULL,
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11) NOT NULL,
 				`visible` int(1) NOT NULL DEFAULT '1',
 				PRIMARY KEY (id),
@@ -1370,7 +1383,7 @@ class Database_model extends CI_Model {
 				`keterangan` text NOT NULL,
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11) NOT NULL,
 				`status` int(1) NOT NULL DEFAULT '0',
 				`visible` int(1) NOT NULL DEFAULT '1',
@@ -1393,7 +1406,7 @@ class Database_model extends CI_Model {
 				`keterangan` text NOT NULL,
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11) NOT NULL,
 				`visible` int(1) NOT NULL DEFAULT '1',
 				PRIMARY KEY (id),
@@ -1426,7 +1439,7 @@ class Database_model extends CI_Model {
 				`keterangan` text NOT NULL,
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11) NOT NULL,
 				`status` int(1) NOT NULL DEFAULT '0',
 				`visible` int(1) NOT NULL DEFAULT '1',
@@ -1449,7 +1462,7 @@ class Database_model extends CI_Model {
 				`keterangan` text NOT NULL,
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11) NOT NULL,
 				`visible` int(1) NOT NULL DEFAULT '1',
 				PRIMARY KEY (id),
@@ -1482,7 +1495,7 @@ class Database_model extends CI_Model {
 				`keterangan` text NOT NULL,
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11) NOT NULL,
 				`status` int(1) NOT NULL DEFAULT '0',
 				`visible` int(1) NOT NULL DEFAULT '1',
@@ -1505,7 +1518,7 @@ class Database_model extends CI_Model {
 				`keterangan` text NOT NULL,
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11) NOT NULL,
 				`visible` int(1) NOT NULL DEFAULT '1',
 				PRIMARY KEY (id),
@@ -1540,7 +1553,7 @@ class Database_model extends CI_Model {
 				`keterangan` text NOT NULL,
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11) NOT NULL,
 				`status` int(1) NOT NULL DEFAULT '0',
 				`visible` int(1) NOT NULL DEFAULT '1',
@@ -1563,7 +1576,7 @@ class Database_model extends CI_Model {
 				`keterangan` text NOT NULL,
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11) NOT NULL,
 				`visible` int(1) NOT NULL DEFAULT '1',
 				PRIMARY KEY (id),
@@ -1594,7 +1607,7 @@ class Database_model extends CI_Model {
 				`keterangan` text NOT NULL,
 				`created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`created_by` int(11) NOT NULL,
-				`updated_at` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+				`updated_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
 				`updated_by` int(11) NOT NULL,
 				`status` int(1) NOT NULL DEFAULT '0',
 				`visible` int(1) NOT NULL DEFAULT '1',
