@@ -65,37 +65,7 @@ class Migrasi_2004_ke_2005 extends CI_model {
 
 	private function covid19()
 	{
-		// Menambahkan menu 'Group / Hak Akses' ke table 'setting_modul'
-		$data[] = array(
-			'id'=>'206',
-			'modul' => 'Siaga Covid-19',
-			'url' => 'covid19',
-			'aktif' => '1',
-			'ikon' => 'fa-heartbeat',
-			'urut' => '0',
-			'level' => '2',
-			'hidden' => '0',
-			'ikon_kecil' => 'fa fa-heartbeat',
-			'parent' => 0
-		);
-
-    foreach ($data as $modul)
-    {
-			$sql = $this->db->insert_string('setting_modul', $modul);
-			$sql .= " ON DUPLICATE KEY UPDATE
-			id = VALUES(id),
-			modul = VALUES(modul),
-			url = VALUES(url),
-			aktif = VALUES(aktif),
-			ikon = VALUES(ikon),
-			urut = VALUES(urut),
-			level = VALUES(level),
-			hidden = VALUES(hidden),
-			ikon_kecil = VALUES(ikon_kecil),
-			parent = VALUES(parent)";
-			$this->db->query($sql);
-    }
-
+		
     // Tambah Tabel Covid-19
     if (!$this->db->table_exists('covid19_pemudik') )
 		{
@@ -158,6 +128,37 @@ class Migrasi_2004_ke_2005 extends CI_model {
 			));
 			$this->dbforge->add_key("id",true);
 			$this->dbforge->create_table("covid19_pemudik", TRUE);
+
+			// Menambahkan menu 'Group / Hak Akses' ke table 'setting_modul'
+			$data[] = array(
+				'id'=>'206',
+				'modul' => 'Siaga Covid-19',
+				'url' => 'covid19',
+				'aktif' => '1',
+				'ikon' => 'fa-heartbeat',
+				'urut' => '0',
+				'level' => '2',
+				'hidden' => '0',
+				'ikon_kecil' => 'fa fa-heartbeat',
+				'parent' => 0
+			);
+
+	    foreach ($data as $modul)
+	    {
+				$sql = $this->db->insert_string('setting_modul', $modul);
+				$sql .= " ON DUPLICATE KEY UPDATE
+				id = VALUES(id),
+				modul = VALUES(modul),
+				url = VALUES(url),
+				aktif = VALUES(aktif),
+				ikon = VALUES(ikon),
+				urut = VALUES(urut),
+				level = VALUES(level),
+				hidden = VALUES(hidden),
+				ikon_kecil = VALUES(ikon_kecil),
+				parent = VALUES(parent)";
+				$this->db->query($sql);
+	    }
 		}
 
 		// add relational constraint antara covid19_pemudik dan tweb_penduduk
@@ -204,50 +205,6 @@ class Migrasi_2004_ke_2005 extends CI_model {
 				),
 			));
   	}
-
-		// Add Menu Child 'Pendataan' & 'Pemantauan'
-		$data = array();
-		$data[] = array(
-			'id'=>'207',
-			'modul' => 'Pendataan',
-			'url' => 'covid19',
-			'aktif' => '1',
-			'ikon' => 'fa-list',
-			'urut' => '1',
-			'level' => '2',
-			'hidden' => '0',
-			'ikon_kecil' => 'fa fa-list',
-			'parent' => 206);
-
-		$data[] = array(
-		'id'=>'208',
-		'modul' => 'Pemantauan',
-		'url' => 'covid19/pantau',
-		'aktif' => '1',
-		'ikon' => 'fa-check',
-		'urut' => '2',
-		'level' => '2',
-		'hidden' => '0',
-		'ikon_kecil' => 'fa fa-check',
-		'parent' => 206);
-
-		foreach ($data as $modul)
-		{
-			$sql = $this->db->insert_string('setting_modul', $modul);
-
-			$sql .= " ON DUPLICATE KEY UPDATE
-			id = VALUES(id),
-			modul = VALUES(modul),
-			url = VALUES(url),
-			aktif = VALUES(aktif),
-			ikon = VALUES(ikon),
-			urut = VALUES(urut),
-			level = VALUES(level),
-			hidden = VALUES(hidden),
-			ikon_kecil = VALUES(ikon_kecil),
-			parent = VALUES(parent)";
-			$this->db->query($sql);
-		}
 
 		// Tambah Tabel Pemantauan Covid-19
 		if (!$this->db->table_exists('covid19_pantau'))
@@ -301,6 +258,50 @@ class Migrasi_2004_ke_2005 extends CI_model {
 			));
 			$this->dbforge->add_key("id",true);
 			$this->dbforge->create_table("covid19_pantau", TRUE);
+
+			// Add Menu Child 'Pendataan' & 'Pemantauan'
+			$data = array();
+			$data[] = array(
+				'id'=>'207',
+				'modul' => 'Pendataan',
+				'url' => 'covid19',
+				'aktif' => '1',
+				'ikon' => 'fa-list',
+				'urut' => '1',
+				'level' => '2',
+				'hidden' => '0',
+				'ikon_kecil' => 'fa fa-list',
+				'parent' => 206);
+
+			$data[] = array(
+			'id'=>'208',
+			'modul' => 'Pemantauan',
+			'url' => 'covid19/pantau',
+			'aktif' => '1',
+			'ikon' => 'fa-check',
+			'urut' => '2',
+			'level' => '2',
+			'hidden' => '0',
+			'ikon_kecil' => 'fa fa-check',
+			'parent' => 206);
+
+			foreach ($data as $modul)
+			{
+				$sql = $this->db->insert_string('setting_modul', $modul);
+
+				$sql .= " ON DUPLICATE KEY UPDATE
+				id = VALUES(id),
+				modul = VALUES(modul),
+				url = VALUES(url),
+				aktif = VALUES(aktif),
+				ikon = VALUES(ikon),
+				urut = VALUES(urut),
+				level = VALUES(level),
+				hidden = VALUES(hidden),
+				ikon_kecil = VALUES(ikon_kecil),
+				parent = VALUES(parent)";
+				$this->db->query($sql);
+			}
 		}
 
 		// add relational constraint antara covid19_pantau dan covid19_pemudik
