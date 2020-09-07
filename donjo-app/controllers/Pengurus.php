@@ -8,9 +8,10 @@ class Pengurus extends Admin_Controller {
 
 	public function __construct()
 	{
+		
 		parent::__construct();
-
-		$this->load->model(['header_model', 'pamong_model', 'penduduk_model', 'config_model', 'referensi_model, biodata_model']);
+		
+		$this->load->model(['header_model', 'pamong_model', 'penduduk_model', 'config_model', 'referensi_model', 'biodata_model']);
 		$this->modul_ini = 200;
 		$this->sub_modul_ini = 18;
 		$this->_set_page = ['20', '50', '100'];
@@ -26,6 +27,7 @@ class Pengurus extends Admin_Controller {
 		redirect('pengurus');
 	}
 
+	
 	public function index($p = 1)
 	{
 		foreach ($this->_list_session as $list)
@@ -77,7 +79,7 @@ class Pengurus extends Admin_Controller {
 		$data['pendidikan_kk'] = $this->referensi_model->list_data('tweb_penduduk_pendidikan_kk');
 		$data['agama'] = $this->referensi_model->list_data('tweb_penduduk_agama');
 
-		if (!empty($_POST['id_pend'])) {
+		if (!empty($id_pend)) {
 			$data['individu'] = $this->penduduk_model->get_penduduk($id_pend);
 
 			if($data['individu']['nik'] == NULL) {
@@ -97,9 +99,10 @@ class Pengurus extends Admin_Controller {
 			//v20.05
 			//$data['individu'] = $this->penduduk_model->get_penduduk($_POST['id_pend']);
 		}
-		else
+		else {
 			$data['individu'] = NULL;
 		}
+	
 		$header = $this->header_model->get_data();
 
 		// $data['p_jabatan'] = array(
@@ -133,7 +136,7 @@ class Pengurus extends Admin_Controller {
 		$this->load->view('home/pengurus_form', $data);
 		$this->load->view('footer');
 	}
-
+	
 	public function filter($filter)
 	{
 		$value = $this->input->post($filter);
@@ -192,7 +195,7 @@ class Pengurus extends Admin_Controller {
 		$this->pamong_model->lock($id, $val);
 		redirect("pengurus");
 	}
-
+	
 	/*
 	 * $aksi = cetak/unduh
 	 */
@@ -202,11 +205,11 @@ class Pengurus extends Admin_Controller {
 		$data['pamong'] = $this->pamong_model->list_data();
 		$data['form_action'] = site_url("pengurus/daftar/$aksi");
 		$this->load->view('home/ajax_pengurus', $data);
-	}
+	} 
 
 	/*
 	 * $aksi = cetak/unduh
-	 */
+	 */ 
 	public function daftar($aksi = 'cetak')
 	{
 		$data['pamong_ttd'] = $this->pamong_model->get_data($this->input->post('pamong_ttd'));
@@ -215,12 +218,6 @@ class Pengurus extends Admin_Controller {
 		$data['main'] = $this->pamong_model->list_data();
 
 		$this->load->view('home/'.$aksi, $data);
-	}
-
-	public function urut($id = 0, $arah = 0)
-	{
-		$this->pamong_model->urut($id, $arah);
-		redirect("pengurus");
 	}
 
 	public function get_data_desa()
