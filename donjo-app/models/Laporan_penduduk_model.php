@@ -204,14 +204,15 @@ class Laporan_penduduk_model extends MY_Model {
 			"statistik/17" => "Akte Kelahiran",
 			"statistik/18" => "Kepemilikan KTP",
 			"statistik/19" => "Jenis Asuransi",
+			"statistik/covid" => "Status Covid",
+			"statistik/bantuan_penduduk" => "Penerima Bantuan (Penduduk)",
+			//dari kulonprogo
 			"dpt" 			=> "Calon Pemilih",
 			"statistik/99"  => "Stat Hbkel", //statistik/19
 			"statistik/20"  => "Jenis Kelamin Kepala Keluarga",
-			"statistik/21"  => "Pendidikan Kepala Keluarga",
+			"statistik/91"  => "Pendidikan Kepala Keluarga",
 			"statistik/22"  => "Pekerjaan Kepala Keluarga",
 			"statistik/23"  => "Umur Kepala Keluarga",
-			"statistik/covid" => "Status Covid"
-			"statistik/bantuan_penduduk" => "Penerima Bantuan (Penduduk)"
 		];
 
 		return $statistik;
@@ -429,7 +430,6 @@ class Laporan_penduduk_model extends MY_Model {
 	}
 
 	// -------------------- Siapkan data untuk statistik kependudukan -------------------
-
 	protected function hitung_total(&$data)
 	{
 		$total['jumlah'] = 0;
@@ -764,7 +764,6 @@ class Laporan_penduduk_model extends MY_Model {
 	}
 
 	// -------------------- Akhir siapkan data untuk statistik kependudukan -------------------
-
 
 	public function list_data_rentang()
 	{

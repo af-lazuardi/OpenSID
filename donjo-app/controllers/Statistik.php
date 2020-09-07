@@ -53,7 +53,7 @@ class Statistik extends Admin_Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model(['wilayah_model', 'laporan_penduduk_model', 'pamong_model', 'program_bantuan_model', 'header_model', 'config_model','agregat_dukcapil_model']);
+		$this->load->model(['wilayah_model', 'laporan_penduduk_model', 'pamong_model', 'program_bantuan_model', 'header_model', 'config_model', 'agregat_dukcapil_model']);
 		$this->_header = $this->header_model->get_data();
 		$this->_list_session = ['lap', 'order_by', 'dusun', 'rw', 'rt'];
 		$this->modul_ini = 3;
@@ -102,7 +102,7 @@ class Statistik extends Admin_Controller {
 
 		redirect('statistik');
 	}
-
+	
 	private function get_data_stat(&$data, $lap)
 	{
 		$data['stat'] = $this->laporan_penduduk_model->judul_statistik($lap);
@@ -128,7 +128,7 @@ class Statistik extends Admin_Controller {
 			$data['kategori'] = 'penduduk';
 		}
 	}
-
+	
 	private function data_kulon_progo($kategori=null, $tahun=0, $semester=0)
 	{
 		$retval = array();
@@ -205,7 +205,7 @@ class Statistik extends Admin_Controller {
 
 	/*
 	* $aksi = cetak/unduh
-	*/
+	*/ 
 	public function daftar($aksi = '', $lap = '', $tahun=0, $semester=0)
 	{
 		$data['aksi'] = $aksi;
