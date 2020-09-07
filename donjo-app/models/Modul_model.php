@@ -9,7 +9,7 @@
 		if (!$this->db->field_exists('parent', 'setting_modul'))
 		{
 			$this->load->model('database_model');
-			$this->database_model->migrasi_db_cri();
+			//$this->database_model->migrasi_db_cri();
 		}
 	}
 

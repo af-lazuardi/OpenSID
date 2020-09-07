@@ -760,13 +760,135 @@ class Database_model extends CI_Model {
 		$this->db->where('id', 48)->update('setting_modul', array('url'=>'web_widget/clear', 'aktif'=>'1'));
   }
 
+  // script tambahan migrasi untuk KulonProgo
+  private function migrasi_kulon_progo()
+  {
+  	$query = "SET SQL_MODE = \"NO_AUTO_VALUE_ON_ZERO\";";
+  	$this->db->query($query);
+
+  	// create kembali tabel inbox, outbox, sent items
+  	if (!$this->db->table_exists('inbox') )
+  	{
+  		$query = "
+			CREATE TABLE `inbox` (
+				`UpdatedInDB` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+				`ReceivingDateTime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+			  `Text` text NOT NULL,
+			  `SenderNumber` varchar(20) NOT NULL DEFAULT '',
+			  `Coding` enum('Default_No_Compression','Unicode_No_Compression','8bit','Default_Compression','Unicode_Compression') NOT NULL DEFAULT 'Default_No_Compression',
+			  `UDH` text NOT NULL,
+			  `SMSCNumber` varchar(20) NOT NULL DEFAULT '',
+			  `Class` int(11) NOT NULL DEFAULT -1,
+			  `TextDecoded` text NOT NULL,
+			  `ID` int(10) UNSIGNED NOT NULL,
+			  `RecipientID` text NOT NULL,
+			  `Processed` enum('false','true') NOT NULL DEFAULT 'false'
+			)
+			";
+			$this->db->query($query);
+
+			$query = "
+			ALTER TABLE `inbox`
+			  ADD PRIMARY KEY (`ID`);
+			";
+			$this->db->query($query);
+
+			$query = "
+			ALTER TABLE `inbox`
+	  		MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+			";
+			$this->db->query($query);
+  	}
+
+  	if (!$this->db->table_exists('outbox') )
+  	{
+  		$query = "
+			CREATE TABLE `outbox` (
+			  `UpdatedInDB` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+			  `InsertIntoDB` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+			  `SendingDateTime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+			  `SendBefore` time NOT NULL DEFAULT '23:59:59',
+			  `SendAfter` time NOT NULL DEFAULT '00:00:00',
+			  `Text` text DEFAULT NULL,
+			  `DestinationNumber` varchar(20) NOT NULL DEFAULT '',
+			  `Coding` enum('Default_No_Compression','Unicode_No_Compression','8bit','Default_Compression','Unicode_Compression') NOT NULL DEFAULT 'Default_No_Compression',
+			  `UDH` text DEFAULT NULL,
+			  `Class` int(11) DEFAULT -1,
+			  `TextDecoded` text NOT NULL,
+			  `ID` int(10) UNSIGNED NOT NULL,
+			  `MultiPart` enum('false','true') DEFAULT 'false',
+			  `RelativeValidity` int(11) DEFAULT -1,
+			  `SenderID` varchar(255) DEFAULT NULL,
+			  `SendingTimeOut` timestamp NULL DEFAULT '0000-00-00 00:00:00',
+			  `DeliveryReport` enum('default','yes','no') DEFAULT 'default',
+			  `CreatorID` text NOT NULL
+			)
+			";
+			$this->db->query($query);
+
+			$query = "
+			ALTER TABLE `outbox`
+			  ADD PRIMARY KEY (`ID`),
+			  ADD KEY `outbox_date` (`SendingDateTime`,`SendingTimeOut`),
+			  ADD KEY `outbox_sender` (`SenderID`);
+			";
+			$this->db->query($query);
+
+			$query = "
+			ALTER TABLE `outbox`
+	  		MODIFY `ID` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+			";
+			$this->db->query($query);
+  	}
+
+  	if (!$this->db->table_exists('sentitems') )
+  	{
+  		$query = "
+			CREATE TABLE `sentitems` (
+			  `UpdatedInDB` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+			  `InsertIntoDB` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+			  `SendingDateTime` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+			  `DeliveryDateTime` timestamp NULL DEFAULT NULL,
+			  `Text` text NOT NULL,
+			  `DestinationNumber` varchar(20) NOT NULL DEFAULT '',
+			  `Coding` enum('Default_No_Compression','Unicode_No_Compression','8bit','Default_Compression','Unicode_Compression') NOT NULL DEFAULT 'Default_No_Compression',
+			  `UDH` text NOT NULL,
+			  `SMSCNumber` varchar(20) NOT NULL DEFAULT '',
+			  `Class` int(11) NOT NULL DEFAULT -1,
+			  `TextDecoded` text NOT NULL,
+			  `ID` int(10) UNSIGNED NOT NULL DEFAULT 0,
+			  `SenderID` varchar(255) NOT NULL,
+			  `SequencePosition` int(11) NOT NULL DEFAULT 1,
+			  `Status` enum('SendingOK','SendingOKNoReport','SendingError','DeliveryOK','DeliveryFailed','DeliveryPending','DeliveryUnknown','Error') NOT NULL DEFAULT 'SendingOK',
+			  `StatusError` int(11) NOT NULL DEFAULT -1,
+			  `TPMR` int(11) NOT NULL DEFAULT -1,
+			  `RelativeValidity` int(11) NOT NULL DEFAULT -1,
+			  `CreatorID` text NOT NULL
+			)
+			";
+			$this->db->query($query);
+
+			$query = "
+			ALTER TABLE `sentitems`
+			  ADD PRIMARY KEY (`ID`,`SequencePosition`),
+			  ADD KEY `sentitems_date` (`DeliveryDateTime`),
+			  ADD KEY `sentitems_tpmr` (`TPMR`),
+			  ADD KEY `sentitems_dest` (`DestinationNumber`),
+			  ADD KEY `sentitems_sender` (`SenderID`);
+			";
+			$this->db->query($query);
+  	}
+
+  	$this->migrasi_1806_ke_1807();
+		$this->migrasi_1808_ke_1809();
+		$this->migrasi_1809_ke_1810();
+		$this->migrasi_1810_ke_1811();
+  }
+
   private function migrasi_1811_ke_1812()
   {
   	// script tambahan migrasi untuk KulonProgo
-  	$this->migrasi_1806_ke_1807();
-	$this->migrasi_1808_ke_1809();
-	$this->migrasi_1809_ke_1810();
-	$this->migrasi_1810_ke_1811();
+  	$this->migrasi_kulon_progo();
 
   	// Ubah struktur tabel tweb_desa_pamong
   	if (!$this->db->field_exists('id_pend', 'tweb_desa_pamong'))
@@ -1240,31 +1362,32 @@ class Database_model extends CI_Model {
 		$this->dbforge->add_field($sql);
 		$this->dbforge->add_key("id_grup_kontak", TRUE);
 		$this->dbforge->create_table('anggota_grup_kontak', FALSE, array('ENGINE' => $this->engine));
+
+		//perbaikan penamaan grup agar tidak ada html url code
+		$this->db->query("UPDATE kontak_grup SET nama_grup = REPLACE(nama_grup, '%20', ' ')");
+		//memindahkan isi kontak_grup ke anggota_grup_kontak
+		$this->db->query("INSERT INTO anggota_grup_kontak (id_grup, id_kontak) SELECT b.id as id_grup, a.id_kontak FROM kontak_grup a RIGHT JOIN (SELECT id,nama_grup FROM kontak_grup GROUP BY nama_grup) b on a.nama_grup = b.nama_grup WHERE a.id_kontak <> 0");
+		//Memperbaiki record kontak_grup agar tidak duplikat
+		$this->db->query("DELETE t1 FROM kontak_grup t1 INNER JOIN kontak_grup t2  WHERE t1.id > t2.id AND t1.nama_grup = t2.nama_grup");
+
+		//modifikasi tabel kontak dan kontak_grup
+		if ($this->db->field_exists('id', 'kontak'))
+		  $this->dbforge->modify_column('kontak', array('id' => array('name'  =>  'id_kontak', 'type' =>  'INT',  'auto_increment'  =>  TRUE )));
+		if ($this->db->field_exists('id_kontak', 'kontak_grup'))
+		  $this->dbforge->drop_column('kontak_grup', 'id_kontak');
+		if ($this->db->field_exists('id', 'kontak_grup'))
+		  $this->dbforge->modify_column('kontak_grup', array('id' => array('name'  =>  'id_grup', 'type' =>  'INT',  'auto_increment'  =>  TRUE )));
+
+		//menambahkan constraint kolom tabel
+		$this->dbforge->add_column('anggota_grup_kontak',array(
+		  'CONSTRAINT `anggota_grup_kontak_ke_kontak` FOREIGN KEY (`id_kontak`) REFERENCES `kontak` (`id_kontak`) ON DELETE CASCADE ON UPDATE CASCADE',
+		  'CONSTRAINT `anggota_grup_kontak_ke_kontak_grup` FOREIGN KEY (`id_grup`) REFERENCES `kontak_grup` (`id_grup`) ON DELETE CASCADE ON UPDATE CASCADE'
+		));
+		$this->dbforge->add_column('kontak',array(
+		  'CONSTRAINT `kontak_ke_tweb_penduduk` FOREIGN KEY (`id_pend`) REFERENCES `tweb_penduduk` (`id`) ON DELETE CASCADE ON UPDATE CASCADE'
+		));
 	}
 
-	//perbaikan penamaan grup agar tidak ada html url code
-	$this->db->query("UPDATE kontak_grup SET nama_grup = REPLACE(nama_grup, '%20', ' ')");
-	//memindahkan isi kontak_grup ke anggota_grup_kontak
-	$this->db->query("INSERT INTO anggota_grup_kontak (id_grup, id_kontak) SELECT b.id as id_grup, a.id_kontak FROM kontak_grup a RIGHT JOIN (SELECT id,nama_grup FROM kontak_grup GROUP BY nama_grup) b on a.nama_grup = b.nama_grup WHERE a.id_kontak <> 0");
-	//Memperbaiki record kontak_grup agar tidak duplikat
-	$this->db->query("DELETE t1 FROM kontak_grup t1 INNER JOIN kontak_grup t2  WHERE t1.id > t2.id AND t1.nama_grup = t2.nama_grup");
-
-	//modifikasi tabel kontak dan kontak_grup
-	if ($this->db->field_exists('id', 'kontak'))
-	  $this->dbforge->modify_column('kontak', array('id' => array('name'  =>  'id_kontak', 'type' =>  'INT',  'auto_increment'  =>  TRUE )));
-	if ($this->db->field_exists('id_kontak', 'kontak_grup'))
-	  $this->dbforge->drop_column('kontak_grup', 'id_kontak');
-	if ($this->db->field_exists('id', 'kontak_grup'))
-	  $this->dbforge->modify_column('kontak_grup', array('id' => array('name'  =>  'id_grup', 'type' =>  'INT',  'auto_increment'  =>  TRUE )));
-
-	//menambahkan constraint kolom tabel
-	$this->dbforge->add_column('anggota_grup_kontak',array(
-	  'CONSTRAINT `anggota_grup_kontak_ke_kontak` FOREIGN KEY (`id_kontak`) REFERENCES `kontak` (`id_kontak`) ON DELETE CASCADE ON UPDATE CASCADE',
-	  'CONSTRAINT `anggota_grup_kontak_ke_kontak_grup` FOREIGN KEY (`id_grup`) REFERENCES `kontak_grup` (`id_grup`) ON DELETE CASCADE ON UPDATE CASCADE'
-	));
-	$this->dbforge->add_column('kontak',array(
-	  'CONSTRAINT `kontak_ke_tweb_penduduk` FOREIGN KEY (`id_pend`) REFERENCES `tweb_penduduk` (`id`) ON DELETE CASCADE ON UPDATE CASCADE'
-	));
 	//buat view
 	$this->db->query("DROP VIEW IF EXISTS `daftar_kontak`");
 	$this->db->query("CREATE VIEW `daftar_kontak` AS select `a`.`id_kontak` AS `id_kontak`,`a`.`id_pend` AS `id_pend`,`b`.`nama` AS `nama`,`a`.`no_hp` AS `no_hp`,(case when (`b`.`sex` = '1') then 'Laki-laki' else 'Perempuan' end) AS `sex`,`b`.`alamat_sekarang` AS `alamat_sekarang` from (`kontak` `a` left join `tweb_penduduk` `b` on((`a`.`id_pend` = `b`.`id`)))");

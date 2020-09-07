@@ -19,7 +19,7 @@ class Setting_model extends CI_Model {
 			if (!$this->db->table_exists('setting_aplikasi'))
 			{
 				$this->load->model('database_model');
-				$this->database_model->migrasi_db_cri();
+				//$this->database_model->migrasi_db_cri();
 			}
 			$pr = $this->db
 				->where("kategori is null or kategori <> 'sistem' and kategori <> 'conf_web' ")
