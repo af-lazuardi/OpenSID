@@ -63,7 +63,7 @@
 
 		$this->load->library('paging');
 		$cfg['page'] = $p;
-		$cfg['per_page'] = $this->session->per_page;
+		$cfg['per_page'] = $_SESSION['per_page'];
 		$cfg['num_rows'] = $jml_data;
 		$this->paging->init($cfg);
 
@@ -72,14 +72,19 @@
 
 	private function list_data_sql()
 	{
+		// kulonprogo
+		$sql = "FROM tweb_biodata_penduduk u WHERE 1 ";
+		return $sql;
+
+		// opensid 20.08
+		/*
 		$sql = "FROM tweb_keluarga u
-			LEFT JOIN tweb_biodata_penduduk t ON u.nik_kepala = t.id
+			LEFT JOIN tweb_penduduk t ON u.nik_kepala = t.id
 			LEFT JOIN tweb_wil_clusterdesa c ON u.id_cluster = c.id";
 
 		$sql .= " WHERE 1 ";
-
-		//$sql .=	$this->search_sql();
-		//$sql .=	$this->status_dasar_sql();
+		$sql .=	$this->search_sql();
+		$sql .=	$this->status_dasar_sql();
 
 		$kolom_kode = [
 			array('dusun', 'c.dusun'),
@@ -95,7 +100,7 @@
 			$sql .= $this->get_sql_kolom_kode($kolom[0], $kolom[1]);
 		}
 
-		return $sql;
+		return $sql;*/
 	}
 
 	protected function get_sql_kolom_kode($kode_session, $kode_kolom)
@@ -114,6 +119,7 @@
 
 	public function list_data($o = 0, $offset = 0, $limit = 500)
 	{
+		// kulonprogo
 		//Ordering SQL
 		switch ($o)
 		{
@@ -121,20 +127,18 @@
 			case 2: $order_sql = ' ORDER BY u.no_kk DESC'; break;
 			case 3: $order_sql = ' ORDER BY kepala_kk'; break;
 			case 4: $order_sql = ' ORDER BY kepala_kk DESC'; break;
-			case 5: $order_sql = ' ORDER BY u.tgl_daftar'; break;
-			case 6: $order_sql = ' ORDER BY u.tgl_daftar DESC'; break;
+			case 5: $order_sql = ' ORDER BY g.nama'; break;
+			case 6: $order_sql = ' ORDER BY g.nama DESC'; break;
 			default:$order_sql = ' ORDER BY u.no_kk DESC';
 		}
 
 		//Paging SQL
 		$paging_sql = ' LIMIT ' .$offset. ',' .$limit;
 
-		$sql = "SELECT u.*, t.nama AS kepala_kk, t.nik, t.tag_id_card, t.sex, t.status_dasar, t.foto, t.id as id_pend,
-			(SELECT COUNT(id) FROM tweb_biodata_penduduk WHERE id_kk = u.id AND status_dasar = 1) AS jumlah_anggota,
-			c.dusun, c.rw, c.rt ";
-
-		$sql .= $this->list_data_sql();
-
+		$sql = "SELECT u.*,  (SELECT COUNT(nik) FROM tweb_biodata_penduduk WHERE no_kk = u.no_kk) AS jumlah_anggota ".$this->list_data_sql();
+		//opensid 20.08
+		//$sql = "SELECT u.*, t.nama AS kepala_kk, t.nik, t.tag_id_card, t.sex, t.status_dasar, t.foto, t.id as id_pend, (SELECT COUNT(id) FROM tweb_penduduk WHERE id_kk = u.id AND status_dasar = 1) AS jumlah_anggota, c.dusun, c.rw, c.rt ";
+		//$sql .= $this->list_data_sql(); //DONE
 		$sql .= $order_sql;
 		$sql .= $paging_sql;
 
@@ -155,7 +159,6 @@
 				$data[$i]['sex'] = "PEREMPUAN";
 			$j++;
 		}
-
 		return $data;
 	}
 

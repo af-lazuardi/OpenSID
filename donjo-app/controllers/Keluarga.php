@@ -79,6 +79,7 @@ class Keluarga extends Admin_Controller {
 		$this->load->view('footer');
 	}
 
+	
 	public function autocomplete()
 	{
 		$data = $this->keluarga_model->autocomplete($this->input->post('cari'));
@@ -266,7 +267,7 @@ class Keluarga extends Admin_Controller {
 
 	/*
 	 * Tambah KK dengan memilih dari penduduk yg sudah ada
-	 */
+	 */ 
 	public function insert()
 	{
 		$this->keluarga_model->insert();
@@ -292,7 +293,7 @@ class Keluarga extends Admin_Controller {
 
 	/*
 	 * Tambah KK dengan mengisi form penduduk kepala keluarga baru
-	 */
+	 */ 
 	public function insert_new()
 	{
 		$this->keluarga_model->insert_new();
