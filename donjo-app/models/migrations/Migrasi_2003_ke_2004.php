@@ -4,9 +4,9 @@ class Migrasi_2003_ke_2004 extends CI_model {
 	public function up()
 	{
 		// ======================
-		$this->surat_mandiri();
-		$this->surat_mandiri_tersedia();
-		$this->mailbox();
+		//$this->surat_mandiri();			sudah ada di 2002 ke 2003
+		//$this->surat_mandiri_tersedia(); 	sudah ada di 2002 ke 2003
+		//$this->mailbox();					sudah ada di 2002 ke 2003
 		$this->ubah_surat_mandiri();
 		// ======================
 

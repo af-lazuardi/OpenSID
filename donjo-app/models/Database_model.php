@@ -879,6 +879,17 @@ class Database_model extends CI_Model {
 			$this->db->query($query);
   	}
 
+  	$this->db->where('url', 'dukcapil')->update('setting_modul', array('id' => '901'));
+  	$this->db->where('url', 'dukcapil/kelahiran')->update('setting_modul', array('id' => '902', 'parent' => '901'));
+  	$this->db->where('url', 'dukcapil/kematian')->update('setting_modul', array('id' => '903', 'parent' => '901'));
+  	$this->db->where('url', 'laporan_dukcapil')->update('setting_modul', array('id' => '904'));
+  	$this->db->where('url', 'laporan_dukcapil/pindah')->update('setting_modul', array('id' => '905', 'parent' => '904'));
+  	$this->db->where('url', 'laporan_dukcapil/datang')->update('setting_modul', array('id' => '906', 'parent' => '904'));
+  	$this->db->where('url', 'laporan_dukcapil/lahir')->update('setting_modul', array('id' => '907', 'parent' => '904'));
+  	$this->db->where('url', 'laporan_dukcapil/mati')->update('setting_modul', array('id' => '908', 'parent' => '904'));
+  	$this->db->where('url', 'dokumen_sekretariat/index/4
+')->update('setting_modul', array('id' => '909', 'parent' => '15'));
+
   	$this->migrasi_1806_ke_1807();
 		$this->migrasi_1808_ke_1809();
 		$this->migrasi_1809_ke_1810();
