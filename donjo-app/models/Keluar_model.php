@@ -96,14 +96,13 @@
 
 	private function list_data_sql()
 	{
+		// tweb_penduduk 20.08
 		//change to nik candra
 		$sql = " FROM log_surat u
 			LEFT JOIN tweb_biodata_penduduk n ON u.id_pend = n.nik
 			LEFT JOIN tweb_surat_format k ON u.id_format_surat = k.id
 			LEFT JOIN tweb_desa_pamong s ON u.id_pamong = s.pamong_id
 			LEFT JOIN tweb_biodata_penduduk p ON s.id_pend = p.nik
-			//opensid-v19.01
-			//LEFT JOIN tweb_penduduk p ON s.id_pend = p.id
 			LEFT JOIN user w ON u.id_user = w.id
 			WHERE 1 ";
 		$sql .= $this->search_sql();
