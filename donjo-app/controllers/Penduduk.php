@@ -40,11 +40,11 @@ class Penduduk extends Admin_Controller {
 		foreach ($this->_list_session as $list)
 		{
 			if (in_array($list, ['dusun', 'rw', 'rt']))
-				$$list = $this->session->$list;
+				$list = $this->session->$list;
 			else
 				$data[$list] = $this->session->$list ?: '';
 		}
-
+		
 		if (isset($dusun))
 		{
 			$data['dusun'] = $dusun;
@@ -69,7 +69,7 @@ class Penduduk extends Admin_Controller {
 		$per_page = $this->input->post('per_page');
 		if (isset($per_page))
 			$this->session->per_page = $per_page;
-
+		
 		$data['func'] = 'index';
 		$data['set_page'] = $this->_set_page;
 		$data['paging'] = $this->penduduk_model->paging($p, $o);
@@ -86,6 +86,7 @@ class Penduduk extends Admin_Controller {
 		$this->load->view('footer');
 	}
 
+	
 	public function validasi($p = 1, $o = 0) {
 		$desa = $this->get_data_desa();
 		$kodeProp = intval($desa['kode_propinsi']);
@@ -137,6 +138,7 @@ class Penduduk extends Admin_Controller {
 		$this->load->view('sid/kependudukan/validasi_penduduk', $data);
 		$this->load->view('footer');
 	}
+
 	public function form($p = 1, $o = 0, $id = '')
 	{
 		// Reset kalau dipanggil dari luar pertama kali ($_POST kosong)
@@ -795,4 +797,5 @@ class Penduduk extends Admin_Controller {
 		$data = $this->penduduk_model->autocomplete($this->input->post('cari'));
 		echo json_encode($data);
 	}
+	
 }
