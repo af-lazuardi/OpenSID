@@ -46,7 +46,8 @@ class Migrasi_1907_ke_1908 extends CI_model {
 		}
 		// Setting nilai default supaya tidak error pada strict mode
 		$fields = array();
-		$fields['id_kepala'] = array('type' => 'INT', 'constraint' => 11, 'null' => TRUE, 'default' => NULL);
+		//untuk kulonprogo id_kepala jangan dirubah tipenya
+		//$fields['id_kepala'] = array('type' => 'INT', 'constraint' => 11, 'null' => TRUE, 'default' => NULL);
 		$fields['lat'] = array('type' => 'VARCHAR', 'constraint' => 20, 'null' => TRUE, 'default' => NULL);
 		$fields['lng'] = array('type' => 'VARCHAR', 'constraint' => 20, 'null' => TRUE, 'default' => NULL);
 		$fields['zoom'] = array('type' => 'INT', 'null' => TRUE, 'default' => NULL);

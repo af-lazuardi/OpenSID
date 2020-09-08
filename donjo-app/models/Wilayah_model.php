@@ -41,10 +41,9 @@
 
 	private function list_data_sql()
 	{
-		// kpv20.06
-		// LEFT JOIN tweb_wil_pamong a ON u.id_kepala = a.nik
+		//opensid 20.08 LEFT JOIN penduduk_hidup a
 		$sql = " FROM tweb_wil_clusterdesa u
-			LEFT JOIN penduduk_hidup a ON u.id_kepala = a.id
+			LEFT JOIN tweb_wil_pamong a ON u.id_kepala = a.nik
 			WHERE u.rt = '0' AND u.rw = '0'  ";
 		$sql .= $this->search_sql();
 		return $sql;
