@@ -33,9 +33,9 @@
 								</div>
 							</div>
 							<div class="form-group">
-								<label for="keterangan"  class="col-sm-3 control-label">Keterangan</label>
+								<label for="lokasi"  class="col-sm-3 control-label">Lokasi Usaha</label>
 								<div class="col-sm-8">
-									<textarea name="keterangan" class="form-control input-sm required" placeholder="Keterangan"></textarea>
+									<textarea name="lokasi" class="form-control input-sm required" placeholder="Lokasi Usaha"></textarea>
 								</div>
 							</div>
 							<?php include("donjo-app/views/surat/form/tgl_berlaku.php"); ?>

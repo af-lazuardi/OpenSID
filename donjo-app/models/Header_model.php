@@ -10,7 +10,7 @@ class Header_model extends CI_Model {
 	// Data penduduk yang digunakan untuk ditampilkan di Widget halaman dashbord (Home SID)
 	public function penduduk_total()
 	{
-		$sql = "SELECT COUNT(id) AS jumlah FROM tweb_biodata_penduduk";
+		$sql = "SELECT COUNT(id) AS jumlah FROM tweb_penduduk";
 		$query = $this->db->query($sql);
 		$data = $query->result_array();
 		return $data;

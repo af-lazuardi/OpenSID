@@ -1,0 +1,1 @@
+<img src="<?php echo base_url(); ?>desa/kop/KOP.jpg" style="width: 100%;">

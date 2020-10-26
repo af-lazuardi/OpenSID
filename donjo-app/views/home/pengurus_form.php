@@ -46,7 +46,6 @@
 				</div>
 			</div>
 			<form id="validasi" action="<?=$form_action?>" method="POST" enctype="multipart/form-data"  class="form-horizontal">
-				<input type="hidden" name="id_pend" value="<?= $individu['id']?>">
 				<div class="col-md-3">
 					<div class="box box-primary">
 						<div class="box-body box-profile">
@@ -125,8 +124,8 @@
 									<input class="form-control input-sm pengurus-desa" type="text" placeholder="Jenis Kelamin" value="<?= $individu['jenis_klmin']?>" readonly="true"></input>
 									<select class="form-control input-sm pengurus-luar-desa" name="pamong_sex" onchange="show_hide_hamil($(this).find(':selected').val());" style="display: none;">
 										<option value="">Jenis Kelamin</option>
-										<option value="LAKI-LAKI" <?php selected($pamong['pamong_sex'], '1'); ?> >Laki-Laki</option>
-										<option value="PEREMPUAN" <?php selected($pamong['pamong_sex'], '2'); ?> >Perempuan</option>
+										<option value="1" <?php selected($pamong['pamong_sex'], '1'); ?> >Laki-Laki</option>
+										<option value="2" <?php selected($pamong['pamong_sex'], '2'); ?> >Perempuan</option>
 									</select>
 								</div>
 							</div>
@@ -137,7 +136,7 @@
 									<select class="form-control input-sm pengurus-luar-desa" name="pamong_pendidikan" style="display: none;">
 										<option value="">Pilih Pendidikan (Dalam KK) </option>
 										<?php foreach ($pendidikan_kk as $data): ?>
-											<option value="<?= strtoupper($data['nama'])?>" <?php selected($pamong['pamong_pendidikan'], $data['id']); ?>><?= strtoupper($data['nama'])?></option>
+											<option value="<?= strtoupper($data['id'])?>" <?php selected($pamong['pamong_pendidikan'], $data['id']); ?>><?= strtoupper($data['nama'])?></option>
 										<?php endforeach?>
 									</select>
 								</div>
@@ -149,7 +148,7 @@
 									<select class="form-control input-sm pengurus-luar-desa" name="pamong_agama" style="display: none;">
 										<option value="">Pilih Agama</option>
 										<?php foreach ($agama as $data): ?>
-											<option value="<?= strtoupper($data['nama'])?>" <?php selected($pamong['pamong_agama'], $data['id']); ?>><?= strtoupper($data['nama'])?></option>
+											<option value="<?= strtoupper($data['id'])?>" <?php selected($pamong['pamong_agama'], $data['id']); ?>><?= strtoupper($data['nama'])?></option>
 										<?php endforeach;?>
 									</select>
 								</div>
@@ -217,6 +216,7 @@
 										<input id="group2" type="radio" name="pamong_status" class="form-check-input" type="radio" value="2" <?php if ($pamong['pamong_status'] == '2'): ?>checked<?php endif ?> autocomplete="off"> Tidak Aktif
 									</label>
 								</div>
+								<input name="id_penduduk" class="form-control input-sm" type="hidden" value="<?= $pamong['id_pend']?>" ></input>
 							</div>
 						</div>
 						<div class='box-footer'>

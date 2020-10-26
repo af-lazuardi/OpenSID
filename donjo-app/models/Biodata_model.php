@@ -205,14 +205,14 @@ $this->save_biodata($xbiodata);
     public function countRow($no_kk){
         $this->db->select('count(nik) as jumlah');
         $this->db->where('no_kk', $no_kk);
-        $hasil=$this->db->get('tweb_biodata_penduduk');
+        $hasil=$this->db->get('tweb_penduduk');
         return $hasil;
     }
 
    	public function get_kk($nik){
-       $this->db->select("no_kk");
+       $this->db->select("id_kk");
        $this->db->where('nik', $nik);
-       $query=$this->db->get('tweb_biodata_penduduk');
+       $query=$this->db->get('tweb_penduduk');
        if ($query->num_rows() > 0) {
          return $query->row()->no_kk;
      }
@@ -221,7 +221,7 @@ $this->save_biodata($xbiodata);
 
     public  function get_individu($nik){
             $this->db->select('*');
-            $this->db->from('tweb_biodata_penduduk');
+            $this->db->from('tweb_penduduk');
             $this->db->where('nik', $nik);
             return $this->db->get();
     }
@@ -274,22 +274,22 @@ $this->save_biodata($xbiodata);
 
 
 	public function save_biodata($biodata=0) {
-		$log_id = $this->db->select('nik')->from('tweb_biodata_penduduk')->
+		$log_id = $this->db->select('nik')->from('tweb_penduduk')->
 				where('nik', $biodata['nik'])->
 				limit(1)->get()->row()->nik;
 			
 		if($log_id) {
 			$this->db->where('nik', $log_id);
-			$this->db->update('tweb_biodata_penduduk',$biodata);
+			$this->db->update('tweb_penduduk',$biodata);
 		} else {
-			$this->db->insert('tweb_biodata_penduduk',$biodata);
+			$this->db->insert('tweb_penduduk',$biodata);
 		}
 
 	}
 
 	public function delete($id='')
 	{
-		$sql = "DELETE FROM tweb_biodata_penduduk WHERE nik = ?";
+		$sql = "DELETE FROM tweb_penduduk WHERE nik = ?";
 		$outp = $this->db->query($sql, array($id));
 
 		if ($outp) $_SESSION['success'] = 1;
@@ -304,7 +304,7 @@ $this->save_biodata($xbiodata);
 		{
 			foreach ($id_cb as $id)
 			{
-				$sql = "DELETE FROM tweb_biodata_penduduk WHERE nik = ?";
+				$sql = "DELETE FROM tweb_penduduk WHERE nik = ?";
 				$outp = $this->db->query($sql, array($id));
 			}
 		}

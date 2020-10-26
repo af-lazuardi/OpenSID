@@ -51,14 +51,14 @@ class First extends Web_Controller {
 		parent::__construct();
 		session_start();
 		$this->load->helper(array('form', 'url','download'));
-		$ip = $this->getRealIpAddr();
-		$data_stat = array(
-			"desa_id"=>$this->db->database,
-			"ip_addres"=>$ip,
-			"tgl"=>date('Y-m-d'),
-			"hits"=>1
-		);
-		cpost('statistik', $data_stat);
+		// $ip = $this->getRealIpAddr();
+		// $data_stat = array(
+		// 	"desa_id"=>$this->db->database,
+		// 	"ip_addres"=>$ip,
+		// 	"tgl"=>date('Y-m-d'),
+		// 	"hits"=>1
+		// );
+		// cpost('statistik', $data_stat);
 
 		// Jika offline_mode dalam level yang menyembunyikan website,
 		// tidak perlu menampilkan halaman website
@@ -143,6 +143,14 @@ class First extends Web_Controller {
 		redirect('first');
 	}
 
+	public function get_penduduk_raw($nik)
+	{
+		$data = get_penduduk_raw($nik);
+
+		j($data);
+		exit;
+	}
+
 	public function index($p=1)
 	{
 		$data = $this->includes;
@@ -157,14 +165,14 @@ class First extends Web_Controller {
 		$data['artikel'] = $this->first_artikel_m->artikel_show($data['paging']->offset, $data['paging']->per_page);
 		$data['headline'] = $this->first_artikel_m->get_headline();
 		$data['cari'] = htmlentities($this->input->get('cari'));
-		if ($this->setting->covid_rss)
-		{
-			$data['feed'] = array(
-				'items' => $this->first_artikel_m->get_feed(),
-				'title' => 'BERITA COVID19.GO.ID',
-				'url' => 'https://www.covid19.go.id'
-			);
-		}
+		// if ($this->setting->covid_rss)
+		// {
+		// 	$data['feed'] = array(
+		// 		'items' => $this->first_artikel_m->get_feed(),
+		// 		'title' => 'BERITA COVID19.GO.ID',
+		// 		'url' => 'https://www.covid19.go.id'
+		// 	);
+		// }
 
 		if ($this->setting->apbdes_footer)
 		{
@@ -356,13 +364,8 @@ class First extends Web_Controller {
 	}
 
 	/*
-<<<<<<< HEAD
 		Artikel bisa ditampilkan menggunakan parameter pertama sebagai id, dan semua parameter lainnya dikosongkan. Url first/artikel/:id
 		Kalau menggunakan slug, dipanggil menggunakan url first/artikel/:thn/:bln/:hri/:slug
-=======
-	| Artikel bisa ditampilkan menggunakan parameter pertama sebagai id, dan semua parameter lainnya dikosongkan. url artikel/:id
-	| Kalau menggunakan slug, dipanggil menggunakan url artikel/:thn/:bln/:hri/:slug
->>>>>>> opensid-v20.06
 	*/
 	public function artikel($url)
 	{
@@ -763,6 +766,7 @@ class First extends Web_Controller {
 			redirect("first/artikel/".$data['thn']."/".$data['bln']."/".$data['hri']."/".$data['slug']."#kolom-komentar");
 
 		}
+	}
 
 	private function _get_common_data(&$data)
 	{

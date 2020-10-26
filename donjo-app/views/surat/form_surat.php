@@ -8,14 +8,18 @@
 *
  -->
 <?php
-	$nama_surat = $url;
+  $nama_surat = $url;
   $form_surat = LOKASI_SURAT_DESA . $nama_surat . "/" . $nama_surat . ".php";
-  if (is_file($form_surat))
-    include($form_surat);
-  elseif (is_file(LOKASI_SURAT_FORM_DESA . $nama_surat . ".php"))
-	  include(LOKASI_SURAT_FORM_DESA . $nama_surat . ".php");
-	else
-	  include("template-surat/$nama_surat/$nama_surat.php");
+
+  if (is_file($form_surat)) {
+    $includee = $form_surat;
+  } else if (is_file(LOKASI_SURAT_FORM_DESA . $nama_surat . ".php")) {
+    $includee = LOKASI_SURAT_FORM_DESA . $nama_surat . ".php";
+  } else {
+    $includee = "./template-surat/$nama_surat/$nama_surat.php";
+  }
+
+  include($includee);
 ?>
 <textarea id="isian_form" hidden="hidden"><?= $isian_form?></textarea>
 
@@ -49,4 +53,3 @@
     });
   }
 </script>
-

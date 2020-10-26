@@ -43,7 +43,7 @@
 	{
 		//opensid 20.08 LEFT JOIN penduduk_hidup a
 		$sql = " FROM tweb_wil_clusterdesa u
-			LEFT JOIN tweb_wil_pamong a ON u.id_kepala = a.nik
+			LEFT JOIN tweb_penduduk a ON u.id_kepala = a.id
 			WHERE u.rt = '0' AND u.rw = '0'  ";
 		$sql .= $this->search_sql();
 		return $sql;

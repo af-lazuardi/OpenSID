@@ -71,7 +71,7 @@ class Keluarga extends Admin_Controller {
 		$data['main'] = $this->keluarga_model->list_data($o, $data['paging']->offset, $data['paging']->per_page);
 		$data['list_sex'] = $this->referensi_model->list_data('tweb_penduduk_sex');
 		$data['list_dusun'] = $this->penduduk_model->list_dusun();
-		$this->_header['minsidebar'] = 1;
+		$this->_header['minsidebar'] = 0;
 
 		$this->load->view('header', $this->_header);
 		$this->load->view('nav');

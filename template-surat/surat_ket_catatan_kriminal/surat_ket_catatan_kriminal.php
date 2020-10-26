@@ -27,9 +27,15 @@
 							<?php	endif; ?>
 							<?php include("donjo-app/views/surat/form/nomor_surat.php"); ?>
 							<div class="form-group">
-								<label for="keterangan"  class="col-sm-3 control-label">Keperluan</label>
+								<label for="keterangan"  class="col-sm-3 control-label">Pelanggaran Hukum</label>
+								<div class="col-sm-4">
+									<?=form_dropdown('pelanggaran_hukum', ['Belum Pernah'=>'Belum Pernah', 'Pernah'=>'Pernah'], '', 'class="form-control input-sm required"');?>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="kasus_hukum"  class="col-sm-3 control-label">Kasus Hukum</label>
 								<div class="col-sm-8">
-									<textarea  id="keterangan" class="form-control input-sm required" placeholder="Keperluan" name="keterangan"></textarea>
+									<textarea  id="kasus_hukum" class="form-control input-sm" placeholder="Diisi apabila pernah berurusan dalam kasus hukum jika tidak pernah mohon dikosongkan" name="kasus_hukum"></textarea>
 								</div>
 							</div>
 							<?php include("donjo-app/views/surat/form/_pamong.php"); ?>

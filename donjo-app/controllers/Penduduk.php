@@ -78,7 +78,7 @@ class Penduduk extends Admin_Controller {
 		$data['list_status_dasar'] = $this->referensi_model->list_data('tweb_status_dasar');
 		$data['list_status_penduduk'] = $this->referensi_model->list_data('tweb_penduduk_status');
 		$data['list_jenis_kelamin'] = $this->referensi_model->list_data('tweb_penduduk_sex');
-		$this->_header['minsidebar'] = 1;
+		$this->_header['minsidebar'] = 0;
 
 		$this->load->view('header', $this->_header);
 		$this->load->view('nav');
@@ -97,10 +97,13 @@ class Penduduk extends Admin_Controller {
 
 		$nav['act'] = 2;
 		$nav['act_sub'] = 21;
-		$header['minsidebar'] = 1;
+		$header['minsidebar'] = 0;
 
-		if (!empty($_POST['nik']))
-		{
+		if (!empty($_POST['nik'])) {
+			$nik = $this->input->post('nik');
+			$foto = get_foto($nik);
+
+			exit;
 
 			$data['individu'] = $this->biodata_model->get_penduduk($_POST['nik']);
 			$data['photo'] = $this->biodata_model->get_photo($_POST['nik']);

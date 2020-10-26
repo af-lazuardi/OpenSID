@@ -45,7 +45,7 @@ class Kelompok extends Admin_Controller {
 		$data['keyword'] = $this->kelompok_model->autocomplete();
 		$data['list_master'] = $this->kelompok_model->list_master();
 		$header = $this->header_model->get_data();
-		$header['minsidebar'] = 1;
+		$header['minsidebar'] = 0;
 
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);

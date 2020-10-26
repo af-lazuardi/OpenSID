@@ -188,7 +188,7 @@
 																			</div>
 																		</div>
 																	</td>
-																	<td><a href="<?= site_url("keluarga/kartu_keluarga/$p/$o/$data[id]")?>"><?= $data['no_kk']?></a></td>
+																	<td><a href="<?= site_url("keluarga/kartu_keluarga/$p/$o/$data[id]")?>"><?= $data['id_kk']?></a></td>
 																	<td nowrap><?= strtoupper($data['kepala_kk'])?></td>
 																	<td><a href="<?= site_url("penduduk/detail/1/0/$data[id_pend]")?>"><?= strtoupper($data['nik'])?></a></td>
 																	<td><?= $data['tag_id_card']?></td>

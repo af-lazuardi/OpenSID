@@ -185,6 +185,11 @@
 		$('#jenis_kepindahan_id').trigger('onchange');
 	}
 </script>
+
+
+
+
+
 <div class="content-wrapper">
 	<?php $this->load->view("surat/form/breadcrumb.php"); ?>
 	<section class="content">
@@ -206,7 +211,7 @@
 							<div class="row jar_form">
 								<label for="nomor" class="col-sm-3"></label>
 								<div class="col-sm-8">
-									<input class="required" type="hidden" name="nik" value="<?= $individu['id']?>">
+									<input class="required" type="hidden" id="nik" name="nik" value="<?= $individu['id']?>">
 								</div>
 							</div>
 							<input id="kode_format" type="hidden" name="kode_format" value="bukan_f108">
@@ -349,47 +354,32 @@
 								<label for="pengikut"  class="col-sm-3 control-label">Pengikut</label>
 								<div class="col-sm-8">
 									<div class="table-responsive">
-										<table class="table table-bordered dataTable table-hover nowrap">
-											<thead class="bg-gray disabled color-palette">
+										<table class="table table-bordered nowrap">
+											<thead>
 												<tr>
-													<th>&nbsp;</th>
-													<th>No</th>
-													<th>NIK</th>
-													<th>KTP Berlaku S/D</th>
-													<th>Nama</th>
-													<th>Jenis Kelamin</th>
-													<th>Umur</th>
-													<th>Status Kawin</th>
+													<th colspan="6">
+														<label for="">Masukkan NIK Pengikut</label>
+														<div class="input-group">
+															<input type="text" name="cari_nik" id="cari_nik_input" class="form-control input-sm">
+
+															<span class="input-group-btn">
+																<button class="btn btn-primary btn-sm" type="button" id="tb_cari_nik" ><i class="fa fa-check"></i> Cari NIK</button>
+															</span>
+														</div>
+													</th>
+												</tr>
+												<tr>
+													<th width="20%">NIK</th>
+													<th width="20%">KTP Berlaku S/D</th>
+													<th width="30%">Nama</th>
+													<th width="10%">Jenis Kelamin</th>
+													<th width="10%">Umur</th>
+													<th width="10%">Status Kawin</th>
 												</tr>
 											</thead>
-											<tbody>
-												<?php if ($anggota!=NULL): ?>
-													<input id='jumlah_anggota' type='hidden' disabled='disabled' value="<?= count($anggota);?>">
-													<?php $i=0;?>
-													<?php foreach ($anggota AS $data): $i++;?>
-														<tr>
-															<td>
-															<?php if ($data['kk_level']=="1"): ?>
-																<input id='kk' type="hidden" name="id_cb[]" value="'<?= $data['id']?>'"/>
-																<input id='kk_show' disabled='disabled' type="checkbox" onchange="urus_masa_ktp($(this).is(':unchecked'),'<?= $i;?>');"/>
-															<?php else: ?>
-																<input id='anggota<?= $i?>' type="hidden" name="id_cb[]" disabled="disabled" value="'<?= $data['id']?>'"/>
-																<input id='anggota_show<?= $i?>' type="checkbox" value="'<?= $data['nik']?>'" onchange="urus_masa_ktp($(this).is(':unchecked'),'<?= $i;?>');"/>
-															<?php endif; ?>
-															</td>
-															<td><?= $i?></td>
-															<td><?= $data['nik']?></td>
-															<td>
-																<input id="ktp_berlaku<?= ($i)?>" type="hidden" name="ktp_berlaku[]" type="text" value="Seumur Hidup"/>
-																<input disabled="disabled" type="text" value="Seumur Hidup" class="inputbox" size="20"/>
-															</td>
-															<td><?= $data['nama']?></td>
-															<td><?= $data['sex']?></td>
-															<td><?= $data['umur']?></td>
-															<td><?= $data['status_kawin']?></td>
-														</tr>
-													<?php endforeach;?>
-												<?php endif; ?>
+											<tbody id="tbl_anggota_row">
+												
+												
 											</tbody>
 										</table>
 									</div>
@@ -421,3 +411,76 @@
 		</div>
 	</section>
 </div>
+
+
+
+<script type="text/javascript">
+	
+	function _calculateAge(time){
+		    var date_array = time.split('-');
+			var today = new Date();
+			var birthDate = new Date(date_array[0],date_array[1],date_array[2]);
+			var age = today.getFullYear() - birthDate.getFullYear();
+			// var m = today.getMonth() - birthDate.getMonth();
+			// if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+			// age--;
+			// }
+			return age;
+	}
+
+	document.getElementById('tb_cari_nik').addEventListener('click', function() {
+
+    	let nik_pengikut = document.getElementById('cari_nik_input').value;
+    	let nik_utama = document.getElementById('nik_didapatkan').value;
+
+    	if (nik_utama != '') {
+	    	if (nik_pengikut != '') {
+	    		if (nik_pengikut.length == 16) {
+					$.ajax({
+					    type: "POST",
+					    data: {nik: nik_pengikut},
+					    url: "<?=base_url('index.php/surat/cari_nik/');?>"+nik_pengikut,
+					    beforeSend: function(){
+					        $("#cari_nik_input").attr("disabled", true);
+					    },
+					    success: function(r, textStatus, jqXHR) {   
+					        $("#cari_nik_input").attr("disabled", false);
+					        if (!(r)) {
+					            alert("NIK tidak ditemukan..");
+					        } else {
+
+					        	let htm = '<tr>'+
+									'<td><input type="text" name="pengikut_nik[]" value="'+r.detil_nik.NIK+'" class="form-control input-sm" readonly></td>'+
+									'<td><input type="text" name="pengikut_berlaku_ktp[]" value="" class="form-control input-sm"></td>'+
+									'<td><input type="text" name="pengikut_nama[]" value="'+r.detil_nik.NAMA_LGKP+'" class="form-control input-sm" readonly></td>'+
+									'<td><input type="text" name="pengikut_jk[]" value="'+r.detil_nik.JENIS_KLMIN+'" class="form-control input-sm" readonly></td>'+
+									'<td><input type="text" name="pengikut_umur[]" value="'+r.detil_nik.usia_tahun+'" class="form-control input-sm" readonly></td>'+
+									'<td><input type="text" name="pengikut_status_kawin[]" value="'+r.detil_nik.STATUS_KAWIN+'" class="form-control input-sm" readonly></td>'+
+								'</tr>';
+
+
+					        	$("#tbl_anggota_row").append(htm);
+					        }
+					    },
+					    error: function(xhr) {
+					        $("#cari_nik_input").attr("disabled", false);
+					        console.log(xhr)
+					    }
+					});
+				} else {
+					alert('NIK Harus 16 digit...!');
+					$("#cari_nik_input").focus();
+				}
+			} else {
+				alert('Masukkan NIK Pengikut..!');
+				$("#cari_nik_input").focus();
+			}
+		} else {
+			alert('Masukkan NIK Pemohon pindah...!');
+			$("#nik_didapatkan").focus();
+		}
+		
+		return false;
+    });
+
+</script>

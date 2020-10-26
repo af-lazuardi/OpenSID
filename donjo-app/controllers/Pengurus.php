@@ -45,7 +45,7 @@ class Pengurus extends Admin_Controller {
 		$data['paging'] = $this->pamong_model->paging($p);
 		$data['main'] = $this->pamong_model->list_data($data['paging']->offset, $data['paging']->per_page);
 		$data['keyword'] = $this->pamong_model->autocomplete();
-		$this->_header['minsidebar'] = 1;
+		$this->_header['minsidebar'] = 0;
 
 		$this->load->view('header', $this->_header);
 		$this->load->view('nav');
@@ -66,7 +66,7 @@ class Pengurus extends Admin_Controller {
 		if ($id)
 		{
 			$data['pamong'] = $this->pamong_model->get_data($id);
-			if (!isset($id_pend)) $id_pend = $data['pamong']['id_pend'];
+			if (!isset($_POST['id_pend'])) $_POST['id_pend'] = $data['pamong']['id_pend'];
 			$data['form_action'] = site_url("pengurus/update/$id");
 		}
 		else
@@ -120,6 +120,7 @@ class Pengurus extends Admin_Controller {
 		$data['p_jabatan'] = array(
 			""=>" - ",
 			"Lurah"=>"Lurah",
+			"PJ Lurah"=>"PJ Lurah",
 			"Carik"=>"Carik",
 			"Jogobyo"=>"Jogoboyo",
 			"Kamituwa"=>"Kamituwa",
@@ -148,13 +149,13 @@ class Pengurus extends Admin_Controller {
 
 	public function insert()
 	{
-		$this->pamong_model->insert();
+		$this->pamong_model->insert();//echo $this->db->last_query(); exit();
 		redirect('pengurus');
 	}
 
 	public function update($id = 0)
 	{
-		$this->pamong_model->update($id);
+		$this->pamong_model->update($id); //echo $this->db->last_query(); exit();
 		redirect('pengurus');
 	}
 

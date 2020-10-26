@@ -5,9 +5,6 @@ class Surat extends Admin_Controller {
 	public function __construct()
 	{
 		parent::__construct();
-		session_start();
-		$this->load->helper(array('url','download'));
-		$this->load->model('biodata_model');
 		$this->load->model('header_model');
 		$this->load->model('penduduk_model');
 		$this->load->model('keluarga_model');
@@ -59,6 +56,13 @@ class Surat extends Admin_Controller {
 		$this->load->view('footer');
 	}
 
+	public function cari_nik($nik) {
+		$get_penduduk = get_penduduk($nik);
+
+		j($get_penduduk);
+		exit;
+	}
+
 	public function form($url = '', $clear = '')
 	{
 		$desa = $this->get_data_desa();
@@ -69,57 +73,87 @@ class Surat extends Admin_Controller {
 
 		$data['url'] = $url;
 		$data['anchor'] = $this->input->post('anchor');
-		$nik = $_POST['id'];
-		$no_kk = $this->biodata_model->get_kk($nik);
-		$data['jumlah'] = $this->biodata_model->countRow($no_kk);
+		$data['individu'] = NULL;
+		$data['anggota'] = NULL;
+		$data['kepala_kk'] = NULL;
+
 		if (!empty($_POST['nik']))
 		{
-			$nik = $_POST['nik'];
+			$get_data_individu = $this->surat_model->get_penduduk($_POST['nik']);
 
-			$data['individu'] = $this->biodata_model->get_penduduk($_POST['nik']);
-			$data['anggota'] = $this->biodata_model->get_kartu_keluarga($_POST['nik']);
-
-
-			if($data['individu']['nik'] == NULL) {
-				$data['individu']['status_data'] = "Data Tidak ditemukan";
+			if (empty($get_data_individu)) {
+				$data['individu'] = [
+					'status_data'=> '',
+					'nama'=> ' - tidak ditemukan - ',
+					'tempatlahir'=> ' - tidak ditemukan - ',
+					'tanggallahir'=> ' - tidak ditemukan - ',
+					'umur'=> ' - tidak ditemukan - ',
+					'alamat_wilayah'=> ' - tidak ditemukan - ',
+					'pendidikan'=> ' - tidak ditemukan - ',
+					'warganegara'=> ' - tidak ditemukan - ',
+					'agama'=> ' - tidak ditemukan - ',
+					'id'=> ' - tidak ditemukan - ',
+					'no_kk'=> ' - tidak ditemukan - ',
+					'eksis'=> $_POST['nik'],
+				];
 			} else {
-				if(
-					$data['individu']['no_prop'] == $kodeProp
-					&& $data['individu']['no_kab'] == $kodeKab
-					&& $data['individu']['no_kec'] == $kodeKec
-					&& $data['individu']['no_kel'] == $kodeKel
-				) {
-					$this->biodata_model->save_biodata($data['individu']);
-				        //$this->biodata_model->save_biodata($data['anggota']);
+				$data['individu'] = $get_data_individu;
+				$data['individu']['eksis'] = $_POST['nik'];
+			}
+
+		}
+
+		if (!empty($_POST['nik_kk']))
+		{
+			$get_data_kepala_kk = $this->surat_model->get_penduduk($_POST['nik_kk']);
+
+			if (empty($get_data_kepala_kk)) {
+				$data['kepala_kk'] = [
+					'status_data'=> '',
+					'nama'=> ' - tidak ditemukan - ',
+					'tempatlahir'=> ' - tidak ditemukan - ',
+					'tanggallahir'=> ' - tidak ditemukan - ',
+					'umur'=> ' - tidak ditemukan - ',
+					'alamat_wilayah'=> ' - tidak ditemukan - ',
+					'pendidikan'=> ' - tidak ditemukan - ',
+					'warganegara'=> ' - tidak ditemukan - ',
+					'agama'=> ' - tidak ditemukan - ',
+					'id'=> ' - tidak ditemukan - ',
+					'no_kk'=> ' - tidak ditemukan - ',
+					'eksis'=> $_POST['nik_kk'],
+				];
+			} else {
+				if ($get_data_kepala_kk['no_kk'] != $data['individu']['no_kk']) {
+					$data['kepala_kk'] = [
+						'status_data'=> '',
+						'nama'=> ' - No KK tidak sama - ',
+						'tempatlahir'=> ' - No KK tidak sama - ',
+						'tanggallahir'=> ' - No KK tidak sama - ',
+						'umur'=> ' - No KK tidak sama - ',
+						'alamat_wilayah'=> ' - No KK tidak sama - ',
+						'pendidikan'=> ' - No KK tidak sama - ',
+						'warganegara'=> ' - No KK tidak sama - ',
+						'agama'=> ' - No KK tidak sama - ',
+						'id'=> ' - No KK tidak sama - ',
+						'no_kk'=> ' - No KK tidak sama - ',
+						'eksis'=> $_POST['nik_kk'],
+					];
 				} else {
-					if($url == 'surat_ket_domisili'){
-						$this->biodata_model->save_biodata($data['individu']);
-					}else{
-						$data['individu']['status_data'] = "Mohon Maaf Biodata Penduduk desa ".$data['individu']['kel_name'];
-					}
+					$data['kepala_kk'] = $get_data_kepala_kk;
+					$data['kepala_kk']['eksis'] = $_POST['nik_kk'];
 				}
 			}
 
-			$data['individu']['alamat_wilayah']= $data['individu']['alamat'];
+			// $data['kepala_kk'] = $this->surat_model->get_penduduk($_POST['nik_kk']);
+		} 
 
-
-		}
-		else
-		{
-			$data['individu'] = NULL;
-			$data['anggota'] = NULL;
-		}
-
-		//var_dump($data['anggota']);
-	//	exit;
+		
 		$this->get_data_untuk_form($url, $data);
 
 		$data['surat_url'] = rtrim($_SERVER['REQUEST_URI'], "/clear");
-		//kp v20.02
-		//$data['form_action'] = site_url("surat/save_surat/$url");
-		$data['form_action'] = site_url("surat/doc/$url");
+		$data['form_action'] = site_url("surat/doc_kp/$url");
 		$header = $this->header_model->get_data();
-		$header['minsidebar'] = 1;
+		$header['minsidebar'] = 0;
 
 		$this->load->view('header', $header);
 		$this->load->view('nav', $nav);
@@ -139,6 +173,12 @@ class Surat extends Admin_Controller {
 	public function doc($url = '')
 	{
 		$this->cetak_doc($url);
+	}
+
+	public function doc_kp($url = '')
+	{
+		$this->cetak_doc_kp($url);
+		
 	}
 
 	private function cetak_doc($url)
@@ -221,6 +261,54 @@ class Surat extends Admin_Controller {
 			header($this->security->get_csrf_token_name().':'.$this->security->get_csrf_hash());
 			header("location:".base_url(LOKASI_ARSIP.$nama_surat));
 		}
+	}
+
+	private function cetak_doc_kp($url)
+	{
+		$format = $this->surat_model->get_surat($url);
+		$log_surat['url_surat'] = $format['id'];
+		$log_surat['id_pamong'] = $_POST['pamong_id'];
+		$log_surat['id_user'] = $_SESSION['user'];
+		$log_surat['no_surat'] = $_POST['nomor'];
+		$id = $_POST['nik'];
+		$keperluan = $_POST['keperluan'];
+		$keterangan = $_POST['keterangan'];
+
+		if ($id)
+		{
+			$get_id_penduduk = $this->db->select('id')->where('nik', $id)->get('tweb_penduduk')
+					->row()->id;
+			$log_surat['id_pend'] = $get_id_penduduk;
+			$nik = $id;
+		}
+
+
+		$log_surat['keterangan'] = $keterangan ? $keterangan : $keperluan;
+		$nama_surat = $this->keluar_model->nama_surat_arsip($url, $nik, $_POST['nomor']);
+		$lampiran = '';
+		$buat_surat = $this->surat_model->buat_surat($url, $nama_surat, $lampiran);
+		$log_surat['nama_surat'] = $nama_surat;
+		$log_surat['lampiran'] = $lampiran;
+		$log_surat['detil'] = json_encode($this->input->post());
+		$q_log_surat = $this->keluar_model->log_surat($log_surat);
+
+
+		$data = $buat_surat;
+		$data['url'] = $url;
+		$data['data'] = $buat_surat['individu'];
+		$data['desa'] = $buat_surat['config'];
+		$data['tanggal_sekarang'] = tgl_indo2(date('Y-m-d'));
+
+		$no_kk = $buat_surat['individu']['no_kk'];
+		$this->db->where('no_kk', $no_kk);
+		$this->db->select('nik_kepala');
+		$get_kepala_kk = $this->db->get('tweb_keluarga')->row()->nik_kepala;
+		$data['kepalakk'] = $this->surat_model->get_detil_penduduk($get_kepala_kk);
+
+		// j($buat_surat);
+		// exit;
+
+		$this->load->view("surat/print_surat", $data);
 	}
 
 	public function nomor_surat_duplikat()

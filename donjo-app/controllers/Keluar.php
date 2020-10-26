@@ -215,42 +215,85 @@ class Keluar extends Admin_Controller {
   }
 
 	public function surat_keluar_cetak($id) {
+		// get detil log
 		$this->db->where("a.id", $id);
 		$this->db->join("tweb_surat_format AS b", "a.id_format_surat = b.id");
 		$detil_log = $this->db->get("log_surat AS a")->row_array();
 
-		$tampil = $this->db->get_where('log_surat',['id'=> $id])->row();
-		$result = json_decode($tampil->detail);
-		$nik= $result->pengikut;
+		$detil_isi_surat = json_decode($detil_log['detil']);
 
-		// print_r(json_decode($tampil->detail));
+		$url = $detil_log['url_surat'];
 
-		$no_kk = $this->biodata_model->get_kk($nik);
-		// echo $this->db->last_query();
-		$data['jumlah'] = $this->biodata_model->countRow($no_kk);
-		$data['penduduk'] = $this->biodata_model->get_individu($nik)->result_array();
+		// ambil sama dari controller surat
+		$format = $this->surat_model->get_surat($url);
+		$log_surat['url_surat'] = $format['id'];
+		$log_surat['id_pamong'] = $detil_log['id_pamong'];
+		$log_surat['id_user'] = $_SESSION['user'];
+		$log_surat['no_surat'] = $detil_log['no_surat'];
+		$id = $detil_log['id_pend'];
+		// $keperluan = $detil_isi_surat['keperluan'];
+		// $keterangan = $_POST['keterangan'];
 
-		$data['data'] = $this->surat_model->get_data_pribadi($detil_log['id_pend']);
-
-
-		$data['desa'] = $this->surat_model->get_data_desa();
-		$data['url'] = $detil_log['url_surat'];
-		$data['tanggal_sekarang'] = tgl_indo(date("Y m d"));
-
-		$data['input']['jabatan'] = $detil_log['jabatan'];
-		$data['input']['pamong'] = $detil_log['pamong_nama'];
-
-		$pc_detail_surat = json_decode($detil_log['detail'], TRUE);
-
-
-		foreach ($pc_detail_surat as $k=>$y) {
-			$data['input'][$k] = $y;
+		if ($id)
+		{
+			$get_id_penduduk = $this->db->select('nik')->where('id', $id)->get('tweb_penduduk')
+					->row()->nik;
+			$log_surat['id_pend'] = $id;
+			$nik = $get_id_penduduk;
 		}
 
-		// echo json_encode($data, JSON_PRETTY_PRINT);
+		$get_individu = $this->surat_model->get_data_surat($nik);
+
+		$data = $buat_surat;
+		$data['url'] = $url;
+		$data['data'] = $get_individu;
+		$data['desa'] = $buat_surat['config'];
+		$data['tanggal_sekarang'] = tgl_indo2(date('Y-m-d'));
+
+		$no_kk = $buat_surat['individu']['no_kk'];
+		$this->db->where('no_kk', $no_kk);
+		$this->db->select('nik_kepala');
+		$get_kepala_kk = $this->db->get('tweb_keluarga')->row()->nik_kepala;
+		$data['kepalakk'] = $this->surat_model->get_detil_penduduk($get_kepala_kk);
+
+		// j($buat_surat);
 		// exit;
 
 		$this->load->view("surat/print_surat", $data);
+
+
+		// $tampil = $this->db->get_where('log_surat',['id'=> $id])->row();
+		// $result = json_decode($tampil->detail);
+		// $nik= $result->pengikut;
+
+		// // print_r(json_decode($tampil->detail));
+
+		// $no_kk = $this->biodata_model->get_kk($nik);
+		// // echo $this->db->last_query();
+		// $data['jumlah'] = $this->biodata_model->countRow($no_kk);
+		// $data['penduduk'] = $this->biodata_model->get_individu($nik)->result_array();
+
+		// $data['data'] = $this->surat_model->get_data_pribadi($detil_log['id_pend']);
+
+
+		// $data['desa'] = $this->surat_model->get_data_desa();
+		// $data['url'] = $detil_log['url_surat'];
+		// $data['tanggal_sekarang'] = tgl_indo(date("Y m d"));
+
+		// $data['input']['jabatan'] = $detil_log['jabatan'];
+		// $data['input']['pamong'] = $detil_log['pamong_nama'];
+
+		// $pc_detail_surat = json_decode($detil_log['detail'], TRUE);
+
+
+		// foreach ($pc_detail_surat as $k=>$y) {
+		// 	$data['input'][$k] = $y;
+		// }
+
+		// // echo json_encode($data, JSON_PRETTY_PRINT);
+		// // exit;
+
+		// $this->load->view("surat/print_surat", $data);
 	}
 
 }

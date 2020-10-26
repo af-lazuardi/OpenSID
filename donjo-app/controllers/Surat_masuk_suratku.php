@@ -1,6 +1,6 @@
 <?php  if(!defined('BASEPATH')) exit('No direct script access allowed');
 
-class Surat_masuk_suratku extends CI_Controller {
+class Surat_masuk_suratku extends Admin_Controller {
 
 	public function __construct()
 	{

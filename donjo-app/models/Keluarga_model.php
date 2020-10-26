@@ -73,7 +73,7 @@
 	private function list_data_sql()
 	{
 		// kulonprogo
-		$sql = "FROM tweb_biodata_penduduk u WHERE 1 ";
+		$sql = "FROM tweb_penduduk u WHERE 1 ";
 		return $sql;
 
 		// opensid 20.08
@@ -123,19 +123,18 @@
 		//Ordering SQL
 		switch ($o)
 		{
-			case 1: $order_sql = ' ORDER BY u.no_kk'; break;
-			case 2: $order_sql = ' ORDER BY u.no_kk DESC'; break;
+			case 1: $order_sql = ' ORDER BY u.id_kk'; break;
+			case 2: $order_sql = ' ORDER BY u.id_kk DESC'; break;
 			case 3: $order_sql = ' ORDER BY kepala_kk'; break;
 			case 4: $order_sql = ' ORDER BY kepala_kk DESC'; break;
 			case 5: $order_sql = ' ORDER BY g.nama'; break;
 			case 6: $order_sql = ' ORDER BY g.nama DESC'; break;
-			default:$order_sql = ' ORDER BY u.no_kk DESC';
+			default:$order_sql = ' ORDER BY u.id_kk DESC';
 		}
 
 		//Paging SQL
 		$paging_sql = ' LIMIT ' .$offset. ',' .$limit;
-
-		$sql = "SELECT u.*,  (SELECT COUNT(nik) FROM tweb_biodata_penduduk WHERE no_kk = u.no_kk) AS jumlah_anggota ".$this->list_data_sql();
+		$sql = "SELECT u.*,  (SELECT COUNT(nik) FROM tweb_penduduk WHERE id_kk = u.id_kk) AS jumlah_anggota ".$this->list_data_sql();
 		//opensid 20.08
 		//$sql = "SELECT u.*, t.nama AS kepala_kk, t.nik, t.tag_id_card, t.sex, t.status_dasar, t.foto, t.id as id_pend, (SELECT COUNT(id) FROM tweb_penduduk WHERE id_kk = u.id AND status_dasar = 1) AS jumlah_anggota, c.dusun, c.rw, c.rt ";
 		//$sql .= $this->list_data_sql(); //DONE
@@ -351,7 +350,7 @@
 	public function delete($id = 0, $semua=false)
 	{
 		//kp bef v20.04
-		$this->db->where('no_kk',$id)->delete('tweb_biodata_penduduk');
+		$this->db->where('no_kk',$id)->delete('tweb_penduduk');
 		//kp bef v20.04 end
 
 		if (!$semua) $this->session->success = 1;
@@ -577,7 +576,7 @@
 	// $options['pilih'] untuk membatasi ke nik tertentu saja
 	public function list_anggota($id=0,$options=array('dengan_kk'=>true))
 	{
-		$sql = "select * from tweb_biodata_penduduk where no_kk=?";
+		$sql = "select * from tweb_penduduk where id_kk=?";
 		//19.02
 		/*
 		$sql = "SELECT u.*, u.sex as sex_id, u.status_kawin as status_kawin_id,

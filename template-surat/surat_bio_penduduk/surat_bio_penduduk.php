@@ -29,7 +29,7 @@
 								<?php include("donjo-app/views/surat/form/konfirmasi_pemohon.php"); ?>
 							<?php	endif; ?>
 							<?php include("donjo-app/views/surat/form/nomor_surat.php"); ?>
-							<div class="form-group">
+							<!-- <div class="form-group">
 								<label for="pengikut"  class="col-sm-3 control-label">Anggota Keluarga</label>
 								<div class="col-sm-8">
 									<div class="table-responsive">
@@ -62,7 +62,7 @@
 										</table>
 									</div>
 								</div>
-							</div>
+							</div> -->
 							<?php include("donjo-app/views/surat/form/_pamong.php"); ?>
 						</form>
 					</div>

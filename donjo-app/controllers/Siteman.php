@@ -40,6 +40,7 @@ class Siteman extends CI_Controller
 	{
 		$this->user_model->siteman();
 
+
 		if ($_SESSION['siteman'] != 1)
 		{
 			// Gagal otentifikasi

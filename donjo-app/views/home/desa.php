@@ -144,7 +144,7 @@
 								<div class="small-box bg-yellow">
 									<div class="inner">
 										<h3><?=$info_surat['results']['jml_belum_dibaca'];?></h3>
-										<p>Surat Masuk SuratKu <br>Belum Dibaca</p>
+										<p>Surat Masuk dari Aplikasi SuratKu <br>Belum Dibaca</p>
 									</div>
 									<div class="icon">
 										<i class="ion ion-email"></i>

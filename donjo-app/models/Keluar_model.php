@@ -315,14 +315,22 @@
 		}
 		if ($log_id)
 		{
+
 			$this->db->where('id', $log_id);
-			$this->db->update('log_surat', $data);
+			$queri = $this->db->update('log_surat', $data);
+			$status['s'] = "edit";
+			$status['lq'] = $this->db->last_query();
+			$status['stat'] = $queri;
 		}
 		else
 		{
-			$this->db->insert('log_surat',$data);
+			$queri = $this->db->insert('log_surat',$data);
+			$status['s'] = "add";
+			$status['lq'] = $this->db->last_query();
+			$status['stat'] = $queri;
 		}
 
+		return $status;
 	}
 
 	public function grafik()
